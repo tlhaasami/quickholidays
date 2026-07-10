@@ -24,7 +24,7 @@ export default function SchengenVisaPage() {
 
   return (
     <div className="bg-brand-cream text-slate-800 font-sans min-h-screen">
-      <main className="grow pt-20">
+      <main className="grow">
       {/* Hero Section */}
         <section className="relative w-full bg-brand-cream min-h-[90vh] flex items-center overflow-visible">
           {/* Backdrop Image */}
@@ -46,8 +46,8 @@ export default function SchengenVisaPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
               {/* Left Column: Text Content (Spans 6 columns) */}
-              <div className="lg:col-span-6 text-left z-10 md:translate-y-2 lg:translate-y-0">
-                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-gold block mb-4">
+              <div className="lg:col-span-6 text-left z-10 md:translate-y-6 lg:translate-y-12">
+                  <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-gold block mb-4">
                   Schengen Tourist Visa
                 </span>
                 <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-brand-navy leading-[1.05] mb-6">
