@@ -51,7 +51,7 @@ export default function Hero() {
           priority
         />
         {/* Soft bottom fade-to-cream gradient to blend image seamlessly into the cream background below */}
-        <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
       </div>
 
       {/* Content Container overlayed on background */}

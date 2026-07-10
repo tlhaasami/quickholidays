@@ -24,7 +24,7 @@ export default function SchengenVisaPage() {
 
   return (
     <div className="bg-brand-cream text-slate-800 font-sans min-h-screen">
-      <main className="flex-grow pt-20">
+      <main className="grow pt-20">
       {/* Hero Section */}
         <section className="relative w-full bg-brand-cream min-h-[90vh] flex items-center overflow-visible">
           {/* Backdrop Image */}
@@ -38,15 +38,15 @@ export default function SchengenVisaPage() {
               priority
             />
             {/* Soft bottom fade-to-cream gradient */}
-            <div className="absolute inset-x-0 bottom-0 h-32 sm:h-44 bg-gradient-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-x-0 bottom-0 h-32 sm:h-44 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
           </div>
 
           {/* Hero Content — same 12-col grid as homepage */}
-          <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-36 pb-32 sm:pt-44 sm:pb-40 lg:pt-48 lg:pb-44">
+          <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
               {/* Left Column: Text Content (Spans 6 columns) */}
-              <div className="lg:col-span-6 text-left z-10">
+              <div className="lg:col-span-6 text-left z-10 md:translate-y-2 lg:translate-y-0">
                 <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-gold block mb-4">
                   Schengen Tourist Visa
                 </span>

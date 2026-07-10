@@ -8,7 +8,7 @@ import ConsultationForm from "@/components/ConsultationForm";
 export default function Home() {
   return (
     <div className="bg-brand-cream text-slate-800 font-sans min-h-screen">
-      <main className="flex-grow">
+      <main className="grow">
         <Hero />
         <Services />
         <WhyChooseUs />
