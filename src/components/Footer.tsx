@@ -14,11 +14,11 @@ export default function Footer() {
 
           {/* Column 1: Brand Info (Horizontal layout on desktop: Logo left, description & socials right) */}
           <div className="md:col-span-7 flex flex-col sm:flex-row items-start gap-8 text-left">
-            <Link href="/" className="flex-shrink-0 inline-block">
+            <Link href="/" className="shrink-0 inline-block">
               <Image
                 src={logoBottom}
                 alt="Quick Holidays Footer Logo"
-                className="h-[120px] w-auto object-contain"
+                className="h-30 w-auto object-contain"
               />
             </Link>
             <div className="space-y-6">
@@ -105,7 +105,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
+                <Link href="/about-us" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
                   About Us
                 </Link>
               </li>
@@ -117,7 +117,7 @@ export default function Footer() {
             <h4 className="text-white text-base font-bold tracking-wide">Contact Us</h4>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
-                <div className="flex-shrink-0 bg-slate-800 p-2 rounded-lg text-brand-gold">
+                <div className="shrink-0 bg-slate-800 p-2 rounded-lg text-brand-gold">
                   {/* Envelope SVG */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -142,7 +142,7 @@ export default function Footer() {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <div className="flex-shrink-0 bg-slate-800 p-2 rounded-lg text-brand-gold">
+                <div className="shrink-0 bg-slate-800 p-2 rounded-lg text-brand-gold">
                   {/* Map Pin SVG */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

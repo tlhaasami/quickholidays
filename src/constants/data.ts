@@ -7,6 +7,7 @@ import aboutUsBg from "@/assets/backgrounds/about-us-page-bg.png";
 import schengenVisaBg from "@/assets/backgrounds/schengen-visa-bg.png";
 import whyChooseUsBg from "@/assets/backgrounds/why-choose-us-bg.png";
 import formBg from "@/assets/backgrounds/consulation-bg.png";
+import contactUsBg from "@/assets/backgrounds/contact-us-page-bg.png";
 import flagPlaceholder from "@/assets/flags/france-flag.png";
 
 // Flags
@@ -47,7 +48,7 @@ import destFinland from "@/assets/places-bg/finland-place-bg.png";
 import destFrance from "@/assets/places-bg/france-place-bg.png";
 import destGermany from "@/assets/places-bg/germany-place-bg.png";
 
-export { logoTop, logoBottom, heroBg, aboutUsBg, whyChooseUsBg, formBg };
+export { logoTop, logoBottom, heroBg, aboutUsBg, whyChooseUsBg, formBg, contactUsBg };
 
 export const STATS = [
   {

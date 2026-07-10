@@ -26,6 +26,7 @@ export default function Navbar() {
   const isHomeActive = pathname === "/";
   const isSchengenActive = pathname === "/schengen-visa";
   const isAboutActive = pathname === "/about-us";
+  const isContactActive = pathname === "/contact-us";
 
   const navRef = useRef<HTMLDivElement | null>(null);
   const [highlightStyle, setHighlightStyle] = useState<{ left: number; width: number; opacity: number }>({
@@ -58,12 +59,12 @@ export default function Navbar() {
   }, [pathname]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-md shadow-xl h-[var(--header-height)]">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-md shadow-xl h-(--header-height)">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
         <div className="flex items-center h-full justify-between gap-4">
           
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Link href="/" className="flex items-center">
               <Image
                 src={logoTop}
@@ -109,7 +110,7 @@ export default function Navbar() {
                 Schengen Visa
               </Link>
               <Link
-                href="/about"
+                href="/about-us"
                 className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
                   isAboutActive
                     ? "text-brand-gold font-semibold"
@@ -119,8 +120,12 @@ export default function Navbar() {
                 About Us
               </Link>
               <Link
-                href="/#consultation"
-                className="nav-link inline-flex items-center px-3 py-1.5 rounded-md text-slate-600 hover:text-brand-navy transition-colors duration-200"
+                href="/contact-us"
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
+                  isContactActive
+                    ? "text-brand-gold font-semibold"
+                    : "text-slate-600 hover:text-brand-navy"
+                }`}
               >
                 Contact Us
               </Link>
@@ -204,7 +209,7 @@ export default function Navbar() {
             Schengen Visa
           </Link>
           <Link
-            href="/about"
+            href="/about-us"
             onClick={() => setIsOpen(false)}
             className={`block rounded-md px-3 py-2 text-base ${
               isAboutActive
@@ -215,9 +220,13 @@ export default function Navbar() {
             About Us
           </Link>
           <Link
-            href="/#consultation"
+            href="/contact-us"
             onClick={() => setIsOpen(false)}
-            className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            className={`block rounded-md px-3 py-2 text-base ${
+              isContactActive
+                ? "font-semibold text-brand-gold bg-brand-cream/50"
+                : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            }`}
           >
             Contact Us
           </Link>

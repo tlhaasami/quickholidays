@@ -1,10 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { formBg } from "@/constants/data";
 
-export default function ConsultationForm() {
+type ConsultationFormProps = {
+  backgroundImage?: StaticImageData;
+  title?: string;
+  subtitle?: string;
+  sectionId?: string;
+  showBackground?: boolean;
+  showSectionWrapper?: boolean;
+  wrapperClassName?: string;
+};
+
+export default function ConsultationForm({
+  backgroundImage,
+  title = "Need a Consultation?",
+  subtitle = "Our team is ready to assist you at every step of your Schengen visa journey.",
+  sectionId = "consultation",
+  showBackground = true,
+  showSectionWrapper = true,
+  wrapperClassName = "",
+}: ConsultationFormProps) {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -51,19 +69,23 @@ export default function ConsultationForm() {
     }, 1500);
   };
 
+  const background = backgroundImage ?? formBg;
+
   return (
-    <section id="consultation" className="relative w-full overflow-hidden py-20 sm:py-28 border-t border-brand-navy/5 bg-[#FAF9F5]">
+    <section id={sectionId} className="relative w-full overflow-hidden py-20 sm:py-28 border-t border-brand-navy/5 bg-brand-cream">
       {/* Full background sketch image */}
-      <div className="absolute inset-0 z-0 select-none">
-        <Image
-          src={formBg}
-          alt="Schengen Consultation Sketch Backdrop"
-          fill
-          sizes="100vw"
-          className="object-cover object-right-bottom select-none"
-          priority
-        />
-      </div>
+      {showBackground && (
+        <div className="absolute inset-0 z-0 select-none">
+          <Image
+            src={background}
+            alt="Schengen Consultation Sketch Backdrop"
+            fill
+            sizes="100vw"
+            className="object-cover object-bottom-right select-none"
+            priority
+          />
+        </div>
+      )}
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl text-left mb-12 sm:mb-16">

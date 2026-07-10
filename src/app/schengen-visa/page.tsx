@@ -62,7 +62,7 @@ export default function SchengenVisaPage() {
                 <div className="space-y-4 max-w-lg">
                   {checklist.map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3.5">
-                      <div className="mt-1.5 flex-shrink-0 w-2.5 h-2.5 rounded-full bg-brand-gold" />
+                      <div className="mt-1.5 shrink-0 w-2.5 h-2.5 rounded-full bg-brand-gold" />
                       <div>
                         <h4 className="text-sm font-bold text-brand-navy">{item.title}</h4>
                         <p className="text-xs text-slate-500 font-medium mt-0.5">{item.desc}</p>
@@ -102,7 +102,7 @@ export default function SchengenVisaPage() {
             {SCHENGEN_DESTINATIONS.map((dest, idx) => (
               <div
                 key={idx}
-                className="flex flex-col items-center justify-between bg-white rounded-[24px] p-8 border-[1.5px] border-slate-100 shadow-[0_10px_30px_rgba(15,33,72,0.06)] text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(15,33,72,0.12)] hover:border-brand-gold group"
+                className="flex flex-col items-center justify-between bg-white rounded-3xl p-8 border-[1.5px] border-slate-100 shadow-[0_10px_30px_rgba(15,33,72,0.06)] text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(15,33,72,0.12)] hover:border-brand-gold group"
               >
                 {/* Flag Area */}
                 <div className="relative w-32 h-20 mb-6 overflow-hidden rounded-xl border border-slate-100 shadow-sm flex items-center justify-center bg-slate-50">
