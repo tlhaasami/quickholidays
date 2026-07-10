@@ -52,14 +52,15 @@ export default function ConsultationForm() {
   };
 
   return (
-    <section id="consultation" className="relative w-full overflow-hidden bg-[#FAF9F5] py-20 sm:py-28 border-t border-brand-navy/5">
-      {/* Background Graphic overlay (Eiffel tower sketch on the right) */}
-      <div className="absolute right-0 bottom-0 w-full md:w-3/5 h-full max-h-[600px] pointer-events-none z-0 select-none opacity-40 md:opacity-75">
+    <section id="consultation" className="relative w-full overflow-hidden py-20 sm:py-28 border-t border-brand-navy/5 bg-[#FAF9F5]">
+      {/* Full background sketch image */}
+      <div className="absolute inset-0 z-0 select-none">
         <Image
           src={formBg}
-          alt="Eiffel Tower Sketch Backdrop"
+          alt="Schengen Consultation Sketch Backdrop"
           fill
-          className="object-contain object-right-bottom"
+          className="object-cover object-right-bottom select-none"
+          priority
         />
       </div>
 

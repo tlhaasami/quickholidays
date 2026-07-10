@@ -4,7 +4,7 @@ import { DESTINATIONS } from "@/constants/data";
 
 export default function Destinations() {
   return (
-    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-20 sm:pb-28">
       {/* Header and CTA */}
       <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12 sm:mb-16">
         <div className="text-left">
@@ -30,22 +30,22 @@ export default function Destinations() {
         {DESTINATIONS.map((dest, idx) => (
           <div
             key={idx}
-            className="relative aspect-[4/5] sm:aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-[0_4px_25px_-4px_rgba(15,33,72,0.05)] group cursor-pointer border border-brand-navy/5"
+            className="relative aspect-square w-full rounded-[24px] overflow-hidden shadow-md group cursor-pointer border border-brand-navy/5 transition-all duration-350 hover:-translate-y-2 hover:shadow-xl"
           >
             {/* Destination Image */}
             <Image
               src={dest.image}
               alt={`${dest.name} Travel Destination`}
               fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
             
             {/* Visual gradient overlay to ensure text contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/80 via-brand-navy/20 to-transparent group-hover:from-brand-navy/90 group-hover:via-brand-navy/30 transition-all duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/80 via-brand-navy/20 to-transparent group-hover:from-brand-navy/90 group-hover:via-brand-navy/35 transition-all duration-300" />
 
             {/* Destination Name text overlay at bottom-left */}
             <div className="absolute bottom-6 left-6 right-6 text-left">
-              <h3 className="text-xl font-bold text-white tracking-wide drop-shadow-sm group-hover:translate-x-1 transition-transform duration-300">
+              <h3 className="text-xl font-bold text-white tracking-wide drop-shadow-sm group-hover:translate-x-1.5 transition-transform duration-300">
                 {dest.name}
               </h3>
             </div>

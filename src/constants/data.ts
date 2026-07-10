@@ -14,7 +14,7 @@ import statIcon3 from "@/assets/visa-success-rate.png";        // passport cover
 // Icons for Services
 import serviceIcon1 from "@/assets/Schengen Tourest VisaConsultation.png";
 import serviceIcon2 from "@/assets/application-preparation.png";
-import serviceIcon3 from "@/assets/spain-flag.png"; // briefcase/globe for Appointment Assistance
+import serviceIcon3 from "@/assets/appointment-assistance.png"; // briefcase/globe for Appointment Assistance
 import serviceIcon4 from "@/assets/Documentaiton Review.png";
 import serviceIcon5 from "@/assets/onging-support.png"; // customer support headset
 

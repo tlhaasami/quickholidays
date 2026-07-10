@@ -16,67 +16,66 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="bg-brand-cream/30 py-20 sm:py-28 overflow-hidden">
+    <section className="bg-brand-cream/20 pt-20 sm:pt-28 pb-6 sm:pb-8 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Testimonials Header with Navigation Arrows */}
+        {/* Testimonials Header (Without slider buttons) */}
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12 sm:mb-16">
           <div className="text-left">
             <span className="text-sm font-bold tracking-widest text-brand-gold uppercase block mb-3">
               What Our Clients Say
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-navy leading-tight">
-              Real Stories,
-              <br />
-              Real Satisfaction
+              Real Stories, Real Satisfaction
             </h2>
-          </div>
-          
-          {/* Navigation Controls (Slider Buttons) */}
-          <div className="flex gap-4">
-            <button
-              onClick={handlePrev}
-              className="flex items-center justify-center w-12 h-12 rounded-full border border-brand-gold bg-transparent text-brand-gold hover:bg-brand-gold hover:text-white active:scale-95 transition-all duration-200 shadow-sm"
-              aria-label="Previous testimonial"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </button>
-            <button
-              onClick={handleNext}
-              className="flex items-center justify-center w-12 h-12 rounded-full border border-brand-gold bg-transparent text-brand-gold hover:bg-brand-gold hover:text-white active:scale-95 transition-all duration-200 shadow-sm"
-              aria-label="Next testimonial"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-            </button>
           </div>
         </div>
 
-        {/* Testimonials List / Slider Grid */}
-        <div className="relative">
+        {/* Testimonials Container (With floating golden slider buttons) */}
+        <div className="relative px-4 sm:px-12">
+          
+          {/* Floating Gold Left Button (Desktop only) */}
+          <button
+            onClick={handlePrev}
+            className="hidden md:flex absolute left-0 lg:left-[-12px] top-1/2 -translate-y-1/2 z-20 items-center justify-center w-12 h-12 rounded-full bg-brand-gold text-white hover:bg-brand-gold/90 active:scale-95 transition-all duration-200 shadow-md shadow-brand-gold/25"
+            aria-label="Previous testimonial"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={3}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          {/* Floating Gold Right Button (Desktop only) */}
+          <button
+            onClick={handleNext}
+            className="hidden md:flex absolute right-0 lg:right-[-12px] top-1/2 -translate-y-1/2 z-20 items-center justify-center w-12 h-12 rounded-full bg-brand-gold text-white hover:bg-brand-gold/90 active:scale-95 transition-all duration-200 shadow-md shadow-brand-gold/25"
+            aria-label="Next testimonial"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={3}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+
           {/* Desktop Layout (Show all 3 in a grid) */}
           <div className="hidden md:grid md:grid-cols-3 gap-8">
             {TESTIMONIALS.map((t, idx) => (
               <div
                 key={idx}
-                className="flex flex-col bg-white/70 hover:bg-white rounded-2xl p-8 border border-brand-navy/5 shadow-[0_4px_25px_-4px_rgba(15,33,72,0.04)] transition-all duration-300 hover:shadow-lg hover:border-brand-gold/15"
+                className="flex flex-col bg-[#F9F8F6] rounded-[24px] p-8 border-[1.5px] border-slate-100 shadow-[0_4px_20px_rgba(15,33,72,0.03)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_30px_rgba(15,33,72,0.08)] hover:border-brand-gold"
               >
                 {/* 5 Stars Rating */}
                 <div className="flex gap-1 mb-6 text-brand-gold">
@@ -98,12 +97,12 @@ export default function Testimonials() {
                 </div>
 
                 {/* Quote Text */}
-                <p className="text-slate-600 text-sm leading-relaxed italic mb-8 flex-grow">
-                  &ldquo;{t.quote}&rdquo;
+                <p className="text-slate-600 text-[14px] leading-relaxed mb-8 flex-grow">
+                  {t.quote}
                 </p>
 
-                {/* Author Info */}
-                <div className="flex items-center gap-4 pt-4 border-t border-brand-navy/5">
+                {/* Author Info - Without border line */}
+                <div className="flex items-center gap-4 pt-2">
                   <div className="relative w-12 h-12 rounded-full overflow-hidden border border-brand-navy/5 bg-slate-100 flex-shrink-0">
                     <Image
                       src={t.avatar}
@@ -123,7 +122,7 @@ export default function Testimonials() {
 
           {/* Mobile Slider View (Show 1 card at a time with touch/button support) */}
           <div className="block md:hidden">
-            <div className="flex flex-col bg-white rounded-2xl p-6 border border-brand-navy/5 shadow-md min-h-[300px] justify-between animate-fadeIn">
+            <div className="flex flex-col bg-[#F9F8F6] rounded-[24px] p-6 border-[1.5px] border-slate-100 shadow-[0_4px_20px_rgba(15,33,72,0.03)] min-h-[300px] justify-between animate-fadeIn transition-all duration-300 hover:border-brand-gold">
               <div>
                 {/* 5 Stars */}
                 <div className="flex gap-1 mb-5 text-brand-gold">
@@ -145,13 +144,13 @@ export default function Testimonials() {
                 </div>
 
                 {/* Quote Text */}
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed italic mb-8">
-                  &ldquo;{TESTIMONIALS[activeIndex].quote}&rdquo;
+                <p className="text-slate-600 text-sm leading-relaxed mb-8">
+                  {TESTIMONIALS[activeIndex].quote}
                 </p>
               </div>
 
-              {/* Author Info */}
-              <div className="flex items-center gap-4 pt-4 border-t border-brand-navy/5">
+              {/* Author Info - Without border line */}
+              <div className="flex items-center gap-4 pt-2">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden border border-brand-navy/5 bg-slate-100 flex-shrink-0">
                   <Image
                     src={TESTIMONIALS[activeIndex].avatar}

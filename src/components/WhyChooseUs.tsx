@@ -3,19 +3,29 @@ import { whyChooseUsBg, WHY_CHOOSE_US_POINTS } from "@/constants/data";
 
 export default function WhyChooseUs() {
   return (
-    <section id="about" className="relative bg-brand-dark text-white overflow-hidden py-20 sm:py-28">
-      {/* Visual background details */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(204,163,82,0.1),transparent_50%)]" />
+    <section id="about" className="relative text-white overflow-hidden py-24 sm:py-32">
+      {/* Full-width Background Image */}
+      <div className="absolute inset-0 z-0 select-none">
+        <Image
+          src={whyChooseUsBg}
+          alt="Why Choose Quick Holidays Background - Passport and Clipboard"
+          fill
+          className="object-cover select-none"
+          priority
+        />
+        {/* Subtle dark overlay for mobile readability */}
+        <div className="absolute inset-0 bg-brand-navy/30 lg:bg-transparent" />
+      </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Content Column */}
-          <div className="lg:col-span-5 text-left">
-            <span className="text-sm font-bold tracking-widest text-brand-gold uppercase block mb-3 animate-pulse">
+          {/* Left Column: Text and Points Checklist (Spans 6 columns) */}
+          <div className="lg:col-span-6 text-left">
+            <span className="text-sm font-bold tracking-widest text-brand-gold uppercase block mb-3">
               Why Choose Us
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-8">
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-[46px] font-bold text-white leading-tight mb-8">
               A Team You
               <br />
               Can Trust
@@ -28,13 +38,13 @@ export default function WhyChooseUs() {
                   key={idx}
                   className="flex items-center gap-4 group transition-all duration-300 hover:translate-x-1"
                 >
-                  {/* Gold Checked Icon */}
-                  <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-brand-gold/20 border border-brand-gold/30 text-brand-gold group-hover:bg-brand-gold group-hover:text-white transition-all duration-300">
+                  {/* Solid Gold Circle Checkmark Icon with Navy check */}
+                  <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-brand-gold text-brand-navy">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      strokeWidth={3}
+                      strokeWidth={3.5}
                       stroke="currentColor"
                       className="w-3.5 h-3.5"
                     >
@@ -42,7 +52,7 @@ export default function WhyChooseUs() {
                     </svg>
                   </div>
                   {/* Point Text */}
-                  <span className="text-slate-200 text-sm sm:text-base font-medium">
+                  <span className="text-white text-base sm:text-[17px] font-medium leading-relaxed">
                     {point}
                   </span>
                 </li>
@@ -50,17 +60,8 @@ export default function WhyChooseUs() {
             </ul>
           </div>
 
-          {/* Right Image Column */}
-          <div className="lg:col-span-7 w-full h-[320px] sm:h-[450px] lg:h-[500px] relative rounded-3xl overflow-hidden shadow-2xl shadow-black/40 border border-white/10 group">
-            <Image
-              src={whyChooseUsBg}
-              alt="Why Choose Quick Holidays - Consultation Form and Passport"
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            {/* Dark glass overlay effect on hover */}
-            <div className="absolute inset-0 bg-brand-dark/10 group-hover:bg-brand-dark/0 transition-all duration-300" />
-          </div>
+          {/* Right Column: Empty on Desktop to show the background image passport/globe */}
+          <div className="hidden lg:block lg:col-span-6" />
 
         </div>
       </div>
