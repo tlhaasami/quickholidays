@@ -1,33 +1,34 @@
-import logoTop from "@/assets/image 1.png";
-import logoBottom from "@/assets/Quick Holidays Logo-Bottom.png";
+import logoTop from "@/assets/quick-holidays logo.png";
+import logoBottom from "@/assets/quick-holidays-logo-bottom.png";
 
 // Backgrounds
-import heroBg from "@/assets/ChatGPT Image Jul 1, 2026, 11_12_18 PM 1 (1).png";
-import whyChooseUsBg from "@/assets/ChatGPT Image Jul 1, 2026, 11_12_18 PM 1.png";
-import formBg from "@/assets/ChatGPT Image Jul 1, 2026, 01_29_45 AM 1.png";
+import heroBg from "@/assets/hero-section-bg.png";
+import whyChooseUsBg from "@/assets/why-choose-us-bg.png";
+import formBg from "@/assets/consulation-bg.png";
 
-// Icons
-import statIcon1 from "@/assets/image 38 (4).png"; // badge/handshake/experience
-import statIcon2 from "@/assets/image 38 (8).png"; // user/clients
-import statIcon3 from "@/assets/image 38 (7).png"; // success rate
+// Icons for Stats
+import statIcon1 from "@/assets/years-of-expereince.png";     // star badge icon
+import statIcon2 from "@/assets/happy-clients.png";     // person with star icon
+import statIcon3 from "@/assets/visa-success-rate.png";        // passport cover icon
 
-import serviceIcon1 from "@/assets/image 38.png";
-import serviceIcon2 from "@/assets/image 38 (1).png";
-import serviceIcon3 from "@/assets/image 38 (2).png";
-import serviceIcon4 from "@/assets/image 38 (3).png";
-import serviceIcon5 from "@/assets/image 38 (6).png";
+// Icons for Services
+import serviceIcon1 from "@/assets/Schengen Tourest VisaConsultation.png";
+import serviceIcon2 from "@/assets/application-preparation.png";
+import serviceIcon3 from "@/assets/spain-flag.png"; // briefcase/globe for Appointment Assistance
+import serviceIcon4 from "@/assets/Documentaiton Review.png";
+import serviceIcon5 from "@/assets/onging-support.png"; // customer support headset
 
 // Testimonial Avatars
-import avatarJames from "@/assets/Ellipse 3.png";
-import avatarSarah from "@/assets/Ellipse 1.png";
-import avatarDaniel from "@/assets/image 9.png";
+import avatarSarah from "@/assets/review-profile-1.png"; // woman portrait
+import avatarJames from "@/assets/review-profile-2.png"; // man portrait (James)
+import avatarRayan from "@/assets/review-profile-3.png"; // man portrait (Daniel/James)
 
 // Destinations
-import destAustria from "@/assets/Rectangle 10.png";
-import destEstonia from "@/assets/Rectangle 11.png";
-import destFinland from "@/assets/ChatGPT Image Jun 30, 2026, 06_56_48 PM 1.png";
-import destFrance from "@/assets/Rectangle 13.png";
-import destGermany from "@/assets/Rectangle 14.png";
+import destAustria from "@/assets/Austria-place-bg.png";
+import destEstonia from "@/assets/Estonia.png";
+import destFinland from "@/assets/Finland.png";
+import destFrance from "@/assets/France.png";
+import destGermany from "@/assets/Germany.png";
 
 export { logoTop, logoBottom, heroBg, whyChooseUsBg, formBg };
 
@@ -53,27 +54,27 @@ export const SERVICES = [
   {
     title: "Schengen Tourist Visa Consultation",
     description: "Expert guidance tailored specifically for Schengen tourist visa applications.",
-    icon: serviceIcon3,
+    icon: serviceIcon1,
   },
   {
     title: "Application Preparation",
     description: "Preparing complete and accurate applications to reduce delays and improve accuracy.",
-    icon: serviceIcon4,
+    icon: serviceIcon2,
   },
   {
     title: "Appointment Assistance",
     description: "Helping clients secure and manage Schengen visa appointments with ease.",
-    icon: serviceIcon2,
+    icon: serviceIcon3,
   },
   {
     title: "Documentation Review",
     description: "Carefully reviewing supporting documents before submission.",
-    icon: serviceIcon5,
+    icon: serviceIcon4,
   },
   {
     title: "Ongoing Support",
     description: "Dedicated assistance throughout every stage of your application.",
-    icon: serviceIcon1,
+    icon: serviceIcon5,
   },
 ];
 
@@ -104,7 +105,7 @@ export const TESTIMONIALS = [
     quote: "Exceptional service and outstanding attention to detail. They reviewed every document thoroughly and answered all of my questions promptly. I couldn't have asked for a better experience.",
     name: "Daniel Carter",
     location: "Birmingham, United Kingdom",
-    avatar: avatarDaniel,
+    avatar: avatarRayan,
     rating: 5,
   },
 ];
