@@ -26,8 +26,20 @@ body {
   padding-top: var(--header-height);
 }
 
-/* Smooth color transitions for nav links */
 .nav-link, .nav-link * {
   transition: color 220ms ease, background-color 220ms ease;
+}
+
+/* Prevent browser autofill from forcing white/light backgrounds in dark theme inputs */
+.dark-autofill input:-webkit-autofill,
+.dark-autofill input:-webkit-autofill:hover,
+.dark-autofill input:-webkit-autofill:focus,
+.dark-autofill textarea:-webkit-autofill,
+.dark-autofill textarea:-webkit-autofill:hover,
+.dark-autofill textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #182C54 inset !important;
+  box-shadow: 0 0 0px 1000px #182C54 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 

@@ -96,18 +96,6 @@ export default function ContactUsPage() {
 
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div>
-                        <label htmlFor="ukStatus" className="block text-sm font-semibold text-brand-navy mb-2">
-                          Status in UK
-                        </label>
-                        <input
-                          id="ukStatus"
-                          name="ukStatus"
-                          type="text"
-                          placeholder="Status in UK"
-                          className="w-full rounded-xl border border-brand-gold/30 bg-brand-cream/70 px-4 py-3 text-sm text-slate-800 placeholder-slate-500 focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold/40 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
                         <label htmlFor="city" className="block text-sm font-semibold text-brand-navy mb-2">
                           City
                         </label>
@@ -119,9 +107,6 @@ export default function ContactUsPage() {
                           className="w-full rounded-xl border border-brand-gold/30 bg-brand-cream/70 px-4 py-3 text-sm text-slate-800 placeholder-slate-500 focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold/40 transition-all duration-200"
                         />
                       </div>
-                    </div>
-
-                    <div className="grid gap-6 sm:grid-cols-2">
                       <div>
                         <label htmlFor="pastVisas" className="block text-sm font-semibold text-brand-navy mb-2">
                           Schengen Visas issued during the past three years
@@ -131,18 +116,6 @@ export default function ContactUsPage() {
                           name="pastVisas"
                           type="text"
                           placeholder="Past visas"
-                          className="w-full rounded-xl border border-brand-gold/30 bg-brand-cream/70 px-4 py-3 text-sm text-slate-800 placeholder-slate-500 focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold/40 transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="bestTime" className="block text-sm font-semibold text-brand-navy mb-2">
-                          What is the best time to call you?
-                        </label>
-                        <input
-                          id="bestTime"
-                          name="bestTime"
-                          type="text"
-                          placeholder="Best time to call"
                           className="w-full rounded-xl border border-brand-gold/30 bg-brand-cream/70 px-4 py-3 text-sm text-slate-800 placeholder-slate-500 focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold/40 transition-all duration-200"
                         />
                       </div>
@@ -156,8 +129,13 @@ export default function ContactUsPage() {
                           { id: "contact-email", label: "By Email" },
                           { id: "contact-whatsapp", label: "By Whatsapp" },
                         ].map((option) => (
-                          <label key={option.id} htmlFor={option.id} className="inline-flex items-center gap-3 rounded-full border border-brand-gold/30 bg-brand-cream/80 px-4 py-3 text-sm font-medium text-slate-700 hover:border-brand-gold hover:text-brand-navy transition-all duration-200">
-                            <input id={option.id} name="responsePreferred" type="radio" className="h-4 w-4 accent-brand-gold" />
+                          <label key={option.id} htmlFor={option.id} className="inline-flex items-center gap-3 rounded-full border border-brand-gold/30 bg-brand-cream/80 px-4 py-3 text-sm font-medium text-slate-700 hover:border-brand-gold hover:text-brand-navy transition-all duration-200 cursor-pointer group">
+                            <input
+                              id={option.id}
+                              name="responsePreferred"
+                              type="radio"
+                              className="h-4 w-4 appearance-none rounded-full border border-brand-gold/60 bg-white checked:bg-brand-gold checked:border-brand-gold checked:ring-2 checked:ring-white checked:ring-inset focus:outline-none transition-all duration-200 cursor-pointer"
+                            />
                             {option.label}
                           </label>
                         ))}

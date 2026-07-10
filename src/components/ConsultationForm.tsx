@@ -28,10 +28,8 @@ export default function ConsultationForm({
     email: "",
     phone: "",
     nationality: "",
-    ukStatus: "",
     city: "",
     pastVisas: "",
-    bestTime: "",
     preferredContact: "call",
   });
 
@@ -60,10 +58,8 @@ export default function ConsultationForm({
         email: "",
         phone: "",
         nationality: "",
-        ukStatus: "",
         city: "",
         pastVisas: "",
-        bestTime: "",
         preferredContact: "call",
       });
     }, 1500);
@@ -165,22 +161,6 @@ export default function ConsultationForm({
                   </div>
 
                   <div>
-                    <label htmlFor="ukStatus" className="block text-sm font-bold text-brand-navy mb-2">
-                      Status in UK
-                    </label>
-                    <input
-                      type="text"
-                      id="ukStatus"
-                      name="ukStatus"
-                      required
-                      value={formData.ukStatus}
-                      onChange={handleChange}
-                      placeholder="e.g. BRP, Citizen, Student Visa"
-                      className="w-full rounded-xl border border-brand-navy/10 bg-white/60 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 backdrop-blur-sm focus:border-brand-gold focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-gold transition-all duration-200"
-                    />
-                  </div>
-
-                  <div>
                     <label htmlFor="pastVisas" className="block text-sm font-bold text-brand-navy mb-2">
                       Schengen Visas issued during the past three years
                     </label>
@@ -242,22 +222,6 @@ export default function ConsultationForm({
                       value={formData.city}
                       onChange={handleChange}
                       placeholder="e.g. London"
-                      className="w-full rounded-xl border border-brand-navy/10 bg-white/60 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 backdrop-blur-sm focus:border-brand-gold focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-gold transition-all duration-200"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="bestTime" className="block text-sm font-bold text-brand-navy mb-2">
-                      What is the best time to call you?
-                    </label>
-                    <input
-                      type="text"
-                      id="bestTime"
-                      name="bestTime"
-                      required
-                      value={formData.bestTime}
-                      onChange={handleChange}
-                      placeholder="e.g. After 2:00 PM, Weekends"
                       className="w-full rounded-xl border border-brand-navy/10 bg-white/60 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 backdrop-blur-sm focus:border-brand-gold focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-gold transition-all duration-200"
                     />
                   </div>
