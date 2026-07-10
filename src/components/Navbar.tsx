@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,15 +25,45 @@ export default function Navbar() {
 
   const isHomeActive = pathname === "/";
   const isSchengenActive = pathname === "/schengen-visa";
-  const isAboutActive = pathname === "/about";
+  const isAboutActive = pathname === "/about-us";
+
+  const navRef = useRef<HTMLDivElement | null>(null);
+  const [highlightStyle, setHighlightStyle] = useState<{ left: number; width: number; opacity: number }>({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
+
+  useEffect(() => {
+    const updateHighlight = () => {
+      const nav = navRef.current;
+      if (!nav) return;
+      const selector = `a[href="${pathname}"]`;
+      const activeLink = nav.querySelector(selector) as HTMLElement | null;
+      if (!activeLink) {
+        setHighlightStyle((s) => ({ ...s, opacity: 0 }));
+        return;
+      }
+      const navRect = nav.getBoundingClientRect();
+      const linkRect = activeLink.getBoundingClientRect();
+      const left = linkRect.left - navRect.left + nav.scrollLeft - 6; // small offset to include padding
+      const width = linkRect.width + 12; // extend pill beyond text a bit
+      setHighlightStyle({ left: Math.max(4, left - 8), width: width + 16, opacity: 1 });
+    };
+
+    // update on mount, route change, and resize
+    updateHighlight();
+    window.addEventListener("resize", updateHighlight);
+    return () => window.removeEventListener("resize", updateHighlight);
+  }, [pathname]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-md shadow-xl py-3">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-md shadow-xl h-[var(--header-height)]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex items-center h-full justify-between gap-4">
           
           {/* Logo */}
-          <div className="shrink-0">
+          <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <Image
                 src={logoTop}
@@ -45,11 +75,22 @@ export default function Navbar() {
           </div>
 
           {/* Center Navigation Links (Capsule shape on Desktop) */}
-          <nav className="hidden md:flex items-center justify-center bg-white shadow-[0_4px_20px_-4px_rgba(15,33,72,0.08)] border border-brand-gold rounded-full px-8 py-3">
-            <div className="flex items-center space-x-8 text-sm font-medium">
+          <nav ref={navRef} className="hidden md:flex items-center justify-center rounded-full px-8 py-3 relative">
+            {/* Moving highlight pill (desktop only) */}
+            <span
+              aria-hidden
+              className="absolute top-1/2 -translate-y-1/2 rounded-full bg-white border border-brand-gold shadow-md pointer-events-none transition-all duration-300"
+              style={{
+                left: highlightStyle.left,
+                width: highlightStyle.width,
+                opacity: highlightStyle.opacity,
+                height: `calc(100% - 10px)`,
+              }}
+            />
+            <div className="flex items-center space-x-10 text-sm font-medium relative z-10">
               <Link
                 href="/"
-                className={`transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
                   isHomeActive
                     ? "text-brand-gold font-semibold"
                     : "text-slate-600 hover:text-brand-navy"
@@ -59,7 +100,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/schengen-visa"
-                className={`transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
                   isSchengenActive
                     ? "text-brand-gold font-semibold"
                     : "text-slate-600 hover:text-brand-navy"
@@ -69,7 +110,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/about"
-                className={`transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
                   isAboutActive
                     ? "text-brand-gold font-semibold"
                     : "text-slate-600 hover:text-brand-navy"
@@ -79,7 +120,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/#consultation"
-                className="text-slate-600 hover:text-brand-navy transition-colors duration-200"
+                className="nav-link inline-flex items-center px-3 py-1.5 rounded-md text-slate-600 hover:text-brand-navy transition-colors duration-200"
               >
                 Contact Us
               </Link>

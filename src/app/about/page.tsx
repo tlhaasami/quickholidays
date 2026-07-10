@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { aboutUsBg } from "@/constants/data";
+import ourPurposeIcon from "@/assets/icons/our-purpose.png";
 
 export default function AboutPage() {
   return (
@@ -41,11 +42,33 @@ export default function AboutPage() {
         </section>
 
         <section className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="text-left">
-            <h2 className="text-2xl font-bold text-brand-navy mb-4">Our Purpose</h2>
-            <p className="text-slate-600 max-w-3xl">
-              We remove uncertainty from the Schengen visa application process. By providing expert guidance, transparent communication, and approval-focused preparation, we help clients move forward with confidence while we take care of every detail.
-            </p>
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+            {/* Icon + Title */}
+            <div className="flex items-center gap-6 md:gap-8 md:flex-1">
+              <div className="shrink-0">
+                <div className="w-20 h-20 rounded-full bg-brand-navy flex items-center justify-center border-4 border-brand-gold">
+                  <Image src={ourPurposeIcon} alt="purpose icon" width={40} height={40} className="w-10 h-10 object-contain" />
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-gold mb-2">OUR PURPOSE</div>
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-navy leading-tight">
+                  We Handle the Process.
+                  <br />
+                  You Enjoy Europe.
+                </h3>
+              </div>
+            </div>
+
+            {/* Divider + Description */}
+            <div className="md:flex-1 w-full md:w-auto md:pl-8">
+              <div className="md:border-l md:border-brand-gold/30 md:pl-8 text-slate-600">
+                <p className="mb-0">
+                  Our purpose is to remove uncertainty from the Schengen visa application process. By providing expert guidance, transparent communication, and approval-focused preparation, we help clients move forward with confidence while we take care of every detail.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
       </main>

@@ -80,7 +80,7 @@ export default function Hero() {
 
       {/* Floating Statistics Banner (Shifted downward to sit 30% on image and 70% below, overflow-visible) */}
       <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-[65%] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="bg-brand-gold rounded-[24px] sm:rounded-full py-6 px-6 sm:px-12 shadow-lg shadow-brand-gold/25 border border-white/20">
+        <div className="bg-brand-gold rounded-3xl sm:rounded-full py-6 px-6 sm:px-12 shadow-lg shadow-brand-gold/25 border border-white/20">
           <div className="grid grid-cols-1 gap-6 divide-y divide-brand-navy/10 sm:grid-cols-3 sm:gap-0 sm:divide-y-0 sm:divide-x">
             {STATS.map((stat, idx) => (
               <div
@@ -88,7 +88,7 @@ export default function Hero() {
                 className="flex items-center justify-start sm:justify-center gap-5 py-2 sm:py-0 sm:px-6 transition-all duration-300 hover:scale-[1.03]"
               >
                 {/* Stat Icon - Large size, directly on the gold banner background */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <Image
                     src={stat.icon}
                     alt={stat.label}

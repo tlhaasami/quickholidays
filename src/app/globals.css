@@ -16,3 +16,18 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Header sizing variable so all pages have consistent spacing under fixed header */
+:root {
+  --header-height: 60px;
+}
+
+/* Reserve space for fixed header so page content aligns consistently */
+body {
+  padding-top: var(--header-height);
+}
+
+/* Smooth color transitions for nav links */
+.nav-link, .nav-link * {
+  transition: color 220ms ease, background-color 220ms ease;
+}
+
