@@ -54,19 +54,19 @@ export default function Navbar() {
                 Home
               </Link>
               <Link
-                href="#services"
+                href="/schengen-visa"
                 className="hover:text-brand-navy transition-colors duration-200"
               >
                 Schengen Visa
               </Link>
               <Link
-                href="#about"
+                href="/about"
                 className="hover:text-brand-navy transition-colors duration-200"
               >
                 About Us
               </Link>
               <Link
-                href="#contact"
+                href="/#consultation"
                 className="hover:text-brand-navy transition-colors duration-200"
               >
                 Contact Us
@@ -136,21 +136,21 @@ export default function Navbar() {
             Home
           </Link>
           <Link
-            href="#services"
+            href="/schengen-visa"
             onClick={() => setIsOpen(false)}
             className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
           >
             Schengen Visa
           </Link>
           <Link
-            href="#about"
+            href="/about"
             onClick={() => setIsOpen(false)}
             className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
           >
             About Us
           </Link>
           <Link
-            href="#contact"
+            href="/#consultation"
             onClick={() => setIsOpen(false)}
             className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
           >

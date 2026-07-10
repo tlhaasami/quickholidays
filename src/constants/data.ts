@@ -1,34 +1,50 @@
-import logoTop from "@/assets/quick-holidays logo.png";
-import logoBottom from "@/assets/quick-holidays-logo-bottom.png";
+import logoTop from "@/assets/logos/quick-holidays-logo.png";
+import logoBottom from "@/assets/logos/quick-holidays-logo-bottom.png";
 
 // Backgrounds
-import heroBg from "@/assets/hero-section-bg.png";
-import whyChooseUsBg from "@/assets/why-choose-us-bg.png";
-import formBg from "@/assets/consulation-bg.png";
+import heroBg from "@/assets/backgrounds/testing.png";
+import whyChooseUsBg from "@/assets/backgrounds/why-choose-us-bg.png";
+import formBg from "@/assets/backgrounds/consulation-bg.png";
+import schengenVisaBg from "@/assets/backgrounds/schengen-visa-bg.png";
+import flagPlaceholder from "@/assets/flags/france-flag.png";
+
+// Flags
+import flagAustria from "@/assets/flags/austria-flag.png";
+import flagBelgium from "@/assets/flags/belgium-flag.png";
+import flagBulgaria from "@/assets/flags/bulgaria-flag.png";
+import flagCroatia from "@/assets/flags/croatia-flag.png";
+import flagCzechRepublic from "@/assets/flags/czech-republic-flag.png";
+import flagDenmark from "@/assets/flags/denmark-flag.png";
+import flagEstonia from "@/assets/flags/estonia-flag.png";
+import flagFinland from "@/assets/flags/finland-flag.png";
+import flagFrance from "@/assets/flags/france-flag.png";
+import flagGermany from "@/assets/flags/germany-flag.png";
+import flagItaly from "@/assets/flags/italy-flag.png";
+import flagSpain from "@/assets/flags/spain-flag.png";
 
 // Icons for Stats
-import statIcon1 from "@/assets/years-of-expereince.png";     // star badge icon
-import statIcon2 from "@/assets/happy-clients.png";     // person with star icon
-import statIcon3 from "@/assets/visa-success-rate.png";        // passport cover icon
+import statIcon1 from "@/assets/icons/years-of-expereince.png";     // star badge icon
+import statIcon2 from "@/assets/icons/happy-clients.png";     // person with star icon
+import statIcon3 from "@/assets/icons/visa-success-rate.png";        // passport cover icon
 
 // Icons for Services
-import serviceIcon1 from "@/assets/Schengen Tourest VisaConsultation.png";
-import serviceIcon2 from "@/assets/application-preparation.png";
-import serviceIcon3 from "@/assets/appointment-assistance.png"; // briefcase/globe for Appointment Assistance
-import serviceIcon4 from "@/assets/Documentaiton Review.png";
-import serviceIcon5 from "@/assets/onging-support.png"; // customer support headset
+import serviceIcon1 from "@/assets/icons/schengen-tourest-visa-consultation.png";
+import serviceIcon2 from "@/assets/icons/application-preparation.png";
+import serviceIcon3 from "@/assets/icons/appointment-assistance.png"; // briefcase/globe for Appointment Assistance
+import serviceIcon4 from "@/assets/icons/documentaiton-review.png";
+import serviceIcon5 from "@/assets/icons/onging-support.png"; // customer support headset
 
 // Testimonial Avatars
-import avatarSarah from "@/assets/review-profile-1.png"; // woman portrait
-import avatarJames from "@/assets/review-profile-2.png"; // man portrait (James)
-import avatarRayan from "@/assets/review-profile-3.png"; // man portrait (Daniel/James)
+import avatarSarah from "@/assets/profile-icons/review-profile-1.png"; // woman portrait
+import avatarJames from "@/assets/profile-icons/review-profile-2.png"; // man portrait (James)
+import avatarRayan from "@/assets/profile-icons/review-profile-3.png"; // man portrait (Daniel/James)
 
 // Destinations
-import destAustria from "@/assets/Austria-place-bg.png";
-import destEstonia from "@/assets/Estonia.png";
-import destFinland from "@/assets/Finland.png";
-import destFrance from "@/assets/France.png";
-import destGermany from "@/assets/Germany.png";
+import destAustria from "@/assets/places-bg/austria-place-bg.png";
+import destEstonia from "@/assets/places-bg/estonia-place-bg.png";
+import destFinland from "@/assets/places-bg/finland-place-bg.png";
+import destFrance from "@/assets/places-bg/france-place-bg.png";
+import destGermany from "@/assets/places-bg/germany-place-bg.png";
 
 export { logoTop, logoBottom, heroBg, whyChooseUsBg, formBg };
 
@@ -131,4 +147,36 @@ export const DESTINATIONS = [
     name: "Germany",
     image: destGermany,
   },
+];
+
+export {
+  schengenVisaBg,
+  flagPlaceholder,
+  flagAustria,
+  flagBelgium,
+  flagBulgaria,
+  flagCroatia,
+  flagCzechRepublic,
+  flagDenmark,
+  flagEstonia,
+  flagFinland,
+  flagFrance,
+  flagGermany,
+  flagItaly,
+  flagSpain,
+};
+
+export const SCHENGEN_DESTINATIONS = [
+  { name: "France", slug: "france", flag: flagFrance },
+  { name: "Spain", slug: "spain", flag: flagSpain },
+  { name: "Italy", slug: "italy", flag: flagItaly },
+  { name: "Austria", slug: "austria", flag: flagAustria },
+  { name: "Belgium", slug: "belgium", flag: flagBelgium },
+  { name: "Bulgaria", slug: "bulgaria", flag: flagBulgaria },
+  { name: "Croatia", slug: "croatia", flag: flagCroatia },
+  { name: "Czech Republic", slug: "czech-republic", flag: flagCzechRepublic },
+  { name: "Denmark", slug: "denmark", flag: flagDenmark },
+  { name: "Estonia", slug: "estonia", flag: flagEstonia },
+  { name: "Finland", slug: "finland", flag: flagFinland },
+  { name: "Germany", slug: "germany", flag: flagGermany },
 ];

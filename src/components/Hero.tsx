@@ -39,7 +39,7 @@ function Counter({ value }: { value: string }) {
 
 export default function Hero() {
   return (
-    <section className="relative w-full bg-brand-cream">
+    <section className="relative w-full bg-brand-cream min-h-[90vh] flex items-center overflow-visible">
       {/* Background Image Spread Across the Complete Section */}
       <div className="absolute inset-0 z-0 select-none overflow-hidden">
         <Image
@@ -54,7 +54,7 @@ export default function Hero() {
       </div>
 
       {/* Content Container overlayed on background */}
-      <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-28 pb-20 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32">
+      <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-36 pb-32 sm:pt-44 sm:pb-40 lg:pt-48 lg:pb-44">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column: Text Content (Spans 6 columns) */}

@@ -95,17 +95,17 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
+                <Link href="/schengen-visa" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
                   Visa Process
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
+                <Link href="/services" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
                   Our Services
                 </Link>
               </li>
               <li>
-                <Link href="#about" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
+                <Link href="/about" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
                   About Us
                 </Link>
               </li>
