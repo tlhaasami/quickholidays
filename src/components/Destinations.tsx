@@ -1,9 +1,20 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DESTINATIONS } from "@/constants/data";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function Destinations() {
+  const [destinations, setDestinations] = useState(DESTINATIONS);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("quick_holidays_destinations");
+    if (stored) {
+      setDestinations(JSON.parse(stored));
+    }
+  }, []);
   return (
     <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-20 sm:pb-28">
       {/* Header and CTA */}
@@ -30,19 +41,15 @@ export default function Destinations() {
 
       {/* Destinations Grid (5 cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        {DESTINATIONS.map((dest, idx) => (
+        {destinations.map((dest, idx) => (
           <ScrollReveal key={idx} animation="scale-in" delay={idx * 80} className="w-full">
             <div
               className="relative aspect-square w-full rounded-[24px] overflow-hidden shadow-md group cursor-pointer border border-brand-navy/5 transition-all duration-350 hover:-translate-y-2 hover:shadow-xl"
             >
-              {/* Destination Image */}
-              <Image
-                src={dest.image}
+              <img
+                src={typeof dest.image === "string" ? dest.image : (dest.image && (dest.image as any).src) || ""}
                 alt={`${dest.name} Travel Destination`}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                priority={idx < 2}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
               
               {/* Visual gradient overlay to ensure text contrast */}

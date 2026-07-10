@@ -69,6 +69,25 @@ export default function Navbar() {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    const isDashboard = pathname ? (
+      pathname.startsWith("/agent-dashboard") || 
+      pathname.startsWith("/processing-dashboard") || 
+      pathname.startsWith("/admin")
+    ) : false;
+    const shouldHide = isDashboard || isAdminSubdomain;
+
+    if (shouldHide) {
+      document.body.classList.add("no-header-padding");
+    } else {
+      document.body.classList.remove("no-header-padding");
+    }
+
+    return () => {
+      document.body.classList.remove("no-header-padding");
+    };
+  }, [pathname, isAdminSubdomain]);
+
   const isAdminPath = pathname ? pathname.startsWith("/admin") : false;
   const isAdminLogin = (isAdminSubdomain || isAdminPath) && !isAdminAuthenticated;
   const isAdminDashboard = (isAdminSubdomain || isAdminPath) && isAdminAuthenticated;

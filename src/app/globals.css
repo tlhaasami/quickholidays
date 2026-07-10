@@ -26,6 +26,10 @@ body {
   padding-top: var(--header-height);
 }
 
+body.no-header-padding {
+  padding-top: 0 !important;
+}
+
 .nav-link, .nav-link * {
   transition: color 220ms ease, background-color 220ms ease;
 }

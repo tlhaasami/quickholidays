@@ -1,8 +1,76 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { logoBottom } from "@/constants/data";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isAdminPath = pathname ? pathname.startsWith("/admin") : false;
+  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin")) : false;
+
+  const [isAdminSubdomain, setIsAdminSubdomain] = useState(false);
+  const [footerInfo, setFooterInfo] = useState({
+    email: "info@quickholidays.co.uk",
+    phone: "+448000584673",
+    address: "39 Stanley Street, Fairfield,\nLiverpool, L7 0JN",
+    copyright: "Quick Holidays. All rights reserved.",
+    whatsapp: "",
+    linkedin: "",
+    instagram: "",
+    facebook: "",
+  });
+
+  const [resolvedWhatsapp, setResolvedWhatsapp] = useState("");
+
+  useEffect(() => {
+    setIsAdminSubdomain(window.location.hostname.startsWith("admin."));
+    const stored = localStorage.getItem("quick_holidays_footer_info");
+    let currentFooterInfo = footerInfo;
+    if (stored) {
+      // Merge with default keys to avoid blank values
+      const parsed = JSON.parse(stored);
+      currentFooterInfo = { ...footerInfo, ...parsed };
+      setFooterInfo(currentFooterInfo);
+    }
+
+    // Resolve rotated WhatsApp link
+    const rawWhatsapp = currentFooterInfo.whatsapp || "";
+    if (rawWhatsapp) {
+      // Split by commas, trim extra spaces, filter out empty strings
+      const parts = rawWhatsapp.split(",").map(p => p.trim()).filter(Boolean);
+      if (parts.length > 1) {
+        // Check if there is already a WhatsApp number assigned in sessionStorage
+        let selected = sessionStorage.getItem("quick_holidays_assigned_whatsapp");
+        if (!selected || !parts.includes(selected)) {
+          // Select a random number/link from the list
+          const randomIndex = Math.floor(Math.random() * parts.length);
+          selected = parts[randomIndex];
+          sessionStorage.setItem("quick_holidays_assigned_whatsapp", selected);
+        }
+        // If it's just a number, prepend WhatsApp URL
+        if (selected.match(/^[0-9+]+$/)) {
+          setResolvedWhatsapp(`https://wa.me/${selected.replace(/[^0-9]/g, "")}`);
+        } else {
+          setResolvedWhatsapp(selected);
+        }
+      } else if (parts.length === 1) {
+        const single = parts[0];
+        if (single.match(/^[0-9+]+$/)) {
+          setResolvedWhatsapp(`https://wa.me/${single.replace(/[^0-9]/g, "")}`);
+        } else {
+          setResolvedWhatsapp(single);
+        }
+      }
+    }
+  }, []);
+
+  if (isDashboardPage || isAdminPath || isAdminSubdomain) {
+    return null;
+  }
+
   return (
     <footer className="relative bg-brand-dark text-slate-300 overflow-hidden pt-16 pb-8 border-t border-white/5">
       {/* Decorative radial lighting background */}
@@ -35,7 +103,7 @@ export default function Footer() {
             <div className="flex gap-4 pt-2">
               {/* WhatsApp */}
               <a
-                href="https://wa.me/448000584673"
+                href={resolvedWhatsapp || `https://wa.me/${footerInfo.phone.replace(/[^0-9]/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-[#25D366] text-white hover:scale-110 hover:opacity-90 transition-transform duration-200"
@@ -48,7 +116,7 @@ export default function Footer() {
 
               {/* LinkedIn */}
               <a
-                href="https://linkedin.com"
+                href={footerInfo.linkedin || "https://linkedin.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-[#0077B5] text-white hover:scale-110 hover:opacity-90 transition-transform duration-200"
@@ -61,7 +129,7 @@ export default function Footer() {
 
               {/* Instagram */}
               <a
-                href="https://instagram.com"
+                href={footerInfo.instagram || "https://instagram.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-[#E1306C] text-white hover:scale-110 hover:opacity-90 transition-transform duration-200"
@@ -74,7 +142,7 @@ export default function Footer() {
 
               {/* Facebook */}
               <a
-                href="https://facebook.com"
+                href={footerInfo.facebook || "https://facebook.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1877F2] text-white hover:scale-110 hover:opacity-90 transition-transform duration-200"
@@ -136,8 +204,8 @@ export default function Footer() {
                     />
                   </svg>
                 </div>
-                <a href="mailto:info@quickholidays.co.uk" className="hover:text-brand-gold transition-colors font-medium">
-                  info@quickholidays.co.uk
+                <a href={`mailto:${footerInfo.email}`} className="hover:text-brand-gold transition-colors font-medium">
+                  {footerInfo.email}
                 </a>
               </li>
               <li className="flex items-center gap-3">
@@ -158,8 +226,8 @@ export default function Footer() {
                     />
                   </svg>
                 </div>
-                <a href="tel:+448000584673" className="hover:text-brand-gold transition-colors font-medium">
-                  +448000584673
+                <a href={`tel:${footerInfo.phone}`} className="hover:text-brand-gold transition-colors font-medium">
+                  {footerInfo.phone}
                 </a>
               </li>
               <li className="flex items-start gap-3">
@@ -185,8 +253,8 @@ export default function Footer() {
                     />
                   </svg>
                 </div>
-                <span className="font-medium leading-relaxed">
-                  39 Stanley Street, Fairfield,<br />Liverpool, L7 0JN
+                <span className="font-medium leading-relaxed whitespace-pre-line">
+                  {footerInfo.address}
                 </span>
               </li>
             </ul>
@@ -196,7 +264,7 @@ export default function Footer() {
 
         {/* Footer Bottom copyright and layout */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-slate-500">
-          <p>&copy; {new Date().getFullYear()} Quick Holidays. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {footerInfo.copyright}</p>
           <div className="flex items-center gap-3">
             <Link href="/privacy-policy" className="hover:text-slate-400">
               Privacy Policy

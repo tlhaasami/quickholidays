@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { TESTIMONIALS } from "@/constants/data";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState(TESTIMONIALS);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("quick_holidays_testimonials");
+    if (stored) {
+      setTestimonials(JSON.parse(stored));
+    }
+  }, []);
+
   const [startIndex, setStartIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedIndices, setExpandedIndices] = useState<Record<number, boolean>>({});
@@ -46,7 +54,9 @@ export default function Testimonials() {
       avatar: defaultAvatar,
     };
 
-    setTestimonials([newReview, ...testimonials]);
+    const updated = [newReview, ...testimonials];
+    setTestimonials(updated);
+    localStorage.setItem("quick_holidays_testimonials", JSON.stringify(updated));
     setStartIndex(0); // Reset sliding carousel view to the newest review
     setIsModalOpen(false);
 
@@ -194,12 +204,10 @@ export default function Testimonials() {
                       {/* Author Info */}
                       <div className="flex items-center gap-4 pt-2">
                         <div className="relative w-12 h-12 rounded-full overflow-hidden border border-brand-navy/5 bg-slate-100 flex-shrink-0">
-                          <Image
-                            src={t.avatar}
+                          <img
+                            src={typeof t.avatar === "string" ? t.avatar : (t.avatar && (t.avatar as any).src) || ""}
                             alt={t.name}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
+                            className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="text-left">
@@ -268,12 +276,10 @@ export default function Testimonials() {
                     {/* Author Info */}
                     <div className="flex items-center gap-4 pt-2">
                       <div className="relative w-12 h-12 rounded-full overflow-hidden border border-brand-navy/5 bg-slate-100 flex-shrink-0">
-                        <Image
-                          src={t.avatar}
+                        <img
+                          src={typeof t.avatar === "string" ? t.avatar : (t.avatar && (t.avatar as any).src) || ""}
                           alt={t.name}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="text-left">
