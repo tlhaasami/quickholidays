@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Schengen Visa Specialist | Quick Holidays",
+  title: "Quick Holidays Ltd",
   description: "We simplify the Schengen visa process for UK residents through expert guidance, meticulous application preparation, and personalized support making every journey to Europe seamless, confident, and stress-free.",
 };
 
