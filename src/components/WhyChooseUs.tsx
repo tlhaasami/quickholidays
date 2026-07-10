@@ -10,6 +10,7 @@ export default function WhyChooseUs() {
           src={whyChooseUsBg}
           alt="Why Choose Quick Holidays Background - Passport and Clipboard"
           fill
+          sizes="100vw"
           className="object-cover select-none"
           priority
         />

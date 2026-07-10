@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { logoTop } from "@/constants/data";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,16 +23,20 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isHomeActive = pathname === "/";
+  const isSchengenActive = pathname === "/schengen-visa";
+  const isAboutActive = pathname === "/about";
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-brand-navy/5 py-1"
-          : "bg-transparent py-3"
+          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-brand-navy/5 py-3"
+          : "bg-transparent py-5"
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -45,29 +51,41 @@ export default function Navbar() {
           </div>
 
           {/* Center Navigation Links (Capsule shape on Desktop) */}
-          <nav className="hidden md:flex items-center justify-center bg-white shadow-[0_4px_20px_-4px_rgba(15,33,72,0.08)] border border-brand-gold rounded-full px-8 py-3.5">
-            <div className="flex items-center space-x-8 text-sm font-medium text-slate-600">
+          <nav className="hidden md:flex items-center justify-center bg-white shadow-[0_4px_20px_-4px_rgba(15,33,72,0.08)] border border-brand-gold rounded-full px-8 py-3">
+            <div className="flex items-center space-x-8 text-sm font-medium">
               <Link
                 href="/"
-                className="text-brand-gold font-semibold transition-colors duration-200"
+                className={`transition-colors duration-200 ${
+                  isHomeActive
+                    ? "text-brand-gold font-semibold"
+                    : "text-slate-600 hover:text-brand-navy"
+                }`}
               >
                 Home
               </Link>
               <Link
                 href="/schengen-visa"
-                className="hover:text-brand-navy transition-colors duration-200"
+                className={`transition-colors duration-200 ${
+                  isSchengenActive
+                    ? "text-brand-gold font-semibold"
+                    : "text-slate-600 hover:text-brand-navy"
+                }`}
               >
                 Schengen Visa
               </Link>
               <Link
                 href="/about"
-                className="hover:text-brand-navy transition-colors duration-200"
+                className={`transition-colors duration-200 ${
+                  isAboutActive
+                    ? "text-brand-gold font-semibold"
+                    : "text-slate-600 hover:text-brand-navy"
+                }`}
               >
                 About Us
               </Link>
               <Link
                 href="/#consultation"
-                className="hover:text-brand-navy transition-colors duration-200"
+                className="text-slate-600 hover:text-brand-navy transition-colors duration-200"
               >
                 Contact Us
               </Link>
@@ -77,7 +95,7 @@ export default function Navbar() {
           {/* Right Action Button */}
           <div className="hidden md:flex">
             <Link
-              href="#consultation"
+              href="/#consultation"
               className="inline-flex items-center justify-center rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-brand-navy/95 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               Get Free Consultancy
@@ -131,21 +149,33 @@ export default function Navbar() {
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
-            className="block rounded-md px-3 py-2 text-base font-semibold text-brand-gold bg-brand-cream/50"
+            className={`block rounded-md px-3 py-2 text-base ${
+              isHomeActive
+                ? "font-semibold text-brand-gold bg-brand-cream/50"
+                : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            }`}
           >
             Home
           </Link>
           <Link
             href="/schengen-visa"
             onClick={() => setIsOpen(false)}
-            className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            className={`block rounded-md px-3 py-2 text-base ${
+              isSchengenActive
+                ? "font-semibold text-brand-gold bg-brand-cream/50"
+                : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            }`}
           >
             Schengen Visa
           </Link>
           <Link
             href="/about"
             onClick={() => setIsOpen(false)}
-            className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            className={`block rounded-md px-3 py-2 text-base ${
+              isAboutActive
+                ? "font-semibold text-brand-gold bg-brand-cream/50"
+                : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+            }`}
           >
             About Us
           </Link>
@@ -158,7 +188,7 @@ export default function Navbar() {
           </Link>
           <div className="pt-4 border-t border-brand-navy/5">
             <Link
-              href="#consultation"
+              href="/#consultation"
               onClick={() => setIsOpen(false)}
               className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-semibold text-white shadow-md hover:bg-brand-navy/90"
             >

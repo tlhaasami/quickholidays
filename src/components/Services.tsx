@@ -58,6 +58,7 @@ export default function Services() {
                 src={service.icon}
                 alt={service.title}
                 fill
+                sizes="64px"
                 className="object-contain object-center select-none"
               />
             </div>

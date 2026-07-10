@@ -108,6 +108,7 @@ export default function Testimonials() {
                       src={t.avatar}
                       alt={t.name}
                       fill
+                      sizes="48px"
                       className="object-cover"
                     />
                   </div>
@@ -156,6 +157,7 @@ export default function Testimonials() {
                     src={TESTIMONIALS[activeIndex].avatar}
                     alt={TESTIMONIALS[activeIndex].name}
                     fill
+                    sizes="48px"
                     className="object-cover"
                   />
                 </div>

@@ -59,6 +59,7 @@ export default function ConsultationForm() {
           src={formBg}
           alt="Schengen Consultation Sketch Backdrop"
           fill
+          sizes="100vw"
           className="object-cover object-right-bottom select-none"
           priority
         />

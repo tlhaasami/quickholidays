@@ -2,10 +2,10 @@ import logoTop from "@/assets/logos/quick-holidays-logo.png";
 import logoBottom from "@/assets/logos/quick-holidays-logo-bottom.png";
 
 // Backgrounds
-import heroBg from "@/assets/backgrounds/testing.png";
+import heroBg from "@/assets/backgrounds/home-bg.png";
+import schengenVisaBg from "@/assets/backgrounds/schengen-visa-bg.png";
 import whyChooseUsBg from "@/assets/backgrounds/why-choose-us-bg.png";
 import formBg from "@/assets/backgrounds/consulation-bg.png";
-import schengenVisaBg from "@/assets/backgrounds/schengen-visa-bg.png";
 import flagPlaceholder from "@/assets/flags/france-flag.png";
 
 // Flags

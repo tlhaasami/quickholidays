@@ -46,6 +46,7 @@ export default function Hero() {
           src={heroBg}
           alt="Schengen Visa Background - St. Peter's Basilica Rome"
           fill
+          sizes="100vw"
           className="object-cover object-right select-none scale-[1.02] origin-top"
           priority
         />
