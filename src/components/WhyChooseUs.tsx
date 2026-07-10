@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { whyChooseUsBg, WHY_CHOOSE_US_POINTS } from "@/constants/data";
+import ScrollReveal from "@/components/ScrollReveal";
 
 export default function WhyChooseUs() {
   return (
@@ -23,40 +24,43 @@ export default function WhyChooseUs() {
           
           {/* Left Column: Text and Points Checklist (Spans 6 columns) */}
           <div className="lg:col-span-6 text-left">
-            <span className="text-sm font-bold tracking-widest text-brand-gold uppercase block mb-3">
-              Why Choose Us
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-[46px] font-bold text-white leading-tight mb-8">
-              A Team You
-              <br />
-              Can Trust
-            </h2>
+            <ScrollReveal animation="slide-left">
+              <span className="text-sm font-bold tracking-widest text-brand-gold uppercase block mb-3">
+                Why Choose Us
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-[46px] font-bold text-white leading-tight mb-8">
+                A Team You
+                <br />
+                Can Trust
+              </h2>
+            </ScrollReveal>
             
             {/* Checklist */}
             <ul className="space-y-6">
               {WHY_CHOOSE_US_POINTS.map((point, idx) => (
-                <li
-                  key={idx}
-                  className="flex items-center gap-4 group transition-all duration-300 hover:translate-x-1"
-                >
-                  {/* Solid Gold Circle Checkmark Icon with Navy check */}
-                  <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-brand-gold text-brand-navy">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={3.5}
-                      stroke="currentColor"
-                      className="w-3.5 h-3.5"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
-                  </div>
-                  {/* Point Text */}
-                  <span className="text-white text-base sm:text-[17px] font-medium leading-relaxed">
-                    {point}
-                  </span>
-                </li>
+                <ScrollReveal key={idx} animation="fade-up" delay={idx * 100} className="w-full">
+                  <li
+                    className="flex items-center gap-4 group transition-all duration-300 hover:translate-x-1"
+                  >
+                    {/* Solid Gold Circle Checkmark Icon with Navy check */}
+                    <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-brand-gold text-brand-navy">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={3.5}
+                        stroke="currentColor"
+                        className="w-3.5 h-3.5"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </div>
+                    {/* Point Text */}
+                    <span className="text-white text-base sm:text-[17px] font-medium leading-relaxed">
+                      {point}
+                    </span>
+                  </li>
+                </ScrollReveal>
               ))}
             </ul>
           </div>

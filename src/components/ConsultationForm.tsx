@@ -296,7 +296,7 @@ export default function ConsultationForm({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center justify-center rounded-full bg-brand-gold px-8 py-3 text-sm font-bold text-white shadow-md hover:bg-brand-gold-dark hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.04] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 px-8 py-3 text-sm font-bold text-white shadow-md cursor-pointer"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">

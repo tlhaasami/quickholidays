@@ -38,6 +38,12 @@ function Counter({ value }: { value: string }) {
 }
 
 export default function Hero() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   return (
     <section className="relative w-full bg-brand-cream min-h-[90vh] flex items-center overflow-visible">
       {/* Background Image Spread Across the Complete Section */}
@@ -60,12 +66,12 @@ export default function Hero() {
           
           {/* Left Column: Text Content (Spans 6 columns) */}
           <div className="lg:col-span-6 text-left z-10">
-            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-brand-navy leading-[1.05] mb-6">
+            <h1 className={`font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-brand-navy leading-[1.05] mb-6 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               Schengen Visa
               <br />
               Specialist
             </h1>
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-lg mb-8">
+            <p className={`text-base sm:text-lg text-slate-700 leading-relaxed max-w-lg mb-8 transition-all duration-[1200ms] delay-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               We simplify the Schengen visa process for UK residents through expert guidance,
               meticulous application preparation, and personalized support making every journey to
               Europe seamless, confident, and stress-free.
@@ -79,7 +85,7 @@ export default function Hero() {
       </div>
 
       {/* Floating Statistics Banner (Shifted downward to sit 30% on image and 70% below, overflow-visible) */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-[65%] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className={`absolute bottom-0 left-0 right-0 z-20 translate-y-[65%] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 transition-all duration-[1200ms] delay-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-[65%]" : "opacity-0 translate-y-[80%]"}`}>
         <div className="bg-brand-gold rounded-3xl sm:rounded-full py-6 px-6 sm:px-12 shadow-lg shadow-brand-gold/25 border border-white/20">
           <div className="grid grid-cols-1 gap-6 divide-y divide-brand-navy/10 sm:grid-cols-3 sm:gap-0 sm:divide-y-0 sm:divide-x">
             {STATS.map((stat, idx) => (

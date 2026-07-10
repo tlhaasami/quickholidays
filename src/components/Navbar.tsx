@@ -91,40 +91,40 @@ export default function Navbar() {
             <div className="flex items-center space-x-10 text-sm font-medium relative z-10">
               <Link
                 href="/"
-                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                   isHomeActive
                     ? "text-brand-gold font-semibold"
-                    : "text-slate-600 hover:text-brand-navy"
+                    : "text-slate-600 hover:text-brand-gold hover:scale-[1.03]"
                 }`}
               >
                 Home
               </Link>
               <Link
                 href="/schengen-visa"
-                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                   isSchengenActive
                     ? "text-brand-gold font-semibold"
-                    : "text-slate-600 hover:text-brand-navy"
+                    : "text-slate-600 hover:text-brand-gold hover:scale-[1.03]"
                 }`}
               >
                 Schengen Visa
               </Link>
               <Link
                 href="/about-us"
-                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                   isAboutActive
                     ? "text-brand-gold font-semibold"
-                    : "text-slate-600 hover:text-brand-navy"
+                    : "text-slate-600 hover:text-brand-gold hover:scale-[1.03]"
                 }`}
               >
                 About Us
               </Link>
               <Link
                 href="/contact-us"
-                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-colors duration-200 ${
+                className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                   isContactActive
                     ? "text-brand-gold font-semibold"
-                    : "text-slate-600 hover:text-brand-navy"
+                    : "text-slate-600 hover:text-brand-gold hover:scale-[1.03]"
                 }`}
               >
                 Contact Us
@@ -135,8 +135,8 @@ export default function Navbar() {
           {/* Right Action Button */}
           <div className="hidden md:flex">
             <Link
-              href="/#consultation"
-              className="inline-flex items-center justify-center rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-brand-navy/95 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              href="/contact-us"
+              className="inline-flex items-center justify-center rounded-full bg-brand-navy px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.04] transition-all duration-300"
             >
               Get Free Consultancy
             </Link>
@@ -232,9 +232,9 @@ export default function Navbar() {
           </Link>
           <div className="pt-4 border-t border-brand-navy/5">
             <Link
-              href="/#consultation"
+              href="/contact-us"
               onClick={() => setIsOpen(false)}
-              className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-semibold text-white shadow-md hover:bg-brand-navy/90"
+              className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.02] transition-all duration-300"
             >
               Get Free Consultancy
             </Link>
