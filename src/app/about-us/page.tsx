@@ -1,9 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { aboutUsBg } from "@/constants/data";
 import ourPurposeIcon from "@/assets/icons/our-purpose.png";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function AboutPage() {
+  const [bgLoaded, setBgLoaded] = useState(false);
+
   return (
     <div className="bg-brand-cream text-slate-800 font-sans min-h-screen">
       <main className="grow">
@@ -15,7 +20,10 @@ export default function AboutPage() {
               alt="About - Background"
               fill
               sizes="100vw"
-              className="object-cover object-right select-none scale-[1.02] origin-top"
+              onLoad={() => setBgLoaded(true)}
+              className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+              }`}
               priority
             />
             <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />

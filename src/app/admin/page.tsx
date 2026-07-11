@@ -89,6 +89,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [animateCard, setAnimateCard] = useState(false);
+  const [bgLoaded, setBgLoaded] = useState(false);
   // Active Navigation Tab State
   const [activeTab, setActiveTab] = useState<"users" | "footer" | "reviews" | "destinations" | "countries" | "backgrounds">("users");
 
@@ -623,7 +624,10 @@ export default function AdminPage() {
             <img
               src={customLoginBg}
               alt="Admin Login Background"
-              className="absolute inset-0 w-full h-full object-cover object-center select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`absolute inset-0 w-full h-full object-cover object-center select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
             />
           ) : (
             <Image
@@ -631,7 +635,10 @@ export default function AdminPage() {
               alt="Admin Login Background"
               fill
               sizes="100vw"
-              className="object-cover object-center select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`object-cover object-center select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
               priority
             />
           )}

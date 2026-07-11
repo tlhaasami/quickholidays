@@ -1,8 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { contactUsBg } from "@/constants/data";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function ContactUsPage() {
+  const [bgLoaded, setBgLoaded] = useState(false);
+
   return (
     <div className="bg-brand-cream text-slate-800 font-sans min-h-screen">
       <main className="grow">
@@ -13,7 +18,10 @@ export default function ContactUsPage() {
               alt="Contact Us Background"
               fill
               sizes="100vw"
-              className="object-cover object-right select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`object-cover object-right select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
               priority
             />
             <div className="absolute inset-0 bg-brand-cream/95 md:bg-brand-cream/70 lg:bg-transparent" />

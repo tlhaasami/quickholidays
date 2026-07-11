@@ -40,6 +40,7 @@ function Counter({ value }: { value: string }) {
 export default function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [customBg, setCustomBg] = useState<string | null>(null);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -57,7 +58,10 @@ export default function Hero() {
           <img
             src={customBg}
             alt="Schengen Visa Background"
-            className="absolute inset-0 w-full h-full object-cover object-right select-none scale-[1.02] origin-top"
+            onLoad={() => setBgLoaded(true)}
+            className={`absolute inset-0 w-full h-full object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
+              bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+            }`}
           />
         ) : (
           <Image
@@ -65,7 +69,10 @@ export default function Hero() {
             alt="Schengen Visa Background - St. Peter's Basilica Rome"
             fill
             sizes="100vw"
-            className="object-cover object-right select-none scale-[1.02] origin-top"
+            onLoad={() => setBgLoaded(true)}
+            className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
+              bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+            }`}
             priority
           />
         )}

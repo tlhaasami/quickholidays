@@ -36,6 +36,7 @@ export default function LoginPage() {
   const [success, setSuccess] = useState("");
   const [customBg, setCustomBg] = useState<string | null>(null);
   const [animateCard, setAnimateCard] = useState(false);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     // Trigger animation
@@ -248,7 +249,10 @@ export default function LoginPage() {
             <img
               src={customBg}
               alt="Workspace Background"
-              className="absolute inset-0 w-full h-full object-cover object-center select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`absolute inset-0 w-full h-full object-cover object-center select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
             />
           ) : (
             <Image
@@ -256,7 +260,10 @@ export default function LoginPage() {
               alt="Workspace Background"
               fill
               sizes="100vw"
-              className="object-cover object-center select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`object-cover object-center select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
               priority
             />
           )}

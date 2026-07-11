@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 
 export default function WhyChooseUs() {
   const [customBg, setCustomBg] = useState<string | null>(null);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("quick_holidays_bg_why_choose_us");
@@ -23,7 +24,10 @@ export default function WhyChooseUs() {
           <img
             src={customBg}
             alt="Why Choose Quick Holidays Background"
-            className="absolute inset-0 w-full h-full object-cover select-none"
+            onLoad={() => setBgLoaded(true)}
+            className={`absolute inset-0 w-full h-full object-cover select-none transition-all duration-[1500ms] ease-out ${
+              bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+            }`}
           />
         ) : (
           <Image
@@ -31,7 +35,10 @@ export default function WhyChooseUs() {
             alt="Why Choose Quick Holidays Background - Passport and Clipboard"
             fill
             sizes="100vw"
-            className="object-cover select-none"
+            onLoad={() => setBgLoaded(true)}
+            className={`object-cover select-none transition-all duration-[1500ms] ease-out ${
+              bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+            }`}
             priority
           />
         )}

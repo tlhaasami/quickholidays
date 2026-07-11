@@ -8,6 +8,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 
 export default function SchengenVisaPage() {
   const [schengenDestinations, setSchengenDestinations] = useState(SCHENGEN_DESTINATIONS);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("quick_holidays_flags");
@@ -46,7 +47,10 @@ export default function SchengenVisaPage() {
               alt="Schengen Visa Background"
               fill
               sizes="100vw"
-              className="object-cover object-right select-none scale-[1.02] origin-top"
+              onLoad={() => setBgLoaded(true)}
+              className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+              }`}
               priority
             />
             {/* Soft bottom fade-to-cream gradient */}

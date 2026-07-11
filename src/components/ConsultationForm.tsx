@@ -66,6 +66,7 @@ export default function ConsultationForm({
   };
 
   const [customBg, setCustomBg] = useState<string | null>(null);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("quick_holidays_bg_consultation_form");
@@ -85,7 +86,10 @@ export default function ConsultationForm({
             <img
               src={customBg}
               alt="Schengen Consultation Sketch Backdrop"
-              className="absolute inset-0 w-full h-full object-cover object-bottom-right select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`absolute inset-0 w-full h-full object-cover object-bottom-right select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
             />
           ) : (
             <Image
@@ -93,7 +97,10 @@ export default function ConsultationForm({
               alt="Schengen Consultation Sketch Backdrop"
               fill
               sizes="100vw"
-              className="object-cover object-bottom-right select-none"
+              onLoad={() => setBgLoaded(true)}
+              className={`object-cover object-bottom-right select-none transition-all duration-[1500ms] ease-out ${
+                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+              }`}
               priority
             />
           )}

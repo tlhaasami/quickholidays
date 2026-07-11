@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { visaSections, VisaField, VisaForm, ClientProfile } from "@/constants/visaFields";
 
@@ -439,7 +439,7 @@ export default function AgentDashboard() {
           
           @page Section1 {
             size: 8.5in 11.0in;
-            margin: 1.0in 1.0in 1.0in 1.0in;
+            margin: 1.0in 1.5in 1.0in 1.5in;
             mso-header-margin: .5in;
             mso-footer-margin: .5in;
             mso-header: h1;
@@ -450,6 +450,8 @@ export default function AgentDashboard() {
           h1 { text-align: center; margin-bottom: 2px; }
           .subtitle { color: #1F497D; font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 20px; }
           h2 { color: #5B9BD5; font-size: 14pt; margin-top: 20px; margin-bottom: 8px; font-weight: bold; }
+          table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px; border: 1px solid #000000; }
+          th, td { word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; }
         </style>
       </head>
       <body>
@@ -490,10 +492,10 @@ export default function AgentDashboard() {
           </div>
 
           <!-- Agent Name Table -->
-          <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 20px; border: 1px solid #000000;">
+          <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 5px; margin-bottom: 20px; border: 1px solid #000000;">
             <tr>
-              <th style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FAFAFA; font-weight: bold; width: 35%; font-family: 'Arial', sans-serif; color: #0F2148;">Agent Name</th>
-              <td style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FFFFFF; width: 65%; font-family: 'Arial', sans-serif; color: #0F2148; font-weight: bold;">${agentName.toUpperCase()}</td>
+              <th style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FAFAFA; font-weight: bold; width: 35%; font-family: 'Arial', sans-serif; color: #0F2148; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">Agent Name</th>
+              <td style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FFFFFF; width: 65%; font-family: 'Arial', sans-serif; color: #0F2148; font-weight: bold; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">${agentName.toUpperCase()}</td>
             </tr>
           </table>
 
@@ -503,12 +505,12 @@ export default function AgentDashboard() {
               &#9888; Warning: <span style="font-weight: normal;">The company holds no responsibility for errors. Check form carefully before submitting.</span>
             </p>
             <h2 style="color: #5B9BD5; font-size: 14pt; margin-top: 0px; margin-bottom: 8px; font-weight: bold; font-family: 'Arial', sans-serif; text-align: left;">${section.title}</h2>
-            <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px; border: 1px solid #000000;">
+            <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px; border: 1px solid #000000;">
               ${section.fields.map((field) => `
                 ${getDividerRow(field.id)}
                 <tr>
-                  <th style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FAFAFA; font-weight: bold; width: 35%; font-family: 'Arial', sans-serif; color: #0F2148;">${field.label}</th>
-                  <td style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FFFFFF; width: 65%; font-family: 'Arial', sans-serif; color: #0F2148;">${data[field.id] || ""}</td>
+                  <th style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FAFAFA; font-weight: bold; width: 35%; font-family: 'Arial', sans-serif; color: #0F2148; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">${field.label}</th>
+                  <td style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FFFFFF; width: 65%; font-family: 'Arial', sans-serif; color: #0F2148; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">${data[field.id] || ""}</td>
                 </tr>
               `).join("")}
             </table>
@@ -543,242 +545,7 @@ export default function AgentDashboard() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
-  // Excel Spreadsheet exporter
-  const handleExportExcel = (form: VisaForm, clientName: string) => {
-    const data = form.approvedData || form.formData || {};
-    
-    // Format text to uppercase helper
-    const fVal = (val: any) => {
-      if (!val) return "";
-      return String(val).toUpperCase();
-    };
-
-    let excelHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Arial', sans-serif; color: #0F2148; }
-          table { border-collapse: collapse; width: 100%; border: 1px solid #000000; }
-          th, td { border: 1px solid #000000; padding: 8px; text-align: left; font-size: 10pt; word-break: break-word; white-space: normal; }
-          th { background-color: #FAFAFA; font-weight: bold; width: 35%; }
-          td { background-color: #FFFFFF; width: 65%; }
-          .header-row { font-size: 14pt; font-weight: bold; text-align: center; background-color: #E36C0A; color: #FFFFFF; height: 35px; }
-          .subtitle-row { font-size: 11pt; font-weight: bold; text-align: center; background-color: #1F497D; color: #FFFFFF; height: 25px; }
-          .section-row { font-size: 11pt; font-weight: bold; background-color: #5B9BD5; color: #FFFFFF; height: 25px; text-align: left; }
-          .divider-row { font-size: 10pt; font-weight: bold; text-align: center; background-color: #FAFAFA; color: #0F2148; }
-          .warning-row { font-size: 9pt; font-weight: bold; color: #FF0000; background-color: #FFF2F2; }
-        </style>
-      </head>
-      <body>
-        <table>
-          <tr><th colspan="2" class="header-row">QUICK HOLIDAYS</th></tr>
-          <tr><th colspan="2" class="subtitle-row">FUTURE VISION ORGANIZATION LIMITED</th></tr>
-          <tr>
-            <td colspan="2" class="warning-row">⚠️ WARNING: THE COMPANY HOLDS NO RESPONSIBILITY FOR ERRORS. CHECK FORM CAREFULLY.</td>
-          </tr>
-          <tr>
-            <th>AGENT NAME</th>
-            <td style="font-weight: bold;">${fVal(agentName)}</td>
-          </tr>
-          <tr>
-            <th>FORM ID</th>
-            <td>${form.id}</td>
-          </tr>
-    `;
-
-    visaSections.forEach((section) => {
-      excelHtml += `
-        <tr><td colspan="2" class="section-row">${section.title.toUpperCase()}</td></tr>
-      `;
-      section.fields.forEach((field) => {
-        // Inject divider rows
-        if (field.id === "address_street") {
-          excelHtml += `<tr><td colspan="2" class="divider-row">FULL RESIDENCE ADDRESS</td></tr>`;
-        }
-        if (field.id === "emp_street") {
-          excelHtml += `<tr><td colspan="2" class="divider-row">EMPLOYER/UNIVERSITY/COLLEGE FULL ADDRESS</td></tr>`;
-        }
-        excelHtml += `
-          <tr>
-            <th>${field.label.toUpperCase()}</th>
-            <td>${fVal(data[field.id])}</td>
-          </tr>
-        `;
-      });
-    });
-
-    excelHtml += `
-          <tr>
-            <td colspan="2" style="font-weight: bold; text-align: center; color: #1F497D; height: 30px;">
-              THANK YOU FOR YOUR COOPERATION AND PATIENCE.
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2" style="font-weight: bold; color: #1F497D;">
-              ☎ CONTACT US<br>
-              • PHONE: +44 800 058 4673<br>
-              • WHATSAPP: +44 7428 878936<br>
-              • EMAIL: INFO@QUICKHOLIDAYS.CO.UK
-            </td>
-          </tr>
-        </table>
-      </body>
-      </html>
-    `;
-
-    const blob = new Blob(["\ufeff" + excelHtml], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Visa_Draft_${clientName.replace(/\s+/g, "_")}_${form.id}.xls`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  // PDF layout tab print exporter
-  const handleExportPdf = (form: VisaForm, clientName: string) => {
-    const data = form.approvedData || form.formData || {};
-    
-    // Format text to uppercase helper
-    const fVal = (val: any) => {
-      if (!val) return "";
-      return String(val).toUpperCase();
-    };
-
-    // Helper to get divider headers
-    const getDividerRow = (fieldId: string) => {
-      if (fieldId === "address_street") {
-        return `
-          <tr>
-            <td colspan="2" style="background-color: #FAFAFA; font-weight: bold; text-align: center; font-size: 10.5pt; border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; color: #0F2148;">
-              FULL RESIDENCE ADDRESS
-            </td>
-          </tr>
-        `;
-      }
-      if (fieldId === "emp_street") {
-        return `
-          <tr>
-            <td colspan="2" style="background-color: #FAFAFA; font-weight: bold; text-align: center; font-size: 10.5pt; border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; color: #0F2148;">
-              EMPLOYER/UNIVERSITY/COLLEGE FULL ADDRESS
-            </td>
-          </tr>
-        `;
-      }
-      return "";
-    };
-
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-
-    const logoBase64 = "data:image/png;base64,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";
-
-    const printHtml = `
-      <html>
-      <head>
-        <title>Schengen Visa Draft - ${clientName.toUpperCase()}</title>
-        <style>
-          @page {
-            size: 8.5in 11.0in;
-            margin: 1.0in;
-          }
-          body {
-            font-family: 'Arial', sans-serif;
-            color: #0F2148;
-            line-height: 1.4;
-            position: relative;
-            margin: 0;
-            padding: 0;
-          }
-          /* Watermark styling */
-          .watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 80pt;
-            color: rgba(230, 233, 239, 0.4);
-            font-weight: bold;
-            z-index: -1000;
-            pointer-events: none;
-            white-space: nowrap;
-            font-family: 'Arial', sans-serif;
-          }
-          .subtitle { color: #1F497D; font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 20px; }
-          h2 { color: #5B9BD5; font-size: 14pt; margin-top: 20px; margin-bottom: 8px; font-weight: bold; page-break-after: avoid; }
-          table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px; page-break-inside: avoid; border: 1px solid #000000; }
-          th, td { border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; word-break: break-word; white-space: normal; }
-          th { background-color: #FAFAFA; font-weight: bold; width: 35%; }
-          td { background-color: #FFFFFF; width: 65%; }
-        </style>
-      </head>
-      <body>
-        <div class="watermark">QUICK HOLIDAYS</div>
-        
-        <img src="${logoBase64}" alt="Quick Holidays Logo" style="display: block; margin: 0 auto 10px auto; width: 220px; height: auto;" />
-        <div class="subtitle" style="text-align: center; font-size: 14pt; color: #1F497D; font-weight: bold; margin-bottom: 20px;">FUTURE VISION ORGANIZATION LIMITED</div>
-        
-        <div style="font-size: 10pt; color: #0F2148; line-height: 1.45; margin-bottom: 15px;">
-          Please fill in <strong>CLEAR BLOCK CAPITAL LETTERS</strong>.<br>
-          The details you provide will be used to complete the online application form.<br>
-          Any mistakes, faint or unclear writing may cause errors in your application.<br>
-          It is <strong>your responsibility</strong> to provide correct and readable information.<br>
-          <span style="color: #FF0000;">In case of any errors on the visa draft form, the <strong>company will not be held responsible</strong>. Please carefully <strong>re-check your form</strong> before submitting.</span>
-        </div>
-
-        <!-- Agent Name Table -->
-        <table border="1">
-          <tr>
-            <th>Agent Name</th>
-            <td style="font-weight: bold;">${fVal(agentName)}</td>
-          </tr>
-        </table>
-
-        ${visaSections.map((section) => `
-          <p style="color: #FF0000; font-size: 9.5pt; margin-top: 22px; margin-bottom: 4px; font-weight: bold;">
-            &#9888; Warning: <span style="font-weight: normal;">The company holds no responsibility for errors. Check form carefully before submitting.</span>
-          </p>
-          <h2>${section.title.toUpperCase()}</h2>
-          <table border="1">
-            ${section.fields.map((field) => `
-              ${getDividerRow(field.id)}
-              <tr>
-                <th>${field.label.toUpperCase()}</th>
-                <td>${fVal(data[field.id])}</td>
-              </tr>
-            `).join("")}
-          </table>
-        `).join("")}
-
-        <p style="color: #1F497D; font-size: 11pt; font-weight: bold; text-align: center; margin-top: 25px; margin-bottom: 20px;">
-          THANK YOU FOR YOUR COOPERATION AND PATIENCE.
-        </p>
-
-        <div style="font-size: 10pt; color: #1F497D; text-align: left; margin-top: 15px; line-height: 1.5;">
-          <strong>☎ CONTACT US</strong>
-          <ul style="list-style-type: disc;">
-            <li>PHONE: +44 800 058 4673</li>
-            <li>WHATSAPP: +44 7428 878936</li>
-            <li>EMAIL: INFO@QUICKHOLIDAYS.CO.UK</li>
-          </ul>
-        </div>
-
-        <script>
-          window.onload = function() {
-            window.print();
-            setTimeout(function() { window.close(); }, 500);
-          };
-        </script>
-      </body>
-      </html>
-    `;
-    printWindow.document.write(printHtml);
-    printWindow.document.close();
-  };
+  // Exporters Excel and PDF have been removed
 
   return (
     <div className="min-h-screen bg-brand-cream text-slate-800 font-sans flex h-screen overflow-hidden antialiased">
@@ -858,15 +625,17 @@ export default function AgentDashboard() {
               {/* Sorting Filters Controls */}
               <div className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 text-[10px] text-slate-500">
                 <span>Sort by:</span>
-                <select
+                <CustomSelect
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-transparent text-slate-700 focus:outline-none cursor-pointer font-bold border-none"
-                >
-                  <option value="updated" className="bg-white text-slate-800">Last Updated</option>
-                  <option value="name" className="bg-white text-slate-800">Name (A-Z)</option>
-                  <option value="forms_count" className="bg-white text-slate-800">Forms Count</option>
-                </select>
+                  onChange={(val) => setSortBy(val as any)}
+                  options={[
+                    { value: "updated", label: "Last Updated" },
+                    { value: "name", label: "Name (A-Z)" },
+                    { value: "forms_count", label: "Forms Count" }
+                  ]}
+                  className="w-32"
+                  buttonClassName="flex items-center gap-1 bg-transparent border-none text-slate-700 focus:outline-none cursor-pointer font-bold text-[10px] p-0 shadow-none hover:text-brand-gold transition-colors"
+                />
               </div>
 
               {/* Search Box */}
@@ -1147,20 +916,6 @@ export default function AgentDashboard() {
                         >
                           Word Doc
                         </button>
-                        <button
-                          onClick={() => handleExportExcel(selectedForm, selectedClient.name)}
-                          className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-3.5 py-1.5 transition-all duration-200 cursor-pointer shadow-sm"
-                          title="Export Schengen Visa application to an Excel Spreadsheet (.xls)"
-                        >
-                          Excel Sheet
-                        </button>
-                        <button
-                          onClick={() => handleExportPdf(selectedForm, selectedClient.name)}
-                          className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-3.5 py-1.5 transition-all duration-200 cursor-pointer shadow-sm"
-                          title="Export Schengen Visa application to PDF Format using print layout"
-                        >
-                          PDF Print
-                        </button>
                         
                         {selectedForm.status !== "approved" ? (
                           <button
@@ -1247,17 +1002,13 @@ export default function AgentDashboard() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                                       <div>
                                         {field.type === "select" ? (
-                                          <select
+                                          <CustomSelect
                                             disabled={selectedForm.status === "approved"}
                                             value={currentValue}
-                                            onChange={(e) => handleAgentEditField(field.id, e.target.value)}
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
-                                          >
-                                            <option value="">-- Select Option --</option>
-                                            {field.options?.map((opt) => (
-                                              <option key={opt} value={opt}>{opt}</option>
-                                            ))}
-                                          </select>
+                                            onChange={(val) => handleAgentEditField(field.id, val)}
+                                            options={field.options || []}
+                                            placeholder="-- Select Option --"
+                                          />
                                         ) : field.type === "date" ? (
                                           <input
                                             disabled={selectedForm.status === "approved"}
@@ -1388,6 +1139,106 @@ export default function AgentDashboard() {
         </div>
       )}
 
+    </div>
+  );
+}
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+interface CustomSelectProps {
+  disabled?: boolean;
+  value: string;
+  onChange: (val: string) => void;
+  options: (string | SelectOption)[];
+  placeholder?: string;
+  className?: string;
+  buttonClassName?: string;
+}
+
+function CustomSelect({ disabled, value, onChange, options, placeholder, className, buttonClassName }: CustomSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const parsedOptions: SelectOption[] = options.map((opt) => {
+    if (typeof opt === "string") {
+      return { value: opt, label: opt };
+    }
+    return opt;
+  });
+
+  const selectedOption = parsedOptions.find((opt) => opt.value === value);
+  const selectedLabel = selectedOption ? selectedOption.label : placeholder || "-- Select Option --";
+
+  return (
+    <div ref={dropdownRef} className={`relative z-10 text-left ${className || "w-full"}`}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={buttonClassName || `w-full text-left rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-850 bg-white focus:outline-none focus:border-brand-gold transition-all flex items-center justify-between cursor-pointer ${
+          disabled ? "opacity-60 cursor-not-allowed" : ""
+        }`}
+      >
+        <span className={value ? "text-slate-800 font-bold" : "text-slate-400"}>{selectedLabel}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2.5}
+          stroke="currentColor"
+          className={`w-3 h-3 text-slate-500 transition-transform duration-200 shrink-0 ml-1.5 ${isOpen ? "rotate-180" : ""}`}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {isOpen && !disabled && (
+        <div className="absolute right-0 mt-1.5 w-48 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl z-50 py-1">
+          {placeholder && (
+            <div
+              onClick={() => {
+                onChange("");
+                setIsOpen(false);
+              }}
+              className="px-3.5 py-2 text-xs text-slate-400 hover:bg-slate-50 cursor-pointer font-medium"
+            >
+              {placeholder}
+            </div>
+          )}
+          {parsedOptions.map((opt) => (
+            <div
+              key={opt.value}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+              className={`px-3.5 py-2 text-xs hover:bg-brand-cream/80 hover:text-brand-navy cursor-pointer font-bold transition-colors flex items-center justify-between ${
+                value === opt.value ? "bg-brand-cream text-brand-navy" : "text-slate-700"
+              }`}
+            >
+              <span>{opt.label}</span>
+              {value === opt.value && (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 text-brand-gold">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
