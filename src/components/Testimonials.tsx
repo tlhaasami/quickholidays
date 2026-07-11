@@ -204,10 +204,12 @@ export default function Testimonials() {
                       {/* Author Info */}
                       <div className="flex items-center gap-4 pt-2">
                         <div className="relative w-12 h-12 rounded-full overflow-hidden border border-brand-navy/5 bg-slate-100 flex-shrink-0">
-                          <img
-                            src={typeof t.avatar === "string" ? t.avatar : (t.avatar && (t.avatar as any).src) || ""}
+                          <Image
+                            src={t.avatar}
                             alt={t.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="48px"
+                            className="object-cover"
                           />
                         </div>
                         <div className="text-left">
@@ -276,10 +278,12 @@ export default function Testimonials() {
                     {/* Author Info */}
                     <div className="flex items-center gap-4 pt-2">
                       <div className="relative w-12 h-12 rounded-full overflow-hidden border border-brand-navy/5 bg-slate-100 flex-shrink-0">
-                        <img
-                          src={typeof t.avatar === "string" ? t.avatar : (t.avatar && (t.avatar as any).src) || ""}
+                        <Image
+                          src={t.avatar}
                           alt={t.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="48px"
+                          className="object-cover"
                         />
                       </div>
                       <div className="text-left">

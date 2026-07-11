@@ -46,10 +46,12 @@ export default function Destinations() {
             <div
               className="relative aspect-square w-full rounded-[24px] overflow-hidden shadow-md group cursor-pointer border border-brand-navy/5 transition-all duration-350 hover:-translate-y-2 hover:shadow-xl"
             >
-              <img
-                src={typeof dest.image === "string" ? dest.image : (dest.image && (dest.image as any).src) || ""}
+              <Image
+                src={dest.image}
                 alt={`${dest.name} Travel Destination`}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
               
               {/* Visual gradient overlay to ensure text contrast */}

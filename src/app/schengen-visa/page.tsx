@@ -9,6 +9,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 export default function SchengenVisaPage() {
   const [schengenDestinations, setSchengenDestinations] = useState(SCHENGEN_DESTINATIONS);
   const [bgLoaded, setBgLoaded] = useState(false);
+  const [loadedFlags, setLoadedFlags] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const stored = localStorage.getItem("quick_holidays_flags");
@@ -129,10 +130,21 @@ export default function SchengenVisaPage() {
                 >
                   {/* Flag Area */}
                   <div className="relative w-32 h-20 mb-6 overflow-hidden rounded-xl border border-slate-100 shadow-sm flex items-center justify-center bg-slate-50">
-                    <img
-                      src={typeof dest.flag === "string" ? dest.flag : (dest.flag && (dest.flag as any).src) || ""}
+                    {!loadedFlags[dest.slug] && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 animate-pulse text-[9px] text-slate-400 font-bold select-none gap-0.5">
+                        <span className="text-xl">🇪🇺</span>
+                        <span>Loading...</span>
+                      </div>
+                    )}
+                    <Image
+                      src={dest.flag}
                       alt={`${dest.name} Flag`}
-                      className="absolute inset-0 w-full h-full object-cover scale-[1.25] transition-transform duration-300 group-hover:scale-[1.38]"
+                      fill
+                      sizes="128px"
+                      onLoad={() => setLoadedFlags((prev) => ({ ...prev, [dest.slug]: true }))}
+                      className={`object-cover scale-[1.2] transition-all duration-[600ms] group-hover:scale-[1.3] ${
+                        loadedFlags[dest.slug] ? "opacity-100 blur-0" : "opacity-0 blur-xs"
+                      }`}
                     />
                   </div>
 

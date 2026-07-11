@@ -63,6 +63,7 @@ export default function Services() {
                   fill
                   sizes="64px"
                   className="object-contain object-center select-none"
+                  priority
                 />
               </div>
               {/* Service Title - serif styling to match main header */}

@@ -426,15 +426,69 @@ export default function AdminPage() {
     }, 2500);
   };
 
-  // File to base64 helper
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (base64: string) => void) => {
+  // Reusable client-side image optimization pipeline using HTML Canvas
+  const processImageFile = (
+    file: File,
+    width: number,
+    height: number,
+    crop: boolean,
+    callback: (base64: string) => void
+  ) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new globalThis.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          if (crop) {
+            const imgAspect = img.width / img.height;
+            const targetAspect = width / height;
+            let srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
+
+            if (imgAspect > targetAspect) {
+              srcW = img.height * targetAspect;
+              srcX = (img.width - srcW) / 2;
+            } else {
+              srcH = img.width / targetAspect;
+              srcY = (img.height - srcH) / 2;
+            }
+            ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, width, height);
+          } else {
+            ctx.drawImage(img, 0, 0, width, height);
+          }
+          let dataUrl = canvas.toDataURL("image/webp", 0.75);
+          if (!dataUrl.startsWith("data:image/webp")) {
+            dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+          }
+          callback(dataUrl);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // File to base64 helper with size target optimization pipeline
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    callback: (base64: string) => void,
+    type: "avatar" | "destination" | "flag"
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        callback(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      let width = 600;
+      let height = 600;
+      if (type === "avatar") {
+        width = 120;
+        height = 120;
+      } else if (type === "flag") {
+        width = 120;
+        height = 80;
+      }
+      processImageFile(file, width, height, true, callback);
     }
   };
 
@@ -575,15 +629,12 @@ export default function AdminPage() {
   const handleBgChange = (e: React.ChangeEvent<HTMLInputElement>, key: string, setter: (val: string | null) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
+      processImageFile(file, 1280, 720, true, (base64String) => {
         localStorage.setItem(key, base64String);
         setter(base64String);
         setContentSuccess("Background image updated successfully!");
         setTimeout(() => setContentSuccess(""), 3000);
-      };
-      reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -1512,7 +1563,7 @@ export default function AdminPage() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleFileChange(e, setReviewAvatar)}
+                    onChange={(e) => handleFileChange(e, setReviewAvatar, "avatar")}
                     className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
                   />
                 </div>
@@ -1650,7 +1701,7 @@ export default function AdminPage() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleFileChange(e, setDestImage)}
+                    onChange={(e) => handleFileChange(e, setDestImage, "destination")}
                     className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
                   />
                 </div>
@@ -1753,7 +1804,7 @@ export default function AdminPage() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => handleFileChange(e, setFlagImage)}
+                  onChange={(e) => handleFileChange(e, setFlagImage, "flag")}
                   className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
                 />
               </div>

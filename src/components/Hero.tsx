@@ -121,6 +121,7 @@ export default function Hero() {
                     width={48}
                     height={48}
                     className="h-12 w-12 object-contain"
+                    priority
                   />
                 </div>
                 {/* Stat Text - Dark Navy */}
