@@ -524,7 +524,7 @@ export default function AdminPage() {
       return;
     }
 
-    const defaultAvatar = adminTestimonials[0]?.avatar || "/assets/profile-icons/review-profile-1.png";
+    const defaultAvatar = adminTestimonials[0]?.avatar || "/assets/profile-icons/review-profile-1.jpg";
 
     const newReview = {
       name: reviewName,

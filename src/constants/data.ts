@@ -2,12 +2,12 @@ import logoTop from "@/assets/logos/quick-holidays-logo.png";
 import logoBottom from "@/assets/logos/quick-holidays-logo-bottom.png";
 
 // Backgrounds
-import heroBg from "@/assets/backgrounds/home-bg.png";
-import aboutUsBg from "@/assets/backgrounds/about-us-page-bg.png";
-import schengenVisaBg from "@/assets/backgrounds/schengen-visa-bg.png";
-import whyChooseUsBg from "@/assets/backgrounds/why-choose-us-bg.png";
-import formBg from "@/assets/backgrounds/consulation-bg.png";
-import contactUsBg from "@/assets/backgrounds/contact-us-page-bg.png";
+import heroBg from "@/assets/backgrounds/home-bg.jpg";
+import aboutUsBg from "@/assets/backgrounds/about-us-page-bg.jpg";
+import schengenVisaBg from "@/assets/backgrounds/schengen-visa-bg.jpg";
+import whyChooseUsBg from "@/assets/backgrounds/why-choose-us-bg.jpg";
+import formBg from "@/assets/backgrounds/consulation-bg.jpg";
+import contactUsBg from "@/assets/backgrounds/contact-us-page-bg.jpg";
 import flagPlaceholder from "@/assets/flags/france-flag.png";
 
 // Flags
@@ -37,16 +37,16 @@ import serviceIcon4 from "@/assets/icons/documentaiton-review.png";
 import serviceIcon5 from "@/assets/icons/onging-support.png"; // customer support headset
 
 // Testimonial Avatars
-import avatarSarah from "@/assets/profile-icons/review-profile-1.png"; // woman portrait
-import avatarJames from "@/assets/profile-icons/review-profile-2.png"; // man portrait (James)
-import avatarRayan from "@/assets/profile-icons/review-profile-3.png"; // man portrait (Daniel/James)
+import avatarSarah from "@/assets/profile-icons/review-profile-1.jpg"; // woman portrait
+import avatarJames from "@/assets/profile-icons/review-profile-2.jpg"; // man portrait (James)
+import avatarRayan from "@/assets/profile-icons/review-profile-3.jpg"; // man portrait (Daniel/James)
 
 // Destinations
-import destAustria from "@/assets/places-bg/austria-place-bg.png";
-import destEstonia from "@/assets/places-bg/estonia-place-bg.png";
-import destFinland from "@/assets/places-bg/finland-place-bg.png";
-import destFrance from "@/assets/places-bg/france-place-bg.png";
-import destGermany from "@/assets/places-bg/germany-place-bg.png";
+import destAustria from "@/assets/places-bg/austria-place-bg.jpg";
+import destEstonia from "@/assets/places-bg/estonia-place-bg.jpg";
+import destFinland from "@/assets/places-bg/finland-place-bg.jpg";
+import destFrance from "@/assets/places-bg/france-place-bg.jpg";
+import destGermany from "@/assets/places-bg/germany-place-bg.jpg";
 
 export { logoTop, logoBottom, heroBg, aboutUsBg, whyChooseUsBg, formBg, contactUsBg };
 
