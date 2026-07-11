@@ -39,23 +39,36 @@ function Counter({ value }: { value: string }) {
 
 export default function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [customBg, setCustomBg] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
+    const stored = localStorage.getItem("quick_holidays_bg_hero");
+    if (stored) {
+      setCustomBg(stored);
+    }
   }, []);
 
   return (
     <section className="relative w-full bg-brand-cream min-h-[90vh] flex items-center overflow-visible">
       {/* Background Image Spread Across the Complete Section */}
       <div className="absolute inset-0 z-0 select-none overflow-hidden">
-        <Image
-          src={heroBg}
-          alt="Schengen Visa Background - St. Peter's Basilica Rome"
-          fill
-          sizes="100vw"
-          className="object-cover object-right select-none scale-[1.02] origin-top"
-          priority
-        />
+        {customBg ? (
+          <img
+            src={customBg}
+            alt="Schengen Visa Background"
+            className="absolute inset-0 w-full h-full object-cover object-right select-none scale-[1.02] origin-top"
+          />
+        ) : (
+          <Image
+            src={heroBg}
+            alt="Schengen Visa Background - St. Peter's Basilica Rome"
+            fill
+            sizes="100vw"
+            className="object-cover object-right select-none scale-[1.02] origin-top"
+            priority
+          />
+        )}
         {/* Soft bottom fade-to-cream gradient to blend image seamlessly into the cream background below */}
         <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
       </div>

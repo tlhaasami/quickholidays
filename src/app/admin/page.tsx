@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import loginBg from "@/assets/backgrounds/login-signup-page-bg.png";
-import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS } from "@/constants/data";
+import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS, heroBg, whyChooseUsBg, formBg } from "@/constants/data";
 
 interface UserRequest {
   id: string;
@@ -89,6 +89,8 @@ export default function AdminPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  // Active Navigation Tab State
+  const [activeTab, setActiveTab] = useState<"users" | "footer" | "reviews" | "destinations" | "countries" | "backgrounds">("users");
 
   // Dashboard state
   const [requests, setRequests] = useState<UserRequest[]>([]);
@@ -158,6 +160,11 @@ export default function AdminPage() {
   // Content Save Messages
   const [contentSuccess, setContentSuccess] = useState("");
   const [contentError, setContentError] = useState("");
+  // Dynamic Background Images States
+  const [customLoginBg, setCustomLoginBg] = useState<string | null>(null);
+  const [customHeroBg, setCustomHeroBg] = useState<string | null>(null);
+  const [customWhyBg, setCustomWhyBg] = useState<string | null>(null);
+  const [customConsultationBg, setCustomConsultationBg] = useState<string | null>(null);
   const [reviewSortOrder, setReviewSortOrder] = useState<"newest" | "highest" | "lowest">("newest");
 
   // Load state and sample data if empty
@@ -165,6 +172,12 @@ export default function AdminPage() {
     // Check authentication
     const authStatus = localStorage.getItem("admin_auth") === "true";
     setIsAuthenticated(authStatus);
+
+    // Load backgrounds
+    setCustomLoginBg(localStorage.getItem("quick_holidays_bg_login"));
+    setCustomHeroBg(localStorage.getItem("quick_holidays_bg_hero"));
+    setCustomWhyBg(localStorage.getItem("quick_holidays_bg_why_choose_us"));
+    setCustomConsultationBg(localStorage.getItem("quick_holidays_bg_consultation_form"));
 
     // Load user signup requests
     const storedRequests = localStorage.getItem("quick_holidays_user_requests");
@@ -555,6 +568,28 @@ export default function AdminPage() {
     setTimeout(() => setContentSuccess(""), 3000);
   };
 
+  const handleBgChange = (e: React.ChangeEvent<HTMLInputElement>, key: string, setter: (val: string | null) => void) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        localStorage.setItem(key, base64String);
+        setter(base64String);
+        setContentSuccess("Background image updated successfully!");
+        setTimeout(() => setContentSuccess(""), 3000);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleBgReset = (key: string, setter: (val: string | null) => void) => {
+    localStorage.removeItem(key);
+    setter(null);
+    setContentSuccess("Background image restored to default!");
+    setTimeout(() => setContentSuccess(""), 3000);
+  };
+
   // Login View
   if (!isAuthenticated) {
     return (
@@ -571,14 +606,22 @@ export default function AdminPage() {
         
         {/* CLEAR background image layer */}
         <div className="absolute inset-0 w-full h-full z-0">
-          <Image
-            src={loginBg}
-            alt="Admin Login Background"
-            fill
-            sizes="100vw"
-            className="object-cover object-center select-none"
-            priority
-          />
+          {customLoginBg ? (
+            <img
+              src={customLoginBg}
+              alt="Admin Login Background"
+              className="absolute inset-0 w-full h-full object-cover object-center select-none"
+            />
+          ) : (
+            <Image
+              src={loginBg}
+              alt="Admin Login Background"
+              fill
+              sizes="100vw"
+              className="object-cover object-center select-none"
+              priority
+            />
+          )}
           {/* Navy-themed soft shadow gradient matching our color scheme */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0F2148]/95 via-[#0F2148]/60 to-transparent pointer-events-none" />
         </div>
@@ -676,7 +719,47 @@ export default function AdminPage() {
     );
   }
 
-  // Dashboard View
+  const getTabHeader = () => {
+    switch (activeTab) {
+      case "users":
+        return {
+          title: "System Control Room",
+          subtitle: "Welcome back, Administrator. Manage registration requests, add team members, and check active accounts.",
+        };
+      case "footer":
+        return {
+          title: "Footer & Social Settings",
+          subtitle: "Manage public site contact details, physical address, social links, and copyright text.",
+        };
+      case "reviews":
+        return {
+          title: "Testimonials Manager",
+          subtitle: "Manage feedback cards. Add reviews, delete submissions, and sort by rating.",
+        };
+      case "destinations":
+        return {
+          title: "Places & Destinations Manager",
+          subtitle: "Manage popular destinations visual cards rendered on your homepage.",
+        };
+      case "countries":
+        return {
+          title: "Schengen Visa Countries Manager",
+          subtitle: "Manage country flags and names displayed on the Schengen Visa countries page.",
+        };
+      case "backgrounds":
+        return {
+          title: "Website Wallpapers Manager",
+          subtitle: "Upload custom background wallpapers across main website pages and portal login screens.",
+        };
+      default:
+        return {
+          title: "System Control Room",
+          subtitle: "Welcome back, Administrator.",
+        };
+    }
+  };
+
+  const tabHeader = getTabHeader();
   const pendingRequests = requests.filter((r) => r.status === "pending");
   const approvedUsers = requests.filter((r) => r.status === "approved" || r.status === "suspended");
 
@@ -699,97 +782,97 @@ export default function AdminPage() {
           {/* Navigation Links */}
           <nav className="flex flex-col gap-2">
             <a
-              href="#add-user"
+              href="#"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById("add-user")?.scrollIntoView({ behavior: "smooth" });
+                setActiveTab("users");
               }}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 group ${
+                activeTab === "users" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
             >
-              <svg className="w-4 h-4 shrink-0 text-brand-gold group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className={`w-4 h-4 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "users" ? "text-brand-navy" : "text-brand-gold"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
-              Add User
+              Users & Requests
             </a>
-            <a
-              href="#pending-requests"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("pending-requests")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
-            >
-              <svg className="w-4 h-4 shrink-0 text-amber-500 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Pending Requests
-            </a>
-            <a
-              href="#approved-accounts"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("approved-accounts")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
-            >
-              <svg className="w-4 h-4 shrink-0 text-emerald-500 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              Approved Accounts
-            </a>
+
             <div className="pt-4 border-t border-white/10 space-y-1">
               <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest px-4 block mb-2">Content Manager</span>
               <a
-                href="#edit-footer"
+                href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById("edit-footer")?.scrollIntoView({ behavior: "smooth" });
+                  setActiveTab("footer");
                 }}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 group ${
+                  activeTab === "footer" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                <svg className="w-3.5 h-3.5 shrink-0 text-indigo-400 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className={`w-3.5 h-3.5 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "footer" ? "text-brand-navy" : "text-indigo-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
                 </svg>
                 Edit Footer Info
               </a>
               <a
-                href="#edit-reviews"
+                href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById("edit-reviews")?.scrollIntoView({ behavior: "smooth" });
+                  setActiveTab("reviews");
                 }}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 group ${
+                  activeTab === "reviews" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                <svg className="w-3.5 h-3.5 shrink-0 text-rose-400 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className={`w-3.5 h-3.5 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "reviews" ? "text-brand-navy" : "text-rose-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 Edit Client Reviews
               </a>
               <a
-                href="#edit-destinations"
+                href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById("edit-destinations")?.scrollIntoView({ behavior: "smooth" });
+                  setActiveTab("destinations");
                 }}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 group ${
+                  activeTab === "destinations" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                <svg className="w-3.5 h-3.5 shrink-0 text-teal-400 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className={`w-3.5 h-3.5 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "destinations" ? "text-brand-navy" : "text-teal-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 </svg>
                 Edit Popular Places
               </a>
               <a
-                href="#edit-countries"
+                href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById("edit-countries")?.scrollIntoView({ behavior: "smooth" });
+                  setActiveTab("countries");
                 }}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 group ${
+                  activeTab === "countries" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                <svg className="w-3.5 h-3.5 shrink-0 text-red-400 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className={`w-3.5 h-3.5 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "countries" ? "text-brand-navy" : "text-red-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21v8h-6l-1-1H5v4m0 4h18" />
                 </svg>
                 Edit Country Flags
+              </a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab("backgrounds");
+                }}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 group ${
+                  activeTab === "backgrounds" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <svg className={`w-3.5 h-3.5 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "backgrounds" ? "text-brand-navy" : "text-purple-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Edit BGs & Wallpaper
               </a>
             </div>
           </nav>
@@ -816,11 +899,11 @@ export default function AdminPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-brand-navy/10 pb-6 mb-8 text-left">
           <div>
-            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-brand-navy tracking-tight">
-              System Control Room
+            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-brand-navy tracking-tight animate-fadeIn">
+              {tabHeader.title}
             </h1>
-            <p className="text-slate-600 text-sm mt-1">
-              Welcome back, Administrator. Manage registration requests, add team members, and check active accounts.
+            <p className="text-slate-600 text-sm mt-1 animate-fadeIn">
+              {tabHeader.subtitle}
             </p>
           </div>
           <button
@@ -833,9 +916,10 @@ export default function AdminPage() {
 
         {/* Enhanced Full-Width UI Dashboard Container */}
         <div className="space-y-8">
-          
-          {/* Stats section */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+          {activeTab === "users" && (
+            <>
+              {/* Stats section */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
             {/* Stat 1: Pending Requests */}
             <div className="bg-white rounded-3xl p-6 border border-brand-gold/15 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex items-center justify-between">
               <div className="text-left">
@@ -1177,9 +1261,12 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+          </>
+          )}
 
           {/* Card A: Edit Footer Info & Social Links */}
-          <div id="edit-footer" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
+          {activeTab === "footer" && (
+            <div id="edit-footer" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1332,9 +1419,11 @@ export default function AdminPage() {
               </div>
             </form>
           </div>
+          )}
 
           {/* Card B: Edit Client Reviews */}
-          <div id="edit-reviews" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
+          {activeTab === "reviews" && (
+            <div id="edit-reviews" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1494,9 +1583,11 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Card C: Edit Popular Destinations */}
-          <div id="edit-destinations" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
+          {activeTab === "destinations" && (
+            <div id="edit-destinations" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-600 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1584,9 +1675,11 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Card D: Edit Country Flags */}
-          <div id="edit-countries" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
+          {activeTab === "countries" && (
+            <div id="edit-countries" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1682,6 +1775,152 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+          )}
+
+          {/* Card E: Edit Website Backgrounds */}
+          {activeTab === "backgrounds" && (
+            <div id="edit-backgrounds" className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm text-left hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="font-sans text-xl font-bold text-brand-navy">
+                  Edit Website Background Images
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">Upload custom background wallpapers across main website pages and portal login screens.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              {/* Background 1: Hero Section */}
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-4 text-left flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Hero Section Wallpaper</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleBgChange(e, "quick_holidays_bg_hero", setCustomHeroBg)}
+                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+                <div className="space-y-3 pt-2">
+                  <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200 bg-slate-250 relative shadow-inner">
+                    <img
+                      src={customHeroBg || (typeof heroBg === "string" ? heroBg : (heroBg as any).src || "")}
+                      alt="Hero Wallpaper"
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {customHeroBg && (
+                    <button
+                      type="button"
+                      onClick={() => handleBgReset("quick_holidays_bg_hero", setCustomHeroBg)}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-[10px] font-bold transition-all cursor-pointer"
+                    >
+                      Restore Default Hero
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Background 2: Why Choose Us */}
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-4 text-left flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Why Choose Us Section Wallpaper</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleBgChange(e, "quick_holidays_bg_why_choose_us", setCustomWhyBg)}
+                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+                <div className="space-y-3 pt-2">
+                  <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200 bg-slate-250 relative shadow-inner">
+                    <img
+                      src={customWhyBg || (typeof whyChooseUsBg === "string" ? whyChooseUsBg : (whyChooseUsBg as any).src || "")}
+                      alt="Why Choose Us Wallpaper"
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {customWhyBg && (
+                    <button
+                      type="button"
+                      onClick={() => handleBgReset("quick_holidays_bg_why_choose_us", setCustomWhyBg)}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-[10px] font-bold transition-all cursor-pointer"
+                    >
+                      Restore Default Why Choose Us
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Background 3: Consultation Form */}
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-4 text-left flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Consultation Form Section Wallpaper</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleBgChange(e, "quick_holidays_bg_consultation_form", setCustomConsultationBg)}
+                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+                <div className="space-y-3 pt-2">
+                  <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200 bg-slate-250 relative shadow-inner">
+                    <img
+                      src={customConsultationBg || (typeof formBg === "string" ? formBg : (formBg as any).src || "")}
+                      alt="Consultation Wallpaper"
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {customConsultationBg && (
+                    <button
+                      type="button"
+                      onClick={() => handleBgReset("quick_holidays_bg_consultation_form", setCustomConsultationBg)}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-[10px] font-bold transition-all cursor-pointer"
+                    >
+                      Restore Default Consultation
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Background 4: Portal Login Background */}
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-4 text-left flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Portal Log In Background</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleBgChange(e, "quick_holidays_bg_login", setCustomLoginBg)}
+                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+                <div className="space-y-3 pt-2">
+                  <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200 bg-slate-250 relative shadow-inner">
+                    <img
+                      src={customLoginBg || (typeof loginBg === "string" ? loginBg : (loginBg as any).src || "")}
+                      alt="Portal Login Wallpaper"
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {customLoginBg && (
+                    <button
+                      type="button"
+                      onClick={() => handleBgReset("quick_holidays_bg_login", setCustomLoginBg)}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-[10px] font-bold transition-all cursor-pointer"
+                    >
+                      Restore Default Login
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          )}
 
         </div>
 

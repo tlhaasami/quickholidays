@@ -34,8 +34,15 @@ export default function LoginPage() {
   // Messages
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [customBg, setCustomBg] = useState<string | null>(null);
 
   useEffect(() => {
+    // Load backgrounds
+    const storedBg = localStorage.getItem("quick_holidays_bg_login");
+    if (storedBg) {
+      setCustomBg(storedBg);
+    }
+
     // Seed default requests if none exist
     const storedRequests = localStorage.getItem("quick_holidays_user_requests");
     if (storedRequests) {
@@ -193,16 +200,24 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen grid grid-cols-1 md:grid-cols-2 bg-[#0F2148] font-sans p-6 select-none overflow-hidden">
       
-      {/* CLEAR background image layer */}
+       {/* CLEAR background image layer */}
       <div className="absolute inset-0 w-full h-full z-0 select-none">
-        <Image
-          src={loginBg}
-          alt="Kayak Ocean Background"
-          fill
-          sizes="100vw"
-          className="object-cover object-center select-none -scale-x-100"
-          priority
-        />
+        {customBg ? (
+          <img
+            src={customBg}
+            alt="Workspace Background"
+            className="absolute inset-0 w-full h-full object-cover object-center select-none -scale-x-100"
+          />
+        ) : (
+          <Image
+            src={loginBg}
+            alt="Kayak Ocean Background"
+            fill
+            sizes="100vw"
+            className="object-cover object-center select-none -scale-x-100"
+            priority
+          />
+        )}
         {/* Navy-themed soft shadow gradient matching our color scheme */}
         <div className="absolute inset-0 bg-gradient-to-l from-[#0F2148]/95 via-[#0F2148]/60 to-transparent pointer-events-none" />
       </div>

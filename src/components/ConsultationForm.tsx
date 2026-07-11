@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image, { type StaticImageData } from "next/image";
 import { formBg } from "@/constants/data";
 
@@ -65,21 +65,38 @@ export default function ConsultationForm({
     }, 1500);
   };
 
-  const background = backgroundImage ?? formBg;
+  const [customBg, setCustomBg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("quick_holidays_bg_consultation_form");
+    if (stored) {
+      setCustomBg(stored);
+    }
+  }, []);
+
+  const background = customBg || backgroundImage || formBg;
 
   return (
     <section id={sectionId} className="relative w-full overflow-hidden py-20 sm:py-28 border-t border-brand-navy/5 bg-brand-cream">
       {/* Full background sketch image */}
       {showBackground && (
         <div className="absolute inset-0 z-0 select-none">
-          <Image
-            src={background}
-            alt="Schengen Consultation Sketch Backdrop"
-            fill
-            sizes="100vw"
-            className="object-cover object-bottom-right select-none"
-            priority
-          />
+          {customBg ? (
+            <img
+              src={customBg}
+              alt="Schengen Consultation Sketch Backdrop"
+              className="absolute inset-0 w-full h-full object-cover object-bottom-right select-none"
+            />
+          ) : (
+            <Image
+              src={background}
+              alt="Schengen Consultation Sketch Backdrop"
+              fill
+              sizes="100vw"
+              className="object-cover object-bottom-right select-none"
+              priority
+            />
+          )}
         </div>
       )}
 
