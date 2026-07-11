@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import loginBg from "@/assets/backgrounds/login-signup-page-bg.png";
 import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS, heroBg, whyChooseUsBg, formBg } from "@/constants/data";
 
 interface UserRequest {
@@ -89,6 +88,7 @@ export default function AdminPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [animateCard, setAnimateCard] = useState(false);
   // Active Navigation Tab State
   const [activeTab, setActiveTab] = useState<"users" | "footer" | "reviews" | "destinations" | "countries" | "backgrounds">("users");
 
@@ -169,6 +169,9 @@ export default function AdminPage() {
 
   // Load state and sample data if empty
   useEffect(() => {
+    // Trigger animation
+    setAnimateCard(true);
+
     // Check authentication
     const authStatus = localStorage.getItem("admin_auth") === "true";
     setIsAuthenticated(authStatus);
@@ -593,7 +596,7 @@ export default function AdminPage() {
   // Login View
   if (!isAuthenticated) {
     return (
-      <div className="relative min-h-screen flex items-center justify-start bg-[#0F2148] font-sans p-6 md:pl-28 select-none overflow-hidden">
+      <div className="relative min-h-screen flex items-center justify-start bg-white font-sans p-6 md:pl-28 select-none overflow-hidden">
         {/* Back to Site Button */}
         <div className="absolute top-6 right-6 z-20">
           <Link
@@ -614,7 +617,7 @@ export default function AdminPage() {
             />
           ) : (
             <Image
-              src={loginBg}
+              src={heroBg}
               alt="Admin Login Background"
               fill
               sizes="100vw"
@@ -622,12 +625,14 @@ export default function AdminPage() {
               priority
             />
           )}
-          {/* Navy-themed soft shadow gradient matching our color scheme */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F2148]/95 via-[#0F2148]/60 to-transparent pointer-events-none" />
+          {/* Light overlay to remove blue shading and keep the image natural */}
+          <div className="absolute inset-0 bg-white/10 pointer-events-none" />
         </div>
 
-        {/* Main glassmorphic card positioned to the left */}
-        <div className="relative z-10 w-full max-w-lg bg-[#0F2148]/35 border border-white/10 rounded-[32px] p-8 shadow-2xl backdrop-blur-md text-left flex flex-col justify-center dark-autofill">
+        {/* Main glassmorphic card positioned to the left with entrance animation - higher opacity for readability */}
+        <div className={`relative z-10 w-full max-w-lg bg-[#0F2148]/80 border border-white/10 rounded-[32px] p-8 shadow-2xl backdrop-blur-md text-left flex flex-col justify-center dark-autofill transition-all duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          animateCard ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-12 scale-95"
+        }`}>
           
           {/* Branding Title */}
           <div className="mb-6">
@@ -646,27 +651,6 @@ export default function AdminPage() {
           )}
 
           <div>
-            {/* Continue with Google button with multicolor Google logo */}
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-3 rounded-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-2.5 px-6 text-xs transition-all duration-300 shadow-sm hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.25)] active:scale-[0.98] cursor-pointer group"
-            >
-              <svg className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
-              </svg>
-              Continue with Google
-            </button>
-
-            {/* Separator line */}
-            <div className="flex items-center gap-4 my-5">
-              <span className="grow h-[1px] bg-white/10" />
-              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Or admin details</span>
-              <span className="grow h-[1px] bg-white/10" />
-            </div>
-
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label htmlFor="admin-user" className="block text-[10px] font-bold text-white/60 uppercase tracking-wider mb-2 ml-1">
@@ -707,6 +691,27 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+
+            {/* Separator line */}
+            <div className="flex items-center gap-4 my-5">
+              <span className="grow h-[1px] bg-white/10" />
+              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Or continue with Google</span>
+              <span className="grow h-[1px] bg-white/10" />
+            </div>
+
+            {/* Continue with Google button with multicolor Google logo */}
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-3 rounded-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-2.5 px-6 text-xs transition-all duration-300 shadow-sm hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.25)] active:scale-[0.98] cursor-pointer group"
+            >
+              <svg className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+              </svg>
+              Continue with Google
+            </button>
           </div>
 
           <div className="text-left text-[10px] text-white/40 mt-5 border-t border-white/10 pt-4 ml-1">
@@ -1902,7 +1907,7 @@ export default function AdminPage() {
                 <div className="space-y-3 pt-2">
                   <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200 bg-slate-250 relative shadow-inner">
                     <img
-                      src={customLoginBg || (typeof loginBg === "string" ? loginBg : (loginBg as any).src || "")}
+                      src={customLoginBg || (typeof heroBg === "string" ? heroBg : (heroBg as any).src || "")}
                       alt="Portal Login Wallpaper"
                       className="object-cover w-full h-full"
                     />

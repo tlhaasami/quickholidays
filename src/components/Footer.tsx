@@ -9,7 +9,7 @@ import { logoBottom } from "@/constants/data";
 export default function Footer() {
   const pathname = usePathname();
   const isAdminPath = pathname ? pathname.startsWith("/admin") : false;
-  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin")) : false;
+  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/visa-form")) : false;
 
   const [isAdminSubdomain, setIsAdminSubdomain] = useState(false);
   const [footerInfo, setFooterInfo] = useState({

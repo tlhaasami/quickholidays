@@ -73,7 +73,8 @@ export default function Navbar() {
     const isDashboard = pathname ? (
       pathname.startsWith("/agent-dashboard") || 
       pathname.startsWith("/processing-dashboard") || 
-      pathname.startsWith("/admin")
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/visa-form")
     ) : false;
     const shouldHide = isDashboard || isAdminSubdomain;
 
@@ -91,7 +92,7 @@ export default function Navbar() {
   const isAdminPath = pathname ? pathname.startsWith("/admin") : false;
   const isAdminLogin = (isAdminSubdomain || isAdminPath) && !isAdminAuthenticated;
   const isAdminDashboard = (isAdminSubdomain || isAdminPath) && isAdminAuthenticated;
-  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin")) : false;
+  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/visa-form")) : false;
   const isHomeActive = pathname === "/" && !isAdminDashboard && !isAdminLogin;
   const isSchengenActive = pathname === "/schengen-visa";
   const isAboutActive = pathname === "/about-us";
