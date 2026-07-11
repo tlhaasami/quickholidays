@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { logoTop } from "@/constants/data";
 
 export default function Navbar() {
@@ -13,6 +13,27 @@ export default function Navbar() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [activeHash, setActiveHash] = useState("#add-user");
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Deferred prefetching pipeline: Wait until the current page has fully loaded
+  // (styles, fonts, images are complete), then prefetch other routes in the background.
+  useEffect(() => {
+    const prefetchOtherRoutes = () => {
+      const routes = ["/", "/schengen-visa", "/about-us", "/contact-us", "/login"];
+      routes
+        .filter((route) => route !== pathname)
+        .forEach((route) => {
+          router.prefetch(route);
+        });
+    };
+
+    if (document.readyState === "complete") {
+      prefetchOtherRoutes();
+    } else {
+      window.addEventListener("load", prefetchOtherRoutes);
+      return () => window.removeEventListener("load", prefetchOtherRoutes);
+    }
+  }, [pathname, router]);
 
   const handleAdminLinkClick = (hash: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -154,7 +175,7 @@ export default function Navbar() {
           
           {/* Logo */}
           <div className="shrink-0">
-            <Link href="/" className="flex items-center">
+            <Link href="/" prefetch={false} className="flex items-center">
               <Image
                 src={logoTop}
                 alt="Quick Holidays Logo"
@@ -220,6 +241,7 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/"
+                    prefetch={false}
                     className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                       isHomeActive
                         ? "text-brand-gold font-semibold"
@@ -230,6 +252,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/schengen-visa"
+                    prefetch={false}
                     className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                       isSchengenActive
                         ? "text-brand-gold font-semibold"
@@ -240,6 +263,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/about-us"
+                    prefetch={false}
                     className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                       isAboutActive
                         ? "text-brand-gold font-semibold"
@@ -250,6 +274,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/contact-us"
+                    prefetch={false}
                     className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
                       isContactActive
                         ? "text-brand-gold font-semibold"
@@ -286,12 +311,14 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <Link
                   href="/contact-us"
+                  prefetch={false}
                   className="inline-flex items-center justify-center rounded-full bg-brand-navy px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.04] transition-all duration-300"
                 >
                   Get Free Consultancy
                 </Link>
                 <Link
                   href="/login"
+                  prefetch={false}
                   className={`inline-flex items-center justify-center rounded-full border border-brand-gold px-6 py-2.5 text-sm font-bold text-brand-gold hover:bg-brand-gold hover:text-white hover:scale-[1.04] transition-all duration-300 cursor-pointer ${
                     isLoginActive
                       ? "bg-brand-gold text-white font-semibold"
