@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   
   // Ignore files with extensions (images, fonts, stylesheets) and Next.js internal calls (HMR, static scripts)
@@ -16,9 +16,11 @@ export function proxy(request: NextRequest) {
 
   const hostname = request.headers.get("host") || "";
   const isSubdomainAdmin = hostname.startsWith("admin.");
+  const isNetlifyDefault = hostname.includes("netlify.app");
 
-  // If trying to access /admin directly from the main domain (e.g. localhost:3000/admin), block it with a 404
-  if (url.pathname.startsWith("/admin") && !isSubdomainAdmin) {
+  // If trying to access /admin directly from the main domain (e.g. localhost:3000/admin), block it with a 404,
+  // EXCEPT when on Netlify's default domain (where admin. subdomain is not possible due to SSL restrictions)
+  if (url.pathname.startsWith("/admin") && !isSubdomainAdmin && !isNetlifyDefault) {
     url.pathname = "/404";
     return NextResponse.rewrite(url);
   }

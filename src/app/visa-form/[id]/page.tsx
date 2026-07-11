@@ -261,7 +261,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-brand-cream text-slate-800 font-sans relative pb-20 select-none antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-brand-cream text-slate-800 font-sans relative pb-20 select-none antialiased overflow-x-clip">
       {/* Background Cover Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-[0.06] z-0"
@@ -332,7 +332,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8">
         
         {/* Active Dossier Navigation & Form Switcher */}
-        <div className="bg-white border border-brand-gold/15 rounded-[24px] p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-left relative overflow-hidden">
+        <div className="bg-white border border-brand-gold/15 rounded-[24px] p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-left relative overflow-visible">
 
           <div className="pl-2">
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Active Travel Dossier</span>
