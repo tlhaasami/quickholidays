@@ -258,16 +258,6 @@ export default function Navbar() {
                   >
                     Contact Us
                   </Link>
-                  <Link
-                    href="/login"
-                    className={`nav-link inline-flex items-center px-3 py-1.5 rounded-md transition-all duration-200 ${
-                      isLoginActive
-                        ? "text-brand-gold font-semibold"
-                        : "text-slate-600 hover:text-brand-gold hover:scale-[1.03]"
-                    }`}
-                  >
-                    Login
-                  </Link>
                 </>
               )}
             </div>
@@ -293,12 +283,24 @@ export default function Navbar() {
                 Back to Site
               </a>
             ) : (
-              <Link
-                href="/contact-us"
-                className="inline-flex items-center justify-center rounded-full bg-brand-navy px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.04] transition-all duration-300"
-              >
-                Get Free Consultancy
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/contact-us"
+                  className="inline-flex items-center justify-center rounded-full bg-brand-navy px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.04] transition-all duration-300"
+                >
+                  Get Free Consultancy
+                </Link>
+                <Link
+                  href="/login"
+                  className={`inline-flex items-center justify-center rounded-full border border-brand-gold px-6 py-2.5 text-sm font-bold text-brand-gold hover:bg-brand-gold hover:text-white hover:scale-[1.04] transition-all duration-300 cursor-pointer ${
+                    isLoginActive
+                      ? "bg-brand-gold text-white font-semibold"
+                      : "bg-white text-brand-gold"
+                  }`}
+                >
+                  Login
+                </Link>
+              </div>
             )}
           </div>
 

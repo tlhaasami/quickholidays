@@ -597,6 +597,16 @@ export default function AdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="relative min-h-screen flex items-center justify-start bg-white font-sans p-6 md:pl-28 select-none overflow-hidden">
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes float-plane {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(8deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+          }
+          .animate-plane {
+            animation: float-plane 4s ease-in-out infinite;
+          }
+        `}} />
         {/* Back to Site Button */}
         <div className="absolute top-6 right-6 z-20">
           <Link
@@ -629,19 +639,26 @@ export default function AdminPage() {
           <div className="absolute inset-0 bg-white/10 pointer-events-none" />
         </div>
 
-        {/* Main glassmorphic card positioned to the left with entrance animation - higher opacity for readability */}
-        <div className={`relative z-10 w-full max-w-lg bg-[#0F2148]/80 border border-white/10 rounded-[32px] p-8 shadow-2xl backdrop-blur-md text-left flex flex-col justify-center dark-autofill transition-all duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        {/* Main glassmorphic card positioned to the left with entrance animation - gold border top & shadow glow */}
+        <div className={`relative z-10 w-full max-w-lg bg-[#0F2148]/80 border border-white/10 border-t-4 border-t-brand-gold/60 rounded-[32px] p-8 shadow-2xl shadow-[0_20px_50px_rgba(15,33,72,0.35),0_0_35px_rgba(204,163,82,0.15)] backdrop-blur-md text-left flex flex-col justify-center dark-autofill transition-all duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           animateCard ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-12 scale-95"
         }`}>
           
-          {/* Branding Title */}
-          <div className="mb-6">
-            <span className="text-xs font-bold uppercase tracking-[0.25em] text-brand-gold block mb-2">
-              System Administrator
-            </span>
-            <h1 className="font-serif text-3xl font-extrabold text-white">
-              Admin Sign In
-            </h1>
+          {/* Branding Title with animated aeroplane */}
+          <div className="mb-6 flex justify-between items-start relative">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-[0.25em] text-brand-gold block mb-2">
+                System Administrator
+              </span>
+              <h1 className="font-serif text-3xl font-extrabold text-white">
+                Admin Sign In
+              </h1>
+            </div>
+            <div className="animate-plane text-brand-gold shrink-0 mt-1 mr-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-8 h-8 drop-shadow-[0_0_8px_rgba(204,163,82,0.6)]">
+                <path d="M3.4 20.4l17.4-8.4L3.4 3.6v6.6l12 1.8-12 1.8v6.6z" />
+              </svg>
+            </div>
           </div>
 
           {error && (
