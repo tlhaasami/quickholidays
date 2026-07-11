@@ -47,3 +47,12 @@ body.no-header-padding {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

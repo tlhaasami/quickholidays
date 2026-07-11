@@ -15,6 +15,7 @@ export default function AgentDashboard() {
   const [clients, setClients] = useState<ClientProfile[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientProfile | null>(null);
   const [selectedForm, setSelectedForm] = useState<VisaForm | null>(null);
+  const [activeSectionIndex, setActiveSectionIndex] = useState(0);
 
   // Search, Filters & Sorting
   const [searchQuery, setSearchQuery] = useState("");
@@ -545,7 +546,49 @@ export default function AgentDashboard() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  // Exporters Excel and PDF have been removed
+  const getAgentSectionStatus = (section: typeof visaSections[0], form: VisaForm) => {
+    const fields = section.fields;
+    const data = form.formData || {};
+    const approved = form.approvedData || {};
+    
+    const filledCount = fields.filter((f) => {
+      const val = data[f.id];
+      return val !== undefined && val !== null && String(val).trim() !== "";
+    }).length;
+
+    const unapprovedCount = fields.filter((f) => {
+      const val = data[f.id] || "";
+      const app = approved[f.id] || "";
+      return val !== app && val !== "";
+    }).length;
+
+    return {
+      filled: filledCount,
+      total: fields.length,
+      percentage: Math.round((filledCount / fields.length) * 100),
+      unapproved: unapprovedCount
+    };
+  };
+
+  const handleFieldsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const containerTop = container.getBoundingClientRect().top;
+    
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    
+    for (let i = 0; i < visaSections.length; i++) {
+      const el = document.getElementById(`section-${i}`);
+      if (el) {
+        const distance = Math.abs(el.getBoundingClientRect().top - containerTop - 10);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = i;
+        }
+      }
+    }
+    setActiveSectionIndex(closestIndex);
+  };
 
   return (
     <div className="min-h-screen bg-brand-cream text-slate-800 font-sans flex h-screen overflow-hidden antialiased">
@@ -820,60 +863,59 @@ export default function AgentDashboard() {
             {/* Split Panel: Client Forms Selector (Left) vs Selected Form Reviewer (Right) */}
             <div className="flex-1 flex overflow-hidden">
               
-              {/* Client Forms Selection Bar */}
-              <div className="w-72 bg-slate-50 border-r border-brand-gold/10 flex flex-col overflow-y-auto p-4 shrink-0 text-left">
-                <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-3">Client Forms</h3>
-                <div className="space-y-2">
-                  {selectedClient.forms.map((form) => {
-                    const isFormSelected = selectedForm?.id === form.id;
-                    const formNeedsApproval = form.status === "client_completed" || Object.keys(form.formData || {}).some((k) => {
-                      const val = form.formData[k];
-                      const app = form.approvedData?.[k];
-                      return val !== app && val !== "";
-                    });
-
-                    return (
-                      <div
-                        key={form.id}
-                        onClick={() => setSelectedForm(form)}
-                        className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                          isFormSelected
-                            ? "bg-white border-brand-gold text-brand-navy shadow-sm font-semibold ring-1 ring-brand-gold"
-                            : "bg-white border-slate-100 hover:bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        <div className="flex justify-between items-start gap-1">
-                          <div>
-                            <h4 className="text-xs font-bold leading-relaxed">{form.title}</h4>
-                            {form.applicantName && (
-                              <p className="text-[10px] text-slate-500 font-medium mt-0.5">for {form.applicantName}</p>
-                            )}
-                          </div>
-                          {formNeedsApproval && (
-                            <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-1 shrink-0 animate-pulse" title="Needs approval" />
-                          )}
-                        </div>
-                        
-                        <div className="flex justify-between items-center mt-3 text-[9px] text-slate-400 font-mono">
-                          <span>Status: <strong>{form.status.toUpperCase()}</strong></span>
-                          <span>{new Date(form.updated_at).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Form Review Core Editor (Right Panel) */}
-              <div className="flex-1 overflow-y-auto flex flex-col bg-white">
+              <div className="flex-1 flex flex-col bg-white overflow-hidden">
                 {selectedForm ? (
                   <>
                     {/* Secondary Form Title & Export Bar */}
                     <div className="bg-slate-50 border-b border-brand-gold/10 px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shrink-0 text-left">
-                      <div>
-                        <h4 className="text-sm font-bold text-brand-navy">
-                          {selectedForm.title} {selectedForm.applicantName ? `(for ${selectedForm.applicantName})` : ""}
-                        </h4>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Dossier:</span>
+                          {(() => {
+                            const activeFormNeedsApproval = selectedForm.status === "client_completed" || Object.keys(selectedForm.formData || {}).some((k) => {
+                              const val = selectedForm.formData[k];
+                              const app = selectedForm.approvedData?.[k];
+                              return val !== app && val !== "";
+                            });
+                            return (
+                              <div className="relative flex items-center gap-2">
+                                <CustomSelect
+                                  value={selectedForm.id}
+                                  onChange={(val) => {
+                                    const found = selectedClient.forms.find((f) => f.id === val);
+                                    if (found) setSelectedForm(found);
+                                  }}
+                                  options={selectedClient.forms.map((f) => {
+                                    const needsApproval = f.status === "client_completed" || Object.keys(f.formData || {}).some((k) => {
+                                      const val = f.formData[k];
+                                      const app = f.approvedData?.[k];
+                                      return val !== app && val !== "";
+                                    });
+                                    let statusLabel = "Draft";
+                                    if (f.status === "client_completed") statusLabel = "Needs Approval";
+                                    if (f.status === "approved") statusLabel = "Final Approved";
+                                    return {
+                                      value: f.id,
+                                      label: `${f.title}${f.applicantName ? ` (for ${f.applicantName})` : ""} [${statusLabel}]${needsApproval ? " ⚠️" : ""}`
+                                    };
+                                  })}
+                                  className="w-80"
+                                  buttonClassName={`flex items-center justify-between gap-2 bg-white border rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 shadow-xs transition-all cursor-pointer focus:outline-none focus:ring-1 ${
+                                    activeFormNeedsApproval
+                                      ? "border-amber-400 focus:border-amber-500 focus:ring-amber-500 text-amber-900 bg-amber-50/10"
+                                      : "border-slate-200 hover:border-brand-gold focus:border-brand-gold focus:ring-brand-gold"
+                                  }`}
+                                />
+                                {activeFormNeedsApproval && (
+                                  <span className="bg-amber-500 text-white font-extrabold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full animate-pulse shrink-0 shadow-xs">
+                                    Needs Approval
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </div>
                         <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
                           <span className="font-mono">URL Link ID: <strong>{selectedForm.id}</strong></span>
                           <span className="text-slate-300">|</span>
@@ -935,125 +977,187 @@ export default function AgentDashboard() {
                       </div>
                     </div>
 
-                    {/* Form Review fields core */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-10">
+                    {/* Form Review fields core split view */}
+                    <div className="flex-1 flex overflow-hidden">
                       
-                      {/* Banner showing status details */}
-                      <div className={`border rounded-2xl p-4 text-left text-xs ${
-                        selectedForm.status === "approved"
-                          ? "bg-green-50 border-green-200 text-green-800"
-                          : selectedForm.status === "client_completed"
-                          ? "bg-amber-50 border-amber-200 text-amber-800 animate-pulse"
-                          : "bg-blue-50 border-blue-200 text-blue-800"
-                      }`}>
-                        <div className="flex gap-2">
-                          <span className="text-sm">📌</span>
-                          <div>
-                            <span className="font-bold block uppercase tracking-wider mb-0.5">Form Status: {selectedForm.status}</span>
-                            <p className="opacity-90 leading-relaxed">
-                              {selectedForm.status === "approved"
-                                ? "All client visa fields have been approved and locked. This dossier is complete and ready for processing."
-                                : selectedForm.status === "client_completed"
-                                ? "The client has marked this form as finished. Please review all fields, check unapproved edits highlighted below, and click Final Approve."
-                                : "The client is still editing this form. You can make direct edits or approve fields at any time."}
-                            </p>
-                          </div>
+                      {/* Sticky Navigation Sidebar on the Left */}
+                      <div className="w-64 border-r border-slate-100 bg-slate-50/50 flex flex-col overflow-y-auto p-4 shrink-0 text-left">
+                        <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-3">Sections</h3>
+                        <div className="space-y-1.5">
+                          {visaSections.map((section, idx) => {
+                            const status = getAgentSectionStatus(section, selectedForm);
+                            const isActive = activeSectionIndex === idx;
+                            return (
+                              <button
+                                type="button"
+                                key={section.title}
+                                onClick={() => {
+                                  setActiveSectionIndex(idx);
+                                  const el = document.getElementById(`section-${idx}`);
+                                  if (el) {
+                                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                                  }
+                                }}
+                                className={`w-full text-left p-3 rounded-xl border text-xs transition-all relative cursor-pointer ${
+                                  isActive
+                                    ? "bg-white border-brand-gold text-brand-navy shadow-sm font-bold ring-1 ring-brand-gold"
+                                    : "bg-white/40 border-slate-100 text-slate-655 hover:bg-white hover:text-slate-800"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center mb-1">
+                                  <span className="font-serif line-clamp-1 pr-2">{section.title}</span>
+                                  {status.unapproved > 0 && (
+                                    <span className="bg-amber-500 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full shrink-0 animate-pulse">
+                                      {status.unapproved} new
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                  <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full rounded-full transition-all duration-350 ${
+                                        status.percentage === 100 ? "bg-green-500" : "bg-brand-navy"
+                                      }`}
+                                      style={{ width: `${status.percentage}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-[9px] font-bold text-slate-400 shrink-0 font-mono">
+                                    {status.filled}/{status.total}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 
-                      {/* Sections List */}
-                      <div className="space-y-10">
-                        {visaSections.map((section) => (
-                          <div key={section.title} className="border border-slate-100 rounded-3xl p-6 shadow-xs text-left relative overflow-hidden bg-white">
-                            <h3 className="font-serif text-base font-bold text-brand-navy mb-6 border-b border-slate-100 pb-2">
-                              {section.title}
-                            </h3>
+                      {/* Main Fields List scroll container */}
+                      <div
+                        onScroll={handleFieldsScroll}
+                        className="flex-1 overflow-y-auto p-6 space-y-10"
+                      >
+                        {/* Banner showing status details */}
+                        <div className={`border rounded-2xl p-4 text-left text-xs ${
+                          selectedForm.status === "approved"
+                            ? "bg-green-50 border-green-200 text-green-800"
+                            : selectedForm.status === "client_completed"
+                            ? "bg-amber-50 border-amber-200 text-amber-800 animate-pulse"
+                            : "bg-blue-50 border-blue-200 text-blue-800"
+                        }`}>
+                          <div className="flex gap-2">
+                            <span className="text-sm">📌</span>
+                            <div>
+                              <span className="font-bold block uppercase tracking-wider mb-0.5">Form Status: {selectedForm.status}</span>
+                              <p className="opacity-90 leading-relaxed">
+                                {selectedForm.status === "approved"
+                                  ? "All client visa fields have been approved and locked. This dossier is complete and ready for processing."
+                                  : selectedForm.status === "client_completed"
+                                  ? "The client has marked this form as finished. Please review all fields, check unapproved edits highlighted below, and click Final Approve."
+                                  : "The client is still editing this form. You can make direct edits or approve fields at any time."}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-                            <div className="space-y-6">
-                              {section.fields.map((field) => {
-                                const currentValue = (selectedForm.formData || {})[field.id] || "";
-                                const approvedValue = (selectedForm.approvedData || {})[field.id] || "";
-                                const isUnapproved = currentValue !== approvedValue && currentValue !== "";
+                        {/* Sections List */}
+                        <div className="space-y-10">
+                          {visaSections.map((section, idx) => (
+                            <div
+                              key={section.title}
+                              id={`section-${idx}`}
+                              className="border border-slate-100 rounded-3xl p-6 shadow-xs text-left relative overflow-hidden bg-white scroll-mt-6"
+                            >
+                              <h3 className="font-serif text-base font-bold text-brand-navy mb-6 border-b border-slate-100 pb-2">
+                                {section.title}
+                              </h3>
 
-                                return (
-                                  <div
-                                    key={field.id}
-                                    className={`p-4 rounded-2xl border transition-all ${
-                                      isUnapproved
-                                        ? "bg-amber-50/20 border-amber-300"
-                                        : "bg-slate-50/20 border-slate-100"
-                                    }`}
-                                  >
-                                    <div className="flex justify-between items-center gap-2 mb-2">
-                                      <span className="text-[10px] font-bold text-brand-navy uppercase tracking-wider">
-                                        {field.label}
-                                      </span>
+                              <div className="space-y-6">
+                                {section.fields.map((field) => {
+                                  const currentValue = (selectedForm.formData || {})[field.id] || "";
+                                  const approvedValue = (selectedForm.approvedData || {})[field.id] || "";
+                                  const isUnapproved = currentValue !== approvedValue && currentValue !== "";
 
-                                      {isUnapproved && (
-                                        <button
-                                          onClick={() => handleApproveField(field.id, currentValue)}
-                                          className="bg-brand-navy hover:bg-brand-gold text-white hover:text-brand-navy text-[9px] font-black px-2.5 py-1 rounded-md transition-colors cursor-pointer"
-                                        >
-                                          Approve Field
-                                        </button>
-                                      )}
-                                    </div>
+                                  return (
+                                    <div
+                                      key={field.id}
+                                      className={`p-4 rounded-2xl border transition-all ${
+                                        isUnapproved
+                                          ? "bg-amber-50/20 border-amber-300"
+                                          : "bg-slate-50/20 border-slate-100"
+                                      }`}
+                                    >
+                                      <div className="flex justify-between items-center gap-2 mb-2">
+                                        <span className="text-[10px] font-bold text-brand-navy uppercase tracking-wider">
+                                          {field.label}
+                                        </span>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                                      <div>
-                                        {field.type === "select" ? (
-                                          <CustomSelect
-                                            disabled={selectedForm.status === "approved"}
-                                            value={currentValue}
-                                            onChange={(val) => handleAgentEditField(field.id, val)}
-                                            options={field.options || []}
-                                            placeholder="-- Select Option --"
-                                          />
-                                        ) : field.type === "date" ? (
-                                          <input
-                                            disabled={selectedForm.status === "approved"}
-                                            type="date"
-                                            value={currentValue}
-                                            onChange={(e) => handleAgentEditField(field.id, e.target.value)}
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
-                                          />
-                                        ) : field.type === "textarea" ? (
-                                          <textarea
-                                            disabled={selectedForm.status === "approved"}
-                                            rows={2}
-                                            value={currentValue}
-                                            onChange={(e) => handleAgentEditField(field.id, e.target.value)}
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
-                                          />
-                                        ) : (
-                                          <input
-                                            disabled={selectedForm.status === "approved"}
-                                            type="text"
-                                            value={currentValue}
-                                            onChange={(e) => handleAgentEditField(field.id, e.target.value)}
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
-                                          />
+                                        {isUnapproved && (
+                                          <button
+                                            onClick={() => handleApproveField(field.id, currentValue)}
+                                            className="bg-brand-navy hover:bg-brand-gold text-white hover:text-brand-navy text-[9px] font-black px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+                                          >
+                                            Approve Field
+                                          </button>
                                         )}
                                       </div>
 
-                                      <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-left">
-                                        <span className="text-[9px] text-slate-400 block mb-0.5 uppercase tracking-wide">Approved Value</span>
-                                        <span className="text-xs text-slate-700 font-bold font-mono">
-                                          {approvedValue ? (
-                                            <span className="text-green-700">{approvedValue}</span>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                                        <div>
+                                          {field.type === "select" ? (
+                                            <CustomSelect
+                                              disabled={selectedForm.status === "approved"}
+                                              value={currentValue}
+                                              onChange={(val) => handleAgentEditField(field.id, val)}
+                                              options={field.options || []}
+                                              placeholder="-- Select Option --"
+                                            />
+                                          ) : field.type === "date" ? (
+                                            <input
+                                              disabled={selectedForm.status === "approved"}
+                                              type="date"
+                                              value={currentValue}
+                                              onChange={(e) => handleAgentEditField(field.id, e.target.value)}
+                                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
+                                            />
+                                          ) : field.type === "textarea" ? (
+                                            <textarea
+                                              disabled={selectedForm.status === "approved"}
+                                              rows={2}
+                                              value={currentValue}
+                                              onChange={(e) => handleAgentEditField(field.id, e.target.value)}
+                                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
+                                            />
                                           ) : (
-                                            <span className="text-slate-400 italic font-normal">None / Blank</span>
+                                            <input
+                                              disabled={selectedForm.status === "approved"}
+                                              type="text"
+                                              value={currentValue}
+                                              onChange={(e) => handleAgentEditField(field.id, e.target.value)}
+                                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
+                                            />
                                           )}
-                                        </span>
+                                        </div>
+
+                                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-left">
+                                          <span className="text-[9px] text-slate-400 block mb-0.5 uppercase tracking-wide">Approved Value</span>
+                                          <span className="text-xs text-slate-700 font-bold font-mono">
+                                            {approvedValue ? (
+                                              <span className="text-green-700">{approvedValue}</span>
+                                            ) : (
+                                              <span className="text-slate-400 italic font-normal">None / Blank</span>
+                                            )}
+                                          </span>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
+
                     </div>
                   </>
                 ) : (

@@ -16,6 +16,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"Saved" | "Saving..." | "Error">("Saved");
+  const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   
   // Add Form client-side state
   const [showAddFormModal, setShowAddFormModal] = useState(false);
@@ -52,6 +53,33 @@ export default function ClientVisaFormPage({ params }: PageProps) {
     }
     setLoading(false);
   }, [formId]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    function handleScroll() {
+      const viewportHeaderHeight = 100;
+      let closestIndex = 0;
+      let minDistance = Infinity;
+
+      for (let i = 0; i < visaSections.length; i++) {
+        const el = document.getElementById(`section-${i}`);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const distance = Math.abs(rect.top - viewportHeaderHeight);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = i;
+          }
+        }
+      }
+      setActiveSectionIndex(closestIndex);
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loading]);
 
   const updateField = (fieldId: string, value: string) => {
     if (!clientForm || clientForm.status === "approved" || !client) return;
@@ -210,6 +238,19 @@ export default function ClientVisaFormPage({ params }: PageProps) {
     );
   }
 
+  const getSectionProgress = (sec: typeof visaSections[0]) => {
+    const fields = sec.fields;
+    const filledCount = fields.filter((f) => {
+      const val = formData[f.id];
+      return val !== undefined && val !== null && String(val).trim() !== "";
+    }).length;
+    return {
+      filled: filledCount,
+      total: fields.length,
+      percentage: Math.round((filledCount / fields.length) * 100)
+    };
+  };
+
   const isLocked = clientForm.status === "approved";
   const isAwaitingReview = clientForm.status === "client_completed";
 
@@ -288,7 +329,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
         }
       `}</style>
 
-      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8">
         
         {/* Active Dossier Navigation & Form Switcher */}
         <div className="bg-white border border-brand-gold/15 rounded-[24px] p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-left relative overflow-hidden">
@@ -398,102 +439,164 @@ export default function ClientVisaFormPage({ params }: PageProps) {
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-slate-400">
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
           </svg>
-          <span>Dossier transmission encrypted. All client details are processed securely.</span>
         </div>
 
-        {/* Detailed Form Layout */}
-        <div className="space-y-12">
-          {visaSections.map((section) => (
-            <div key={section.title} className="bg-white border border-brand-gold/15 rounded-[32px] p-6 sm:p-8 shadow-sm text-left relative">
-              <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-3">
-                <span className="w-1.5 h-5 bg-brand-gold rounded-full shrink-0"></span>
-                <h3 className="font-serif text-lg font-black text-brand-navy uppercase tracking-wide">
-                  {section.title}
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {section.fields.map((field) => {
-                  const currentValue = formData[field.id] || "";
-                  const approvedValue = (clientForm.approvedData && clientForm.approvedData[field.id]) || "";
-                  const isUnapproved = currentValue !== approvedValue && currentValue !== "";
-
+        {/* Detailed Form Layout with Sidebar navigation */}
+        <div className="flex flex-col md:flex-row gap-8 items-start relative mt-8">
+          
+          {/* Sticky Left Navigation Sidebar */}
+          <div className="w-full md:w-64 shrink-0 md:sticky md:top-[100px] self-start md:max-h-[calc(100vh-140px)] md:overflow-y-auto scrollbar-none space-y-3 z-30 mb-4 md:mb-0">
+            <div className="bg-white border border-brand-gold/15 rounded-3xl p-4 shadow-sm">
+              <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-3 hidden md:block text-left pl-1">
+                Sections & Progress
+              </h3>
+              {/* Flex row on mobile, flex col on desktop */}
+              <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-2 pb-2 md:pb-0 scrollbar-thin">
+                {visaSections.map((section, idx) => {
+                  const status = getSectionProgress(section);
+                  const isActive = activeSectionIndex === idx;
                   return (
-                    <div key={field.id} className="flex flex-col gap-2">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                        {field.label}
-                      </label>
+                    <button
+                      type="button"
+                      key={section.title}
+                      onClick={() => {
+                        setActiveSectionIndex(idx);
+                        const el = document.getElementById(`section-${idx}`);
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }}
+                      className={`text-left p-3 rounded-2xl border text-xs transition-all duration-200 shrink-0 w-56 md:w-full cursor-pointer relative flex flex-col justify-between ${
+                        isActive
+                          ? "bg-brand-navy border-brand-gold text-white shadow-md font-semibold"
+                          : "bg-slate-50/50 border-slate-100 text-slate-655 hover:bg-slate-50 hover:text-slate-805"
+                      }`}
+                    >
+                      <div className="flex justify-between items-center w-full mb-1">
+                        <span className="font-serif truncate pr-2">{section.title}</span>
+                        <span className={`text-[9px] font-bold font-mono ${isActive ? "text-brand-gold" : "text-slate-400"}`}>
+                          {status.filled}/{status.total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200/50 h-1.5 rounded-full overflow-hidden mt-1.5 relative">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            status.percentage === 100
+                              ? "bg-green-500"
+                              : isActive
+                              ? "bg-brand-gold"
+                              : "bg-brand-navy"
+                          }`}
+                          style={{ width: `${status.percentage}%` }}
+                        ></div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
 
-                      <div className="relative">
-                        {field.type === "select" ? (
-                          <CustomSelect
-                            disabled={isLocked || isAwaitingReview}
-                            value={currentValue}
-                            onChange={(val) => updateField(field.id, val)}
-                            options={field.options || []}
-                            placeholder="-- Select Option --"
-                            isUnapproved={isUnapproved}
-                          />
-                        ) : field.type === "date" ? (
-                          <div className="relative flex items-center">
-                            <div className="absolute left-3.5 pointer-events-none text-slate-400">
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-slate-400">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                              </svg>
-                            </div>
-                            <input
+          {/* Main Scrollable Form sections list on the right */}
+          <div className="flex-1 w-full space-y-12">
+            {visaSections.map((section, idx) => (
+              <div
+                key={section.title}
+                id={`section-${idx}`}
+                onFocusCapture={() => setActiveSectionIndex(idx)}
+                className="bg-white border border-brand-gold/15 rounded-[32px] p-6 sm:p-8 shadow-sm text-left relative scroll-mt-24"
+              >
+                <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-3">
+                  <span className="w-1.5 h-5 bg-brand-gold rounded-full shrink-0"></span>
+                  <h3 className="font-serif text-lg font-black text-brand-navy uppercase tracking-wide">
+                    {section.title}
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {section.fields.map((field) => {
+                    const currentValue = formData[field.id] || "";
+                    const approvedValue = (clientForm.approvedData && clientForm.approvedData[field.id]) || "";
+                    const isUnapproved = currentValue !== approvedValue && currentValue !== "";
+
+                    return (
+                      <div key={field.id} className="flex flex-col gap-2">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                          {field.label}
+                        </label>
+
+                        <div className="relative">
+                          {field.type === "select" ? (
+                            <CustomSelect
                               disabled={isLocked || isAwaitingReview}
-                              type="date"
+                              value={currentValue}
+                              onChange={(val) => updateField(field.id, val)}
+                              options={field.options || []}
+                              placeholder="-- Select Option --"
+                              isUnapproved={isUnapproved}
+                            />
+                          ) : field.type === "date" ? (
+                            <div className="relative flex items-center">
+                              <div className="absolute left-3.5 pointer-events-none text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-slate-400">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                </svg>
+                              </div>
+                              <input
+                                disabled={isLocked || isAwaitingReview}
+                                type="date"
+                                value={currentValue}
+                                onChange={(e) => updateField(field.id, e.target.value)}
+                                className={`w-full custom-date-input rounded-xl border pl-10 pr-10 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
+                                  isUnapproved
+                                    ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
+                                    : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
+                                }`}
+                              />
+                            </div>
+                          ) : field.type === "textarea" ? (
+                            <textarea
+                              disabled={isLocked || isAwaitingReview}
+                              rows={3}
+                              placeholder={field.placeholder}
                               value={currentValue}
                               onChange={(e) => updateField(field.id, e.target.value)}
-                              className={`w-full custom-date-input rounded-xl border pl-10 pr-10 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
+                              className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
                                 isUnapproved
                                   ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
                                   : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
                               }`}
                             />
-                          </div>
-                        ) : field.type === "textarea" ? (
-                          <textarea
-                            disabled={isLocked || isAwaitingReview}
-                            rows={3}
-                            placeholder={field.placeholder}
-                            value={currentValue}
-                            onChange={(e) => updateField(field.id, e.target.value)}
-                            className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
-                              isUnapproved
-                                ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
-                                : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
-                            }`}
-                          />
-                        ) : (
-                          <input
-                            disabled={isLocked || isAwaitingReview}
-                            type="text"
-                            placeholder={field.placeholder}
-                            value={currentValue}
-                            onChange={(e) => updateField(field.id, e.target.value)}
-                            className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
-                              isUnapproved
-                                ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
-                                : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
-                            }`}
-                          />
-                        )}
+                          ) : (
+                            <input
+                              disabled={isLocked || isAwaitingReview}
+                              type="text"
+                              placeholder={field.placeholder}
+                              value={currentValue}
+                              onChange={(e) => updateField(field.id, e.target.value)}
+                              className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
+                                isUnapproved
+                                  ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
+                                  : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
+                              }`}
+                            />
+                          )}
 
-                      </div>
-
-                      {isUnapproved && approvedValue && (
-                        <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-400 font-medium text-left">
-                          <span>Previously approved: &ldquo;{approvedValue}&rdquo;</span>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+
+                        {isUnapproved && approvedValue && (
+                          <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-400 font-medium text-left">
+                            <span>Previously approved: &ldquo;{approvedValue}&rdquo;</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
         </div>
 
         {hasUnapprovedChanges && (
