@@ -1071,7 +1071,7 @@ export default function AgentDashboard() {
                                 {section.title}
                               </h3>
 
-                              <div className="space-y-6">
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 {section.fields.map((field) => {
                                   const currentValue = (selectedForm.formData || {})[field.id] || "";
                                   const approvedValue = (selectedForm.approvedData || {})[field.id] || "";
@@ -1101,7 +1101,7 @@ export default function AgentDashboard() {
                                         )}
                                       </div>
 
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                                      <div className="space-y-2.5">
                                         <div>
                                           {field.type === "select" ? (
                                             <CustomSelect
@@ -1138,9 +1138,9 @@ export default function AgentDashboard() {
                                           )}
                                         </div>
 
-                                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-left">
-                                          <span className="text-[9px] text-slate-400 block mb-0.5 uppercase tracking-wide">Approved Value</span>
-                                          <span className="text-xs text-slate-700 font-bold font-mono">
+                                        <div className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-left flex items-center justify-between gap-2">
+                                          <span className="text-[9px] text-slate-400 uppercase tracking-wide shrink-0">Approved Value:</span>
+                                          <span className="text-xs text-slate-700 font-bold font-mono truncate">
                                             {approvedValue ? (
                                               <span className="text-green-700">{approvedValue}</span>
                                             ) : (

@@ -21,9 +21,8 @@ export default function AboutPage() {
               fill
               sizes="100vw"
               onLoad={() => setBgLoaded(true)}
-              className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
-                bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
-              }`}
+              className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+                }`}
               priority
             />
             <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />

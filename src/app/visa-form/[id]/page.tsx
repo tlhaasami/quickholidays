@@ -17,7 +17,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"Saved" | "Saving..." | "Error">("Saved");
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
-  
+
   // Add Form client-side state
   const [showAddFormModal, setShowAddFormModal] = useState(false);
   const [newFormTitle, setNewFormTitle] = useState("");
@@ -29,7 +29,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
     if (storedFormsRaw) {
       try {
         const clientsData: ClientProfile[] = JSON.parse(storedFormsRaw);
-        
+
         let foundClient: ClientProfile | null = null;
         let foundForm: VisaForm | null = null;
 
@@ -263,7 +263,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-brand-cream text-slate-800 font-sans relative pb-20 select-none antialiased overflow-x-clip">
       {/* Background Cover Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-[0.06] z-0"
         style={{ backgroundImage: `url(${formBg.src})` }}
       />
@@ -302,13 +302,12 @@ export default function ClientVisaFormPage({ params }: PageProps) {
               </span>
             </div>
 
-            <span className={`text-[9px] font-extrabold tracking-widest uppercase px-3 py-1 rounded-full border ${
-              isLocked
+            <span className={`text-[9px] font-extrabold tracking-widest uppercase px-3 py-1 rounded-full border ${isLocked
                 ? "bg-green-50 text-green-700 border-green-200"
                 : isAwaitingReview
-                ? "bg-amber-50 text-amber-700 border-amber-200"
-                : "bg-blue-50 text-blue-700 border-blue-200"
-            }`}>
+                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                  : "bg-blue-50 text-blue-700 border-blue-200"
+              }`}>
               {isLocked ? "Approved & Locked" : isAwaitingReview ? "Awaiting Agent" : "Drafting Mode"}
             </span>
           </div>
@@ -330,9 +329,9 @@ export default function ClientVisaFormPage({ params }: PageProps) {
       `}</style>
 
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        
+
         {/* Active Dossier Navigation & Form Switcher */}
-        <div className="bg-white border border-brand-gold/15 rounded-[24px] p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-left relative overflow-visible">
+        <div className="bg-white border border-brand-gold/15 rounded-[24px] p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-left relative overflow-hidden">
 
           <div className="pl-2">
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Active Travel Dossier</span>
@@ -372,15 +371,14 @@ export default function ClientVisaFormPage({ params }: PageProps) {
             )}
           </div>
         </div>
-        
+
         {/* Collaborative Workspace Banner */}
-        <div className={`mb-8 border rounded-3xl p-6 sm:p-8 shadow-sm text-left relative overflow-hidden transition-all duration-300 ${
-          isLocked
+        <div className={`mb-8 border rounded-3xl p-6 sm:p-8 shadow-sm text-left relative overflow-hidden transition-all duration-300 ${isLocked
             ? "bg-green-50/50 border-green-200 text-green-900"
             : isAwaitingReview
-            ? "bg-amber-50/50 border-amber-200 text-amber-900"
-            : "bg-blue-50/50 border-blue-200 text-blue-900"
-        }`}>
+              ? "bg-amber-50/50 border-amber-200 text-amber-900"
+              : "bg-blue-50/50 border-blue-200 text-blue-900"
+          }`}>
           {/* Subtle side glow */}
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand-navy opacity-85"></div>
 
@@ -392,17 +390,17 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                   {isLocked
                     ? "Application Finalized & Locked"
                     : isAwaitingReview
-                    ? "Dossier Submitted to Consultant"
-                    : "Secure Schengen Visa Workspace"}
+                      ? "Dossier Submitted to Consultant"
+                      : "Secure Schengen Visa Workspace"}
                 </h4>
               </div>
-              
+
               <p className="text-xs leading-relaxed text-slate-600 font-medium">
                 {isLocked
                   ? "Your Quick Holidays specialist has finalized your visa draft dossier. All fields have been locked and compiled into the official consular registration records."
                   : isAwaitingReview
-                  ? "Your dossier is currently under review by our specialist team. We are cross-referencing your entries with your flight and accommodation bookings. You will be notified immediately of any updates."
-                  : "Welcome to your secure Schengen Travel Dossier. Any adjustments you make below are updated in real-time. Fields marked in yellow indicate pending reviews that your visa specialist will verify."}
+                    ? "Your dossier is currently under review by our specialist team. We are cross-referencing your entries with your flight and accommodation bookings. You will be notified immediately of any updates."
+                    : "Welcome to your secure Schengen Travel Dossier. Any adjustments you make below are updated in real-time. Fields marked in yellow indicate pending reviews that your visa specialist will verify."}
               </p>
             </div>
 
@@ -426,9 +424,9 @@ export default function ClientVisaFormPage({ params }: PageProps) {
           <div>
             <h5 className="font-bold text-slate-800 mb-1 uppercase tracking-wider text-[10px]">Important Accuracy & Visa Policy Disclosure</h5>
             <p className="leading-relaxed text-slate-600 font-medium">
-              Quick Holidays Ltd prepares official Schengen submissions strictly based on client-provided details. 
-              Please verify that all entries correspond exactly with your passport, BRP card, and travel tickets. 
-              Consular offices enforce rigid verification policies; minor transcription errors, name mismatches, or invalid numbers can result in processing delays or immediate application refusal. 
+              Quick Holidays Ltd prepares official Schengen submissions strictly based on client-provided details.
+              Please verify that all entries correspond exactly with your passport, BRP card, and travel tickets.
+              Consular offices enforce rigid verification policies; minor transcription errors, name mismatches, or invalid numbers can result in processing delays or immediate application refusal.
               Please check your details thoroughly.
             </p>
           </div>
@@ -443,7 +441,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
 
         {/* Detailed Form Layout with Sidebar navigation */}
         <div className="flex flex-col md:flex-row gap-8 items-start relative mt-8">
-          
+
           {/* Sticky Left Navigation Sidebar */}
           <div className="w-full md:w-64 shrink-0 md:sticky md:top-[100px] self-start md:max-h-[calc(100vh-140px)] md:overflow-y-auto scrollbar-none space-y-3 z-30 mb-4 md:mb-0">
             <div className="bg-white border border-brand-gold/15 rounded-3xl p-4 shadow-sm">
@@ -466,11 +464,10 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                           el.scrollIntoView({ behavior: "smooth", block: "start" });
                         }
                       }}
-                      className={`text-left p-3 rounded-2xl border text-xs transition-all duration-200 shrink-0 w-56 md:w-full cursor-pointer relative flex flex-col justify-between ${
-                        isActive
+                      className={`text-left p-3 rounded-2xl border text-xs transition-all duration-200 shrink-0 w-56 md:w-full cursor-pointer relative flex flex-col justify-between ${isActive
                           ? "bg-brand-navy border-brand-gold text-white shadow-md font-semibold"
                           : "bg-slate-50/50 border-slate-100 text-slate-655 hover:bg-slate-50 hover:text-slate-805"
-                      }`}
+                        }`}
                     >
                       <div className="flex justify-between items-center w-full mb-1">
                         <span className="font-serif truncate pr-2">{section.title}</span>
@@ -480,13 +477,12 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                       </div>
                       <div className="w-full bg-slate-200/50 h-1.5 rounded-full overflow-hidden mt-1.5 relative">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            status.percentage === 100
+                          className={`h-full rounded-full transition-all duration-500 ${status.percentage === 100
                               ? "bg-green-500"
                               : isActive
-                              ? "bg-brand-gold"
-                              : "bg-brand-navy"
-                          }`}
+                                ? "bg-brand-gold"
+                                : "bg-brand-navy"
+                            }`}
                           style={{ width: `${status.percentage}%` }}
                         ></div>
                       </div>
@@ -547,11 +543,10 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                                 type="date"
                                 value={currentValue}
                                 onChange={(e) => updateField(field.id, e.target.value)}
-                                className={`w-full custom-date-input rounded-xl border pl-10 pr-10 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
-                                  isUnapproved
+                                className={`w-full custom-date-input rounded-xl border pl-10 pr-10 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${isUnapproved
                                     ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
                                     : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
-                                }`}
+                                  }`}
                               />
                             </div>
                           ) : field.type === "textarea" ? (
@@ -561,11 +556,10 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                               placeholder={field.placeholder}
                               value={currentValue}
                               onChange={(e) => updateField(field.id, e.target.value)}
-                              className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
-                                isUnapproved
+                              className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${isUnapproved
                                   ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
                                   : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
-                              }`}
+                                }`}
                             />
                           ) : (
                             <input
@@ -574,11 +568,10 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                               placeholder={field.placeholder}
                               value={currentValue}
                               onChange={(e) => updateField(field.id, e.target.value)}
-                              className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${
-                                isUnapproved
+                              className={`w-full rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all ${isUnapproved
                                   ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
                                   : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
-                              }`}
+                                }`}
                             />
                           )}
 
@@ -614,7 +607,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
         {/* Footer Contact Details */}
         <div className="mt-12 bg-slate-900 rounded-[32px] p-8 text-white text-left relative overflow-hidden border border-brand-gold/10 shadow-lg">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(204,163,82,0.12),transparent_60%)] pointer-events-none" />
-          
+
           <h4 className="font-serif text-lg font-bold text-brand-gold mb-2 flex items-center gap-2">
             <span>📞</span> Need assistance with drafting?
           </h4>
@@ -738,13 +731,11 @@ function CustomSelect({ disabled, value, onChange, options, placeholder, isUnapp
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full text-left rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all flex items-center justify-between cursor-pointer ${
-          disabled ? "opacity-60 cursor-not-allowed" : ""
-        } ${
-          isUnapproved
+        className={`w-full text-left rounded-xl border px-3.5 py-3 text-xs text-slate-800 bg-slate-50/50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-gold/45 transition-all flex items-center justify-between cursor-pointer ${disabled ? "opacity-60 cursor-not-allowed" : ""
+          } ${isUnapproved
             ? "border-amber-400 bg-amber-50/10 focus:border-amber-500 focus:ring-amber-500 text-slate-900 font-medium"
             : "border-slate-200 focus:border-brand-gold focus:ring-brand-gold"
-        } ${className || ""}`}
+          } ${className || ""}`}
       >
         <span className={value ? "text-slate-955 font-bold" : "text-slate-400"}>{selectedLabel}</span>
         <svg
@@ -779,9 +770,8 @@ function CustomSelect({ disabled, value, onChange, options, placeholder, isUnapp
                 onChange(opt.value);
                 setIsOpen(false);
               }}
-              className={`px-3.5 py-2.5 text-xs hover:bg-brand-cream/80 hover:text-brand-navy cursor-pointer font-bold transition-colors flex items-center justify-between ${
-                value === opt.value ? "bg-brand-cream text-brand-navy" : "text-slate-700"
-              }`}
+              className={`px-3.5 py-2.5 text-xs hover:bg-brand-cream/80 hover:text-brand-navy cursor-pointer font-bold transition-colors flex items-center justify-between ${value === opt.value ? "bg-brand-cream text-brand-navy" : "text-slate-700"
+                }`}
             >
               <span>{opt.label}</span>
               {value === opt.value && (

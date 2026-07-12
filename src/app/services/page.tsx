@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import ScrollReveal from "@/components/ScrollReveal";
+
+export const metadata: Metadata = {
+  title: "Our Services | Schengen Visa Assistance | Quick Holidays Ltd",
+  description: "Explore our Schengen visa services including document validation, appointment booking support, and thorough application consultation.",
+};
+
 
 export default function ServicesPage() {
   return (
