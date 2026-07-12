@@ -74,9 +74,10 @@ export default function LoginPage() {
 
       setTimeout(() => {
         if (userData.role === "admin") {
-          const hostname = window.location.host;
-          if (!hostname.startsWith("admin.")) {
-            window.location.href = window.location.protocol + "//admin." + hostname + "/";
+          const hostname = window.location.hostname;
+          const isNetlify = hostname.endsWith(".netlify.app");
+          if (!hostname.startsWith("admin.") && !isNetlify) {
+            window.location.href = window.location.protocol + "//admin." + window.location.host + "/";
           } else {
             router.push("/admin");
           }
