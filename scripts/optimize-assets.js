@@ -1,8 +1,31 @@
 const { Jimp } = require("jimp");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const ASSETS_DIR = path.join(__dirname, "..", "src", "assets");
+const MANIFEST_PATH = path.join(ASSETS_DIR, "optimized-manifest.json");
+
+// Load manifest
+let manifest = {};
+if (fs.existsSync(MANIFEST_PATH)) {
+  try {
+    manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, "utf8"));
+  } catch (e) {
+    console.warn("Could not parse optimized-manifest.json, starting fresh.");
+    manifest = {};
+  }
+}
+
+function getFileHash(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  const content = fs.readFileSync(filePath);
+  return crypto.createHash("md5").update(content).digest("hex");
+}
+
+function saveManifest() {
+  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2), "utf8");
+}
 
 async function processFile({ src, dest, width, height, crop = true, quality = 80 }) {
   try {
@@ -47,6 +70,14 @@ async function run() {
       const dest = path.join(bgDir, file.replace(/\.(png|jpeg|jpg)$/i, ".jpg"));
       const tempDest = dest.replace(".jpg", "-temp.jpg");
       
+      const relativeKey = path.relative(ASSETS_DIR, dest).replace(/\\/g, "/");
+      const currentHash = getFileHash(src);
+      
+      if (manifest[relativeKey] && manifest[relativeKey] === currentHash && fs.existsSync(dest)) {
+        console.log(`  - Skipping already optimized background: ${relativeKey}`);
+        continue;
+      }
+      
       const success = await processFile({ src, dest: tempDest, width: 1920, height: 1080, crop: true, quality: 80 });
       if (success) {
         fs.unlinkSync(src);
@@ -54,6 +85,7 @@ async function run() {
           try { fs.unlinkSync(dest); } catch (e) {}
         }
         fs.renameSync(tempDest, dest);
+        manifest[relativeKey] = getFileHash(dest);
       }
     }
   }
@@ -67,6 +99,14 @@ async function run() {
       const dest = path.join(placesDir, file.replace(/\.(png|jpeg|jpg)$/i, ".jpg"));
       const tempDest = dest.replace(".jpg", "-temp.jpg");
       
+      const relativeKey = path.relative(ASSETS_DIR, dest).replace(/\\/g, "/");
+      const currentHash = getFileHash(src);
+      
+      if (manifest[relativeKey] && manifest[relativeKey] === currentHash && fs.existsSync(dest)) {
+        console.log(`  - Skipping already optimized place bg: ${relativeKey}`);
+        continue;
+      }
+      
       const success = await processFile({ src, dest: tempDest, width: 600, height: 600, crop: true, quality: 85 });
       if (success) {
         fs.unlinkSync(src);
@@ -74,6 +114,7 @@ async function run() {
           try { fs.unlinkSync(dest); } catch (e) {}
         }
         fs.renameSync(tempDest, dest);
+        manifest[relativeKey] = getFileHash(dest);
       }
     }
   }
@@ -87,6 +128,14 @@ async function run() {
       const dest = path.join(profileDir, file.replace(/\.(png|jpeg|jpg)$/i, ".jpg"));
       const tempDest = dest.replace(".jpg", "-temp.jpg");
       
+      const relativeKey = path.relative(ASSETS_DIR, dest).replace(/\\/g, "/");
+      const currentHash = getFileHash(src);
+      
+      if (manifest[relativeKey] && manifest[relativeKey] === currentHash && fs.existsSync(dest)) {
+        console.log(`  - Skipping already optimized profile icon: ${relativeKey}`);
+        continue;
+      }
+      
       const success = await processFile({ src, dest: tempDest, width: 120, height: 120, crop: true, quality: 85 });
       if (success) {
         fs.unlinkSync(src);
@@ -94,6 +143,7 @@ async function run() {
           try { fs.unlinkSync(dest); } catch (e) {}
         }
         fs.renameSync(tempDest, dest);
+        manifest[relativeKey] = getFileHash(dest);
       }
     }
   }
@@ -105,10 +155,20 @@ async function run() {
     for (const file of flagFiles) {
       const src = path.join(flagsDir, file);
       const tempDest = src.replace(".png", "-temp.png");
+      
+      const relativeKey = path.relative(ASSETS_DIR, src).replace(/\\/g, "/");
+      const currentHash = getFileHash(src);
+      
+      if (manifest[relativeKey] && manifest[relativeKey] === currentHash) {
+        console.log(`  - Skipping already optimized flag: ${relativeKey}`);
+        continue;
+      }
+      
       const success = await processFile({ src, dest: tempDest, width: 120, height: 80, crop: true });
       if (success) {
         fs.unlinkSync(src);
         fs.renameSync(tempDest, src);
+        manifest[relativeKey] = getFileHash(src);
       }
     }
   }
@@ -120,10 +180,20 @@ async function run() {
     for (const file of iconFiles) {
       const src = path.join(iconsDir, file);
       const tempDest = src.replace(".png", "-temp.png");
+      
+      const relativeKey = path.relative(ASSETS_DIR, src).replace(/\\/g, "/");
+      const currentHash = getFileHash(src);
+      
+      if (manifest[relativeKey] && manifest[relativeKey] === currentHash) {
+        console.log(`  - Skipping already optimized icon: ${relativeKey}`);
+        continue;
+      }
+      
       const success = await processFile({ src, dest: tempDest, width: 128, height: 128, crop: false });
       if (success) {
         fs.unlinkSync(src);
         fs.renameSync(tempDest, src);
+        manifest[relativeKey] = getFileHash(src);
       }
     }
   }
@@ -135,14 +205,25 @@ async function run() {
     for (const file of logoFiles) {
       const src = path.join(logosDir, file);
       const tempDest = src.replace(".png", "-temp.png");
+      
+      const relativeKey = path.relative(ASSETS_DIR, src).replace(/\\/g, "/");
+      const currentHash = getFileHash(src);
+      
+      if (manifest[relativeKey] && manifest[relativeKey] === currentHash) {
+        console.log(`  - Skipping already optimized logo: ${relativeKey}`);
+        continue;
+      }
+      
       const success = await processFile({ src, dest: tempDest, width: 300, crop: false });
       if (success) {
         fs.unlinkSync(src);
         fs.renameSync(tempDest, src);
+        manifest[relativeKey] = getFileHash(src);
       }
     }
   }
   
+  saveManifest();
   console.log("Build-time asset pipeline complete!");
 }
 
