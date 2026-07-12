@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { TESTIMONIALS } from "@/constants/data";
+import { TESTIMONIALS, mapStoredTestimonials } from "@/constants/data";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function Testimonials() {
@@ -11,7 +11,11 @@ export default function Testimonials() {
   useEffect(() => {
     const stored = localStorage.getItem("quick_holidays_testimonials");
     if (stored) {
-      setTestimonials(JSON.parse(stored));
+      try {
+        setTestimonials(mapStoredTestimonials(JSON.parse(stored)));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, []);
 
@@ -316,7 +320,7 @@ export default function Testimonials() {
           </div>
         </div>
 
-        {/* Write a Review Button Section */}
+        {/* Write a Review Button Section - Disabled/hidden per user request
         <ScrollReveal animation="fade-in" delay={200}>
           <div className="flex justify-center mt-12">
             <button
@@ -337,6 +341,7 @@ export default function Testimonials() {
             </button>
           </div>
         </ScrollReveal>
+        */}
 
       </div>
 

@@ -3,7 +3,7 @@ import { cookies, headers } from "next/headers";
 
 function getCookieDomain(host?: string | null) {
   if (!host) return undefined;
-  const cleanHost = host.split(":")[0];
+  const cleanHost = host.split(":")[0].toLowerCase();
   if (cleanHost === "localhost" || cleanHost.endsWith(".localhost")) {
     return "localhost";
   }
@@ -11,8 +11,16 @@ function getCookieDomain(host?: string | null) {
     return undefined;
   }
   const parts = cleanHost.split(".");
-  if (parts.length >= 2) {
-    return "." + parts.slice(-2).join(".");
+  const isDoubleTld = parts.length >= 3 && [
+    "co", "com", "org", "net", "ltd", "me", "plc", "sch", "ac", "gov"
+  ].includes(parts[parts.length - 2]);
+
+  if (isDoubleTld) {
+    return "." + parts.slice(-3).join(".");
+  } else {
+    if (parts.length >= 2) {
+      return "." + parts.slice(-2).join(".");
+    }
   }
   return undefined;
 }

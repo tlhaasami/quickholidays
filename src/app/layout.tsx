@@ -124,7 +124,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(navigationJsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-brand-cream text-slate-800">
+      <body className="min-h-full flex flex-col bg-brand-cream text-slate-800 overflow-x-hidden">
         {!isDashboard && <Navbar />}
         <main className="grow">{children}</main>
         {!isDashboard && <Footer />}

@@ -74,17 +74,11 @@ export default function LoginPage() {
 
       setTimeout(() => {
         if (userData.role === "admin") {
-          const hostname = window.location.hostname;
-          const isNetlify = hostname.endsWith(".netlify.app");
-          if (!hostname.startsWith("admin.") && !isNetlify) {
-            window.location.href = window.location.protocol + "//admin." + window.location.host + "/";
-          } else {
-            router.push("/admin");
-          }
+          window.location.href = "/admin";
         } else if (userData.role === "processor") {
-          router.push("/processing-dashboard");
+          window.location.href = "/processing-dashboard";
         } else {
-          router.push(`/${userData.username.toLowerCase()}/agent-dashboard`);
+          window.location.href = `/${userData.username.toLowerCase()}/agent-dashboard`;
         }
       }, 1000);
 

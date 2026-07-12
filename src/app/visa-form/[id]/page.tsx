@@ -286,8 +286,8 @@ export default function ClientVisaFormPage({ params }: PageProps) {
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-3">
             <Image src={logoTop} alt="Quick Holidays Logo" className="h-10 w-auto object-contain shrink-0" />
-            <div className="h-6 w-[1px] bg-slate-200"></div>
-            <span className="bg-brand-gold/10 text-brand-navy text-[8px] uppercase font-extrabold tracking-widest rounded-full px-2.5 py-0.5 border border-brand-gold/25">
+            <div className="hidden sm:block h-6 w-[1px] bg-slate-200"></div>
+            <span className="hidden sm:inline-block bg-brand-gold/10 text-brand-navy text-[8px] uppercase font-extrabold tracking-widest rounded-full px-2.5 py-0.5 border border-brand-gold/25 whitespace-nowrap">
               Secure Client Portal
             </span>
           </div>
@@ -470,9 +470,9 @@ export default function ClientVisaFormPage({ params }: PageProps) {
                           : "bg-slate-50/50 border-slate-100 text-slate-655 hover:bg-slate-50 hover:text-slate-805"
                         }`}
                     >
-                      <div className="flex justify-between items-center w-full mb-1">
-                        <span className="font-serif truncate pr-2">{section.title}</span>
-                        <span className={`text-[9px] font-bold font-mono ${isActive ? "text-brand-gold" : "text-slate-400"}`}>
+                      <div className="flex justify-between items-center w-full gap-2 mb-1 min-w-0">
+                        <span className="font-serif truncate min-w-0 flex-1">{section.title}</span>
+                        <span className={`text-[9px] font-bold font-mono shrink-0 ${isActive ? "text-brand-gold" : "text-slate-400"}`}>
                           {status.filled}/{status.total}
                         </span>
                       </div>

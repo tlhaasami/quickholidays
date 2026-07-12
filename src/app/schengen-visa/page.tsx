@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { schengenVisaBg, SCHENGEN_DESTINATIONS } from "@/constants/data";
+import { schengenVisaBg, SCHENGEN_DESTINATIONS, mapStoredFlags } from "@/constants/data";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function SchengenVisaPage() {
@@ -14,7 +14,11 @@ export default function SchengenVisaPage() {
   useEffect(() => {
     const stored = localStorage.getItem("quick_holidays_flags");
     if (stored) {
-      setSchengenDestinations(JSON.parse(stored));
+      try {
+        setSchengenDestinations(mapStoredFlags(JSON.parse(stored)));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, []);
   const checklist = [
@@ -50,10 +54,12 @@ export default function SchengenVisaPage() {
               sizes="100vw"
               onLoad={() => setBgLoaded(true)}
               className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
-                bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+                bgLoaded ? "opacity-30 sm:opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
               }`}
               priority
             />
+            {/* Readable text background overlay (stronger on mobile, fading to transparent on the right) */}
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-cream/90 via-brand-cream/75 to-transparent sm:bg-gradient-to-r sm:from-brand-cream/95 sm:via-brand-cream/75 sm:to-transparent pointer-events-none z-10" />
             {/* Soft bottom fade-to-cream gradient */}
             <div className="absolute inset-x-0 bottom-0 h-32 sm:h-44 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
           </div>
@@ -68,11 +74,11 @@ export default function SchengenVisaPage() {
                   <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-gold block mb-4">
                     Schengen Tourist Visa
                   </span>
-                  <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-brand-navy leading-[1.05] mb-6">
+                  <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-black tracking-tight text-brand-navy leading-[1.05] mb-6">
                     Apply Your<br />
                     Schengen Visa
                   </h1>
-                  <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-lg mb-8">
+                  <p className="text-base sm:text-lg font-bold sm:font-normal text-slate-900 sm:text-slate-700 leading-relaxed max-w-lg mb-8">
                     We specialize exclusively in Schengen Tourist Visa applications for UK residents. Choose your destination and let our dedicated specialists guide you through every stage of the application.
                   </p>
                 </ScrollReveal>
@@ -121,26 +127,26 @@ export default function SchengenVisaPage() {
           </ScrollReveal>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
             {schengenDestinations.map((dest, idx) => (
               <ScrollReveal key={idx} animation="scale-in" delay={idx * 60} className="w-full">
                 <Link
                   href="/contact-us"
-                  className="flex flex-col items-center justify-between h-full bg-white rounded-3xl p-8 border-[1.5px] border-slate-100 shadow-[0_10px_30px_rgba(15,33,72,0.06)] text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(15,33,72,0.12)] hover:border-brand-gold group cursor-pointer"
+                  className="flex flex-row sm:flex-col items-center justify-between sm:justify-between h-full bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-[1.5px] border-slate-100 shadow-[0_4px_20px_rgba(15,33,72,0.03)] sm:shadow-[0_10px_30px_rgba(15,33,72,0.06)] text-left sm:text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_32px_rgba(15,33,72,0.1)] hover:border-brand-gold group cursor-pointer gap-4"
                 >
                   {/* Flag Area */}
-                  <div className="relative w-32 h-20 mb-6 overflow-hidden rounded-xl border border-slate-100 shadow-sm flex items-center justify-center bg-slate-50">
+                  <div className="relative w-16 h-10 sm:w-28 sm:h-18 overflow-hidden rounded-lg sm:rounded-xl border border-slate-100 shadow-sm flex items-center justify-center bg-slate-50 flex-shrink-0">
                     {!loadedFlags[dest.slug] && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 animate-pulse text-[9px] text-slate-400 font-bold select-none gap-0.5">
-                        <span className="text-xl">🇪🇺</span>
-                        <span>Loading...</span>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 animate-pulse text-[8px] sm:text-[9px] text-slate-400 font-bold select-none gap-0.5">
+                        <span className="text-sm sm:text-xl">🇪🇺</span>
+                        <span className="hidden sm:inline">Loading...</span>
                       </div>
                     )}
                     <Image
                       src={dest.flag}
                       alt={`${dest.name} Flag`}
                       fill
-                      sizes="128px"
+                      sizes="(max-width: 640px) 64px, 112px"
                       onLoad={() => setLoadedFlags((prev) => ({ ...prev, [dest.slug]: true }))}
                       className={`object-cover scale-[1.2] transition-all duration-[600ms] group-hover:scale-[1.3] ${
                         loadedFlags[dest.slug] ? "opacity-100 blur-0" : "opacity-0 blur-xs"
@@ -149,19 +155,19 @@ export default function SchengenVisaPage() {
                   </div>
 
                   {/* Country Name */}
-                  <h3 className="text-base font-bold text-brand-navy tracking-tight mb-2">
+                  <h3 className="text-sm sm:text-base font-bold text-brand-navy tracking-tight grow sm:grow-0 sm:mb-2 text-left sm:text-center">
                     {dest.name}
                   </h3>
 
                   {/* Arrow Button */}
-                  <div className="mt-4 flex items-center justify-center w-10 h-10 rounded-full border border-brand-gold/60 text-brand-gold group-hover:bg-brand-gold group-hover:text-white group-hover:shadow-[0_0_12px_rgba(204,163,82,0.45)] group-hover:scale-105 transition-all duration-200">
+                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-brand-gold/60 text-brand-gold group-hover:bg-brand-gold group-hover:text-white group-hover:shadow-[0_0_12px_rgba(204,163,82,0.45)] group-hover:scale-105 transition-all duration-200">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth={2.5}
                       stroke="currentColor"
-                      className="w-4.5 h-4.5"
+                      className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5"
                     >
                       <path
                         strokeLinecap="round"

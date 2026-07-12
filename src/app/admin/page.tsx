@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS, heroBg, whyChooseUsBg, formBg } from "@/constants/data";
+import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS, heroBg, whyChooseUsBg, formBg, mapStoredTestimonials, mapStoredDestinations, mapStoredFlags } from "@/constants/data";
 import { visaSections } from "@/constants/visaFields";
 import { createClient } from "@/lib/supabase/client";
 
@@ -97,6 +97,7 @@ export default function AdminPage() {
   const [bgLoaded, setBgLoaded] = useState(false);
   // Active Navigation Tab State
   const [activeTab, setActiveTab] = useState<"users" | "footer" | "reviews" | "destinations" | "countries" | "backgrounds" | "agents_work">("users");
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   // Dashboard state
   const [requests, setRequests] = useState<UserRequest[]>([]);
@@ -117,6 +118,13 @@ export default function AdminPage() {
   const [previewActiveTab, setPreviewActiveTab] = useState(0);
   const [addError, setAddError] = useState("");
   const [addSuccess, setAddSuccess] = useState("");
+
+  // Change Password States
+  const [changePasswordUser, setChangePasswordUser] = useState<UserRequest | null>(null);
+  const [changePasswordVal, setChangePasswordVal] = useState("");
+  const [changePasswordError, setChangePasswordError] = useState("");
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState("");
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
   // Custom UI Dialog Modal State (Replaces native confirm dialogs)
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
@@ -258,7 +266,11 @@ export default function AdminPage() {
     // Load Testimonials
     const storedTestimonials = localStorage.getItem("quick_holidays_testimonials");
     if (storedTestimonials) {
-      setAdminTestimonials(JSON.parse(storedTestimonials));
+      try {
+        setAdminTestimonials(mapStoredTestimonials(JSON.parse(storedTestimonials)));
+      } catch (e) {
+        setAdminTestimonials(TESTIMONIALS);
+      }
     } else {
       localStorage.setItem("quick_holidays_testimonials", JSON.stringify(TESTIMONIALS));
       setAdminTestimonials(TESTIMONIALS);
@@ -267,7 +279,11 @@ export default function AdminPage() {
     // Load Destinations
     const storedDestinations = localStorage.getItem("quick_holidays_destinations");
     if (storedDestinations) {
-      setAdminDestinations(JSON.parse(storedDestinations));
+      try {
+        setAdminDestinations(mapStoredDestinations(JSON.parse(storedDestinations)));
+      } catch (e) {
+        setAdminDestinations(DESTINATIONS);
+      }
     } else {
       localStorage.setItem("quick_holidays_destinations", JSON.stringify(DESTINATIONS));
       setAdminDestinations(DESTINATIONS);
@@ -276,7 +292,11 @@ export default function AdminPage() {
     // Load Flags
     const storedFlags = localStorage.getItem("quick_holidays_flags");
     if (storedFlags) {
-      setAdminFlags(JSON.parse(storedFlags));
+      try {
+        setAdminFlags(mapStoredFlags(JSON.parse(storedFlags)));
+      } catch (e) {
+        setAdminFlags(SCHENGEN_DESTINATIONS);
+      }
     } else {
       localStorage.setItem("quick_holidays_flags", JSON.stringify(SCHENGEN_DESTINATIONS));
       setAdminFlags(SCHENGEN_DESTINATIONS);
@@ -512,6 +532,38 @@ export default function AdminPage() {
     }
     // Close modal
     setConfirmModal((m) => ({ ...m, isOpen: false }));
+  };
+
+  const handleChangePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!changePasswordUser || !changePasswordVal) return;
+
+    setChangePasswordError("");
+    setChangePasswordSuccess("");
+    setChangePasswordLoading(true);
+
+    try {
+      const response = await fetch("/api/admin/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: changePasswordUser.id, newPassword: changePasswordVal }),
+      });
+      const data = await response.json();
+      if (data.error) {
+        setChangePasswordError(data.error);
+      } else {
+        setChangePasswordSuccess("Password updated successfully!");
+        setChangePasswordVal("");
+        setTimeout(() => {
+          setChangePasswordUser(null);
+          setChangePasswordSuccess("");
+        }, 1500);
+      }
+    } catch (err: any) {
+      setChangePasswordError("Failed to update password. Please try again.");
+    } finally {
+      setChangePasswordLoading(false);
+    }
   };
 
   const handleAddUser = async (e: React.FormEvent) => {
@@ -1171,7 +1223,23 @@ export default function AdminPage() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 md:ml-64 min-h-screen pt-8 pb-16">
+      <div className="flex-1 md:ml-64 min-h-screen pt-0 md:pt-8 pb-16">
+        {/* Mobile top bar for Admin Dashboard */}
+        <div className="md:hidden sticky top-0 z-40 bg-[#0F2148] text-white flex items-center justify-between p-4 shadow-md shrink-0">
+          <span className="font-serif text-lg font-bold tracking-wider uppercase text-brand-gold">
+            Quick Holidays Admin
+          </span>
+          <button
+            onClick={() => setIsAdminMenuOpen(true)}
+            className="p-2 rounded-md hover:bg-white/10 text-white focus:outline-none cursor-pointer"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="pt-8 md:pt-0">
       
       {/* Top Welcome Title Grid */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1424,7 +1492,7 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-xs">
+                <table className="w-full text-xs min-w-[600px]">
                   <thead>
                     <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px] pb-4">
                       <th className="pb-3 text-left">Name</th>
@@ -1488,7 +1556,7 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-xs">
+                <table className="w-full text-xs min-w-[650px]">
                   <thead>
                     <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px] pb-4">
                       <th className="pb-3 text-left">Name</th>
@@ -1517,22 +1585,28 @@ export default function AdminPage() {
                             {user.status === "approved" ? "Active" : "Suspended"}
                           </span>
                         </td>
-                        <td className="py-4 text-right space-x-2">
+                        <td className="py-4 text-right space-x-2 whitespace-nowrap font-medium text-slate-800">
                           {user.status === "approved" ? (
                             <button
                               onClick={() => updateRequestStatus(user.id, "suspended")}
-                              className="bg-red-50 hover:bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer"
+                              className="bg-red-50 hover:bg-red-100 text-red-600 rounded-full px-3 py-1.5 text-xs font-bold transition-all cursor-pointer"
                             >
                               Suspend
                             </button>
                           ) : (
                             <button
                               onClick={() => updateRequestStatus(user.id, "approved")}
-                              className="bg-green-50 hover:bg-green-100 text-green-700 rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer"
+                              className="bg-green-50 hover:bg-green-100 text-green-700 rounded-full px-3 py-1.5 text-xs font-bold transition-all cursor-pointer"
                             >
                               Unsuspend
                             </button>
                           )}
+                          <button
+                            onClick={() => setChangePasswordUser(user)}
+                            className="bg-[#CCA352]/10 hover:bg-[#CCA352] text-[#0F2148] hover:text-white rounded-full px-3 py-1.5 text-xs font-bold transition-all cursor-pointer border border-[#CCA352]/25"
+                          >
+                            Password
+                          </button>
                           <button
                             onClick={() => deleteRequest(user.id)}
                             className="text-slate-400 hover:text-red-600 transition-colors p-1"
@@ -1761,7 +1835,7 @@ export default function AdminPage() {
                                           <p className="text-[11px] text-slate-500 font-medium pl-1">No visa forms created for this client.</p>
                                         ) : (
                                           <div className="overflow-x-auto">
-                                            <table className="w-full text-left text-[11px] text-slate-600 border-collapse">
+                                            <table className="w-full min-w-[650px] text-left text-[11px] text-slate-600 border-collapse">
                                               <thead>
                                                 <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
                                                   <th className="pb-2 font-medium">Application ID</th>
@@ -2683,7 +2757,7 @@ export default function AdminPage() {
             ) : (
               <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                 {/* Sections Sidebar */}
-                <div className="w-full md:w-60 bg-slate-50 border-r border-slate-100 overflow-y-auto p-4 shrink-0 flex md:flex-col gap-1 text-left scrollbar-thin">
+                <div className="w-full md:w-60 bg-slate-50 border-r border-slate-100 overflow-x-auto md:overflow-x-hidden overflow-y-hidden md:overflow-y-auto p-4 shrink-0 flex md:flex-col gap-1 text-left scrollbar-none whitespace-nowrap">
                   {visaSections.map((section, idx) => (
                     <button
                       key={idx}
@@ -2761,44 +2835,237 @@ export default function AdminPage() {
             )}
 
             {/* Modal Footer */}
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end items-center gap-3 shrink-0">
-              <span className="text-[10px] font-semibold text-slate-400 mr-auto">
+            <div className="bg-slate-50 px-4 sm:px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+              <span className="text-[10px] font-semibold text-slate-400 text-center sm:text-left">
                 Created: {new Date(previewForm?.created_at).toLocaleDateString()} • Updated: {new Date(previewForm?.updated_at).toLocaleDateString()}
               </span>
 
-              {previewForm?.status !== "approved" && (
+              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
+                {previewForm?.status !== "approved" && (
+                  <button
+                    onClick={() => handleApproveForm(previewForm.id)}
+                    className="rounded-full bg-emerald-600 hover:bg-emerald-705 text-white text-xs font-bold px-4 py-2 transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5 shrink-0"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Approve Form
+                  </button>
+                )}
+
                 <button
-                  onClick={() => handleApproveForm(previewForm.id)}
-                  className="rounded-full bg-emerald-600 hover:bg-emerald-705 text-white text-xs font-bold px-5 py-2.5 transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5"
+                  onClick={() => handleDeleteForm(previewForm.id)}
+                  className="rounded-full bg-rose-600 hover:bg-rose-705 text-white text-xs font-bold px-4 py-2 transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5 shrink-0"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
-                  Approve Form
+                  Delete Form
                 </button>
-              )}
 
-              <button
-                onClick={() => handleDeleteForm(previewForm.id)}
-                className="rounded-full bg-rose-600 hover:bg-rose-705 text-white text-xs font-bold px-5 py-2.5 transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Delete Form
-              </button>
-
-              <button
-                onClick={() => setIsPreviewOpen(false)}
-                className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-5 py-2.5 transition-all duration-300 shadow-md cursor-pointer"
-              >
-                Close Preview
-              </button>
+                <button
+                  onClick={() => setIsPreviewOpen(false)}
+                  className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-4 py-2 transition-all duration-300 shadow-md cursor-pointer shrink-0"
+                >
+                  Close Preview
+                </button>
+              </div>
             </div>
 
           </div>
         </div>
       )}
+
+      {/* CHANGE PASSWORD MODAL */}
+      {changePasswordUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 text-left animate-fadeIn">
+          <div className="bg-white border border-brand-gold/20 rounded-[32px] max-w-sm w-full p-8 shadow-2xl relative animate-scaleUp">
+            <button
+              onClick={() => {
+                setChangePasswordUser(null);
+                setChangePasswordVal("");
+                setChangePasswordError("");
+                setChangePasswordSuccess("");
+              }}
+              className="absolute right-6 top-6 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h3 className="font-serif text-xl font-bold text-brand-navy mb-1">Change Password</h3>
+            <p className="text-xs text-slate-500 mb-6">
+              Update password for <strong>{changePasswordUser.name}</strong> ({changePasswordUser.role === "agent" ? "Agent" : "Processor"}).
+            </p>
+
+            <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
+              {changePasswordError && (
+                <p className="text-[10px] text-red-500 font-bold bg-red-50 border border-red-100 p-2 rounded-lg">{changePasswordError}</p>
+              )}
+              {changePasswordSuccess && (
+                <p className="text-[10px] text-green-600 font-bold bg-green-50 border border-green-100 p-2 rounded-lg">{changePasswordSuccess}</p>
+              )}
+
+              <div>
+                <label className="block text-[10px] font-bold text-brand-navy uppercase tracking-widest mb-1.5 font-semibold">New Password *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Enter at least 6 characters"
+                  value={changePasswordVal}
+                  onChange={(e) => setChangePasswordVal(e.target.value)}
+                  className="w-full rounded-xl border border-brand-gold/30 bg-white px-3.5 py-2.5 text-xs text-slate-805 focus:outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy font-semibold"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={changePasswordLoading}
+                className="w-full rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white transition-all duration-300 py-2.5 text-xs font-bold cursor-pointer mt-2 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {changePasswordLoading ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={4}></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Updating...
+                  </>
+                ) : (
+                  "Update Password"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+        </div> {/* Closing pt-8 md:pt-0 */}
+
+        {/* Mobile Menu Drawer Overlay */}
+        <div
+          className={`fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 md:hidden ${
+            isAdminMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setIsAdminMenuOpen(false)}
+        >
+          <div
+            className={`fixed left-0 top-0 bottom-0 w-64 bg-[#0F2148] text-white p-6 shadow-2xl transition-transform duration-300 flex flex-col justify-between ${
+              isAdminMenuOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between pb-6 border-b border-white/10">
+              <span className="font-serif text-lg font-black tracking-wider uppercase text-brand-gold">
+                Menu
+              </span>
+              <button
+                onClick={() => setIsAdminMenuOpen(false)}
+                className="rounded-md p-2 text-white hover:bg-white/10 focus:outline-none cursor-pointer"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Drawer Navigation Links */}
+            <nav className="flex-1 space-y-2 py-6 overflow-y-auto">
+              <button
+                onClick={() => {
+                  setActiveTab("users");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "users" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Users Verification
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("agents_work");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "agents_work" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Agents & Forms
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("footer");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "footer" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Footer Info
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("reviews");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "reviews" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Reviews
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("destinations");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "destinations" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Destinations
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("countries");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "countries" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Countries
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("backgrounds");
+                  setIsAdminMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all cursor-pointer text-left ${
+                  activeTab === "backgrounds" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Backgrounds
+              </button>
+            </nav>
+
+            {/* Drawer Logout */}
+            <div className="pt-4 border-t border-white/10">
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsAdminMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy transition-all cursor-pointer"
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>

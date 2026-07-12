@@ -2,7 +2,7 @@ import { createBrowserClient } from "@supabase/ssr";
 
 function getCookieDomain() {
   if (typeof window === "undefined") return undefined;
-  const hostname = window.location.hostname;
+  const hostname = window.location.hostname.toLowerCase();
   if (hostname === "localhost" || hostname.endsWith(".localhost")) {
     return "localhost";
   }
@@ -10,8 +10,16 @@ function getCookieDomain() {
     return undefined;
   }
   const parts = hostname.split(".");
-  if (parts.length >= 2) {
-    return "." + parts.slice(-2).join(".");
+  const isDoubleTld = parts.length >= 3 && [
+    "co", "com", "org", "net", "ltd", "me", "plc", "sch", "ac", "gov"
+  ].includes(parts[parts.length - 2]);
+
+  if (isDoubleTld) {
+    return "." + parts.slice(-3).join(".");
+  } else {
+    if (parts.length >= 2) {
+      return "." + parts.slice(-2).join(".");
+    }
   }
   return undefined;
 }

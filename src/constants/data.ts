@@ -182,3 +182,34 @@ export const SCHENGEN_DESTINATIONS = [
   { name: "Finland", slug: "finland", flag: flagFinland },
   { name: "Germany", slug: "germany", flag: flagGermany },
 ];
+
+export function mapStoredTestimonials(storedList: any[]): any[] {
+  return storedList.map((item) => {
+    const match = TESTIMONIALS.find((t) => t.name === item.name);
+    if (match && (typeof item.avatar === "object" || !item.avatar)) {
+      return { ...item, avatar: match.avatar };
+    }
+    return item;
+  });
+}
+
+export function mapStoredDestinations(storedList: any[]): any[] {
+  return storedList.map((item) => {
+    const match = DESTINATIONS.find((d) => d.name === item.name);
+    if (match && (typeof item.image === "object" || !item.image)) {
+      return { ...item, image: match.image };
+    }
+    return item;
+  });
+}
+
+export function mapStoredFlags(storedList: any[]): any[] {
+  return storedList.map((item) => {
+    const match = SCHENGEN_DESTINATIONS.find((d) => d.name === item.name || d.slug === item.slug);
+    if (match && (typeof item.flag === "object" || !item.flag)) {
+      return { ...item, flag: match.flag };
+    }
+    return item;
+  });
+}
+

@@ -79,11 +79,13 @@ export default function ContactUsPage() {
               sizes="100vw"
               onLoad={() => setBgLoaded(true)}
               className={`object-cover object-right select-none transition-all duration-[1500ms] ease-out ${
-                bgLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
+                bgLoaded ? "opacity-30 sm:opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-sm"
               }`}
               priority
             />
-            <div className="absolute inset-0 bg-brand-cream/95 md:bg-brand-cream/70 lg:bg-transparent" />
+            {/* Readable text background overlay (stronger on mobile, fading to transparent on the right) */}
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-cream/90 via-brand-cream/75 to-transparent sm:bg-gradient-to-r sm:from-brand-cream/95 sm:via-brand-cream/75 sm:to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-0 bg-brand-cream/95 md:bg-brand-cream/70 lg:bg-transparent z-10" />
           </div>
 
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
@@ -92,12 +94,12 @@ export default function ContactUsPage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.35em] text-brand-gold mb-4">
                   Contact Us
                 </p>
-                <h1 className="text-5xl sm:text-6xl font-serif font-extrabold text-brand-navy leading-tight">
+                <h1 className="text-5xl sm:text-6xl font-serif font-black sm:font-extrabold text-brand-navy leading-tight">
                   We’re Here to Help.
                   <br />
                   Let’s Get in Touch.
                 </h1>
-                <p className="mt-6 max-w-2xl text-base sm:text-lg text-slate-700 leading-relaxed">
+                <p className="mt-6 max-w-2xl text-base sm:text-lg font-bold sm:font-normal text-slate-900 sm:text-slate-700 leading-relaxed">
                   Have questions about your Schengen Visa application? Our team is ready to assist you at every step with expert guidance, clear next steps, and personalised support.
                 </p>
               </div>

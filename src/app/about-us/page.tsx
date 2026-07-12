@@ -21,10 +21,12 @@ export default function AboutPage() {
               fill
               sizes="100vw"
               onLoad={() => setBgLoaded(true)}
-              className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+              className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${bgLoaded ? "opacity-30 sm:opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
                 }`}
               priority
             />
+            {/* Readable text background overlay (stronger on mobile, fading to transparent on the right) */}
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-cream/90 via-brand-cream/75 to-transparent sm:bg-gradient-to-r sm:from-brand-cream/95 sm:via-brand-cream/75 sm:to-transparent pointer-events-none z-10" />
             <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
           </div>
 
@@ -32,15 +34,15 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               <div className="lg:col-span-6 text-left z-10">
                 <ScrollReveal animation="fade-up">
-                  <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[72px] font-serif font-extrabold text-brand-navy leading-[1.03] mb-6">
+                  <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[72px] font-serif font-black sm:font-extrabold text-brand-navy leading-[1.03] mb-6">
                     Experts in
                     <br />
                     Schengen Visas
                   </h1>
-                  <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-2xl mb-6">
+                  <p className="text-base sm:text-lg font-bold sm:font-normal text-slate-900 sm:text-slate-800 leading-relaxed max-w-2xl mb-6">
                     Quick Holidays is a trusted UK Schengen Visa Specialist dedicated to simplifying the visa application process. Through expert consultation, efficient preparation, and personalized support, we help clients submit approval-focused Schengen visa applications with confidence, making every step clear, seamless, and stress-free.
                   </p>
-                  <p className="text-sm text-slate-600 max-w-2xl">
+                  <p className="text-sm font-bold sm:font-normal text-slate-900 sm:text-slate-700 max-w-2xl">
                     Our identity reflects professionalism, transparency, expertise, and efficiency. Every element of the brand is designed to communicate trust, confidence, and a commitment to delivering a fast, stress-free Schengen visa experience for UK residents.
                   </p>
                 </ScrollReveal>

@@ -9,7 +9,7 @@ import { logoBottom } from "@/constants/data";
 export default function Footer() {
   const pathname = usePathname();
   const isAdminPath = pathname ? pathname.startsWith("/admin") : false;
-  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/visa-form")) : false;
+  const isDashboardPage = pathname ? (pathname.includes("/agent-dashboard") || pathname.includes("/processing-dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/visa-form")) : false;
 
   const [isAdminSubdomain, setIsAdminSubdomain] = useState(false);
   const [footerInfo, setFooterInfo] = useState({
@@ -93,7 +93,7 @@ export default function Footer() {
 
           {/* Column 2: Brand Info & Socials */}
           <div className="max-w-[320px] text-left space-y-6">
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <p className="text-slate-200 text-sm leading-relaxed">
               We provide specialist Schengen Tourist Visa consultation for UK residents, offering
               expert guidance, application preparation, appointment assistance, and documentation
               support through a fast, transparent, and stress-free process.
@@ -166,17 +166,17 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/schengen-visa" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
-                  Visa Process
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
-                  Our Services
+                  Schengen Visa
                 </Link>
               </li>
               <li>
                 <Link href="/about-us" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
                   About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact-us" className="hover:text-brand-gold hover:translate-x-1 transition-all duration-200 inline-block">
+                  Contact Us
                 </Link>
               </li>
             </ul>

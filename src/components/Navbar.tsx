@@ -92,8 +92,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const isDashboard = pathname ? (
-      pathname.startsWith("/agent-dashboard") || 
-      pathname.startsWith("/processing-dashboard") || 
+      pathname.includes("/agent-dashboard") || 
+      pathname.includes("/processing-dashboard") || 
       pathname.startsWith("/admin") ||
       pathname.startsWith("/visa-form")
     ) : false;
@@ -113,7 +113,7 @@ export default function Navbar() {
   const isAdminPath = pathname ? pathname.startsWith("/admin") : false;
   const isAdminLogin = (isAdminSubdomain || isAdminPath) && !isAdminAuthenticated;
   const isAdminDashboard = (isAdminSubdomain || isAdminPath) && isAdminAuthenticated;
-  const isDashboardPage = pathname ? (pathname.startsWith("/agent-dashboard") || pathname.startsWith("/processing-dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/visa-form")) : false;
+  const isDashboardPage = pathname ? (pathname.includes("/agent-dashboard") || pathname.includes("/processing-dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/visa-form")) : false;
   const isHomeActive = pathname === "/" && !isAdminDashboard && !isAdminLogin;
   const isSchengenActive = pathname === "/schengen-visa";
   const isAboutActive = pathname === "/about-us";
@@ -169,8 +169,9 @@ export default function Navbar() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-md shadow-xl h-(--header-height)">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-md shadow-xl h-(--header-height)">
+      <div className="mx-auto max-w-7xl px-6 sm:px-6 lg:px-8 h-full">
         <div className="flex items-center h-full justify-between gap-4">
           
           {/* Logo */}
@@ -368,149 +369,184 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+    </header>
 
-      {/* Mobile Menu */}
+    {/* Mobile Menu Overlay / Drawer */}
       <div
-        className={`${isOpen ? "block animate-fadeIn" : "hidden"} md:hidden bg-white border-t border-brand-navy/5`}
-        id="mobile-menu"
+        className={`fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 md:hidden ${
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsOpen(false)}
       >
-        <div className="space-y-1 px-4 py-4 pb-6">
-          {isAdminDashboard ? (
-            <>
-              <a
-                href="#add-user"
-                onClick={(e) => {
-                  setIsOpen(false);
-                  handleAdminLinkClick("#add-user", e);
-                }}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  activeHash === "#add-user"
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
+        <div
+          className={`fixed right-0 top-0 bottom-0 w-4/5 max-w-sm bg-white p-6 shadow-2xl transition-transform duration-300 flex flex-col ${
+            isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header inside drawer */}
+          <div className="flex items-center justify-between pb-6 border-b border-brand-navy/5">
+            <Link href="/" className="inline-block" onClick={() => setIsOpen(false)}>
+              <Image
+                src={logoTop}
+                alt="Quick Holidays Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="rounded-md p-2 text-brand-navy hover:bg-brand-navy/5 focus:outline-none"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
               >
-                Add User
-              </a>
-              <a
-                href="#pending-requests"
-                onClick={(e) => {
-                  setIsOpen(false);
-                  handleAdminLinkClick("#pending-requests", e);
-                }}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  activeHash === "#pending-requests"
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                Pending Requests
-              </a>
-              <a
-                href="#approved-accounts"
-                onClick={(e) => {
-                  setIsOpen(false);
-                  handleAdminLinkClick("#approved-accounts", e);
-                }}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  activeHash === "#approved-accounts"
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                Approved Accounts
-              </a>
-              <div className="pt-4 border-t border-brand-navy/5">
-                <button
-                  onClick={() => {
-                    localStorage.removeItem("admin_auth");
-                    window.location.reload();
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-2 py-6 grow overflow-y-auto">
+            {isAdminDashboard ? (
+              <>
+                <a
+                  href="#add-user"
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    handleAdminLinkClick("#add-user", e);
                   }}
-                  className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy transition-all animate-pulseFast"
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    activeHash === "#add-user"
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
                 >
-                  Log Out
-                </button>
+                  Add User
+                </a>
+                <a
+                  href="#pending-requests"
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    handleAdminLinkClick("#pending-requests", e);
+                  }}
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    activeHash === "#pending-requests"
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
+                >
+                  Pending Requests
+                </a>
+                <a
+                  href="#approved-accounts"
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    handleAdminLinkClick("#approved-accounts", e);
+                  }}
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    activeHash === "#approved-accounts"
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
+                >
+                  Approved Accounts
+                </a>
+                <div className="pt-4 border-t border-brand-navy/5">
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("admin_auth");
+                      window.location.reload();
+                    }}
+                    className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy transition-all animate-pulseFast"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              </>
+            ) : isAdminLogin ? (
+              <div className="pt-4">
+                <a
+                  href={isAdminSubdomain ? "http://localhost:3000" : "/"}
+                  onClick={() => setIsOpen(false)}
+                  className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy transition-all"
+                >
+                  Back to Site
+                </a>
               </div>
-            </>
-          ) : isAdminLogin ? (
-            <div className="pt-4">
-              <a
-                href={isAdminSubdomain ? "http://localhost:3000" : "/"}
-                onClick={() => setIsOpen(false)}
-                className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy transition-all"
-              >
-                Back to Site
-              </a>
-            </div>
-          ) : (
-            <>
-              <Link
-                href="/"
-                onClick={() => setIsOpen(false)}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  isHomeActive
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/schengen-visa"
-                onClick={() => setIsOpen(false)}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  isSchengenActive
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                Schengen Visa
-              </Link>
-              <Link
-                href="/about-us"
-                onClick={() => setIsOpen(false)}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  isAboutActive
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                About Us
-              </Link>
-              <Link
-                href="/contact-us"
-                onClick={() => setIsOpen(false)}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  isContactActive
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                Contact Us
-              </Link>
-              <Link
-                href="/login"
-                onClick={() => setIsOpen(false)}
-                className={`block rounded-md px-3 py-2 text-base ${
-                  isLoginActive
-                    ? "font-semibold text-brand-gold bg-brand-cream/50"
-                    : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
-                }`}
-              >
-                Login
-              </Link>
-              <div className="pt-4 border-t border-brand-navy/5">
+            ) : (
+              <>
+                <Link
+                  href="/"
+                  onClick={() => setIsOpen(false)}
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    isHomeActive
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/schengen-visa"
+                  onClick={() => setIsOpen(false)}
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    isSchengenActive
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
+                >
+                  Schengen Visa
+                </Link>
+                <Link
+                  href="/about-us"
+                  onClick={() => setIsOpen(false)}
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    isAboutActive
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
+                >
+                  About Us
+                </Link>
                 <Link
                   href="/contact-us"
                   onClick={() => setIsOpen(false)}
-                  className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.02] transition-all duration-300"
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    isContactActive
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
                 >
-                  Get Free Consultancy
+                  Contact Us
                 </Link>
-              </div>
-            </>
-          )}
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className={`block rounded-md px-3 py-2 text-base ${
+                    isLoginActive
+                      ? "font-semibold text-brand-gold bg-brand-cream/50"
+                      : "font-medium text-slate-600 hover:bg-brand-cream/30 hover:text-brand-navy"
+                  }`}
+                >
+                  Login
+                </Link>
+                <div className="pt-4 border-t border-brand-navy/5">
+                  <Link
+                    href="/contact-us"
+                    onClick={() => setIsOpen(false)}
+                    className="flex w-full items-center justify-center rounded-full bg-brand-navy px-4 py-2.5 text-base font-bold text-white shadow-md hover:bg-brand-gold hover:text-brand-navy hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] hover:scale-[1.02] transition-all duration-300"
+                  >
+                    Get Free Consultancy
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }

@@ -18,13 +18,19 @@ export default function ScrollReveal({
   duration = 800,
 }: ScrollRevealProps) {
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check if browser supports IntersectionObserver
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
       setIsRevealed(true);
-      return;
+      return () => window.removeEventListener("resize", checkMobile);
     }
 
     const observer = new IntersectionObserver(
@@ -35,8 +41,8 @@ export default function ScrollReveal({
         }
       },
       {
-        threshold: 0.1, // Trigger when 10% of the element is visible
-        rootMargin: "0px 0px -50px 0px", // Trigger slightly before it fully enters viewport
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
       }
     );
 
@@ -50,10 +56,14 @@ export default function ScrollReveal({
         observer.unobserve(currentRef);
       }
       observer.disconnect();
+      window.removeEventListener("resize", checkMobile);
     };
   }, []);
 
   const getAnimationStyles = () => {
+    if (!isMobile) {
+      return "opacity-100 translate-y-0 scale-100 translate-x-0";
+    }
     switch (animation) {
       case "fade-up":
         return isRevealed
@@ -76,13 +86,17 @@ export default function ScrollReveal({
     }
   };
 
+  const transitionClass = isMobile 
+    ? "transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]" 
+    : "transition-none";
+
   return (
     <div
       ref={ref}
-      className={`transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${getAnimationStyles()} ${className}`}
+      className={`${transitionClass} ${getAnimationStyles()} ${className}`}
       style={{
-        transitionDelay: `${delay}ms`,
-        transitionDuration: `${duration}ms`,
+        transitionDelay: isMobile ? `${delay}ms` : "0ms",
+        transitionDuration: isMobile ? `${duration}ms` : "0ms",
       }}
     >
       {children}

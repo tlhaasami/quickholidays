@@ -51,9 +51,9 @@ export default function Services() {
       {/* Service Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {SERVICES.map((service, idx) => (
-          <ScrollReveal key={idx} delay={idx * 80} className="h-full">
+          <ScrollReveal key={idx} delay={idx * 80} className="h-full w-full">
             <div
-              className="flex flex-col items-center h-full text-center bg-white rounded-[24px] pt-8 pb-6 px-6 border-[1.5px] border-slate-100 shadow-[0_4px_20px_rgba(15,33,72,0.03)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_30px_rgba(15,33,72,0.08)] hover:border-brand-gold"
+              className="flex flex-col items-center h-full text-center bg-white rounded-[24px] pt-8 pb-6 px-6 border-[1.5px] border-slate-100 shadow-[0_4px_20px_rgba(15,33,72,0.03)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_30px_rgba(15,33,72,0.08)] hover:border-brand-gold w-[70%] sm:w-full mx-auto"
             >
               {/* Service Icon - Centered and uniform size */}
               <div className="mb-6 relative w-16 h-16 select-none flex items-center justify-center">

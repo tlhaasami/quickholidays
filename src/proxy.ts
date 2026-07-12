@@ -52,6 +52,30 @@ export async function proxy(request: NextRequest) {
         },
       });
 
+function getCookieDomain(host?: string | null) {
+  if (!host) return undefined;
+  const cleanHost = host.split(":")[0].toLowerCase();
+  if (cleanHost === "localhost" || cleanHost.endsWith(".localhost")) {
+    return "localhost";
+  }
+  if (cleanHost.endsWith(".netlify.app")) {
+    return undefined;
+  }
+  const parts = cleanHost.split(".");
+  const isDoubleTld = parts.length >= 3 && [
+    "co", "com", "org", "net", "ltd", "me", "plc", "sch", "ac", "gov"
+  ].includes(parts[parts.length - 2]);
+
+  if (isDoubleTld) {
+    return "." + parts.slice(-3).join(".");
+  } else {
+    if (parts.length >= 2) {
+      return "." + parts.slice(-2).join(".");
+    }
+  }
+  return undefined;
+}
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -61,6 +85,7 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
+          const cookieDomain = getCookieDomain(hostname);
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -76,7 +101,10 @@ export async function proxy(request: NextRequest) {
                 },
               });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, {
+              ...options,
+              domain: cookieDomain,
+            })
           );
         },
       },

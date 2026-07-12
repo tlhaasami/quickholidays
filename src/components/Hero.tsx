@@ -58,40 +58,42 @@ export default function Hero() {
           <img
             src={customBg}
             alt="Schengen Visa Background"
-            onLoad={() => setBgLoaded(true)}
-            className={`absolute inset-0 w-full h-full object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
-              bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+            className={`w-full h-full object-cover object-right sm:object-center transition-all duration-[1200ms] ease-out ${
+              bgLoaded ? "opacity-30 sm:opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-md"
             }`}
+            onLoad={() => setBgLoaded(true)}
           />
         ) : (
           <Image
             src={heroBg}
-            alt="Schengen Visa Background - St. Peter's Basilica Rome"
+            alt="Schengen Visa Background"
             fill
             sizes="100vw"
-            onLoad={() => setBgLoaded(true)}
-            className={`object-cover object-right select-none origin-top transition-all duration-[1500ms] ease-out ${
-              bgLoaded ? "opacity-100 scale-[1.02] blur-0" : "opacity-0 scale-[1.07] blur-sm"
+            className={`object-cover object-right sm:object-center transition-all duration-[1200ms] ease-out ${
+              bgLoaded ? "opacity-30 sm:opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-md"
             }`}
+            onLoad={() => setBgLoaded(true)}
             priority
           />
         )}
+        {/* Readable text background overlay (stronger on mobile, fading to transparent on the right) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-cream/90 via-brand-cream/75 to-transparent sm:bg-gradient-to-r sm:from-brand-cream/95 sm:via-brand-cream/75 sm:to-transparent pointer-events-none z-10" />
         {/* Soft bottom fade-to-cream gradient to blend image seamlessly into the cream background below */}
         <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
       </div>
 
       {/* Content Container overlayed on background */}
-      <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-36 pb-32 sm:pt-44 sm:pb-40 lg:pt-48 lg:pb-44">
+      <div className="relative z-20 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-20 pb-20 sm:pt-28 sm:pb-24 lg:pt-32 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column: Text Content (Spans 6 columns) */}
           <div className="lg:col-span-6 text-left z-10">
-            <h1 className={`font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-brand-navy leading-[1.05] mb-6 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <h1 className={`font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-black tracking-tight text-brand-navy leading-[1.05] mb-6 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               Schengen Visa
               <br />
               Specialist
             </h1>
-            <p className={`text-base sm:text-lg text-slate-700 leading-relaxed max-w-lg mb-8 transition-all duration-[1200ms] delay-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <p className={`text-base sm:text-lg font-bold sm:font-normal text-slate-900 sm:text-slate-700 leading-relaxed max-w-lg mb-8 transition-all duration-[1200ms] delay-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               We simplify the Schengen visa process for UK residents through expert guidance,
               meticulous application preparation, and personalized support making every journey to
               Europe seamless, confident, and stress-free.

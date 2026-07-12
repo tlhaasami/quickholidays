@@ -68,14 +68,14 @@ export default function AgentDashboard() {
     const checkAuthAndLoad = async () => {
       const session = localStorage.getItem("user_session");
       if (!session) {
-        router.push("/login");
+        window.location.href = "/login";
         return;
       }
       const user = JSON.parse(session);
       
       const { data: { user: sbUser } } = await supabase.auth.getUser();
       if (!sbUser || sbUser.id !== user.id) {
-        router.push("/login");
+        window.location.href = "/login";
         return;
       }
       
@@ -163,7 +163,7 @@ export default function AgentDashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem("user_session");
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   const generateFormId = () => {
@@ -798,7 +798,7 @@ export default function AgentDashboard() {
   return (
     <div className="min-h-screen bg-brand-cream text-slate-800 font-sans flex h-screen overflow-hidden antialiased">
         {/* 1. SIDEBAR (Premium Light Layout) */}
-      <aside className="w-85 bg-white text-slate-850 flex flex-col shrink-0 border-r border-brand-gold/15 shadow-sm relative z-20">
+      <aside className={`w-full lg:w-85 bg-white text-slate-850 flex flex-col shrink-0 border-r border-brand-gold/15 shadow-sm relative z-20 h-full ${selectedClient ? "hidden lg:flex" : "flex"}`}>
         
         {/* Sidebar Brand Header */}
         <div className="p-6 border-b border-slate-100 bg-slate-50/50 text-left">
@@ -1035,15 +1035,28 @@ export default function AgentDashboard() {
       </aside>
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden bg-brand-cream relative z-10">
+      <main className={`flex-1 flex flex-col h-full overflow-hidden bg-brand-cream relative z-10 ${selectedClient ? "flex" : "hidden lg:flex"}`}>
         {selectedClient ? (
           <>
             {/* Main Header & Client Info Bar */}
             <div className="bg-white border-b border-brand-gold/15 p-6 shadow-sm shrink-0 text-left flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3">
-                  <h2 className="font-serif text-2xl font-black text-brand-navy">{selectedClient.name}</h2>
-                  <span className="bg-brand-gold/10 text-brand-navy text-[10px] font-bold px-2 py-0.5 rounded-md border border-brand-gold/10">
+                  {/* Mobile Back Button */}
+                  <button
+                    onClick={() => {
+                      setSelectedClient(null);
+                      setSelectedForm(null);
+                    }}
+                    className="lg:hidden p-2 -ml-2 rounded-full hover:bg-slate-100 text-brand-navy cursor-pointer flex items-center justify-center shrink-0"
+                    aria-label="Back to Clients"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                  </button>
+                  <h2 className="font-serif text-2xl font-black text-brand-navy truncate max-w-[150px] sm:max-w-none">{selectedClient.name}</h2>
+                  <span className="bg-brand-gold/10 text-brand-navy text-[10px] font-bold px-2 py-0.5 rounded-md border border-brand-gold/10 shrink-0">
                     {selectedClient.forms.length} Visa Dossier{selectedClient.forms.length !== 1 ? "s" : ""}
                   </span>
                 </div>
@@ -1207,10 +1220,10 @@ export default function AgentDashboard() {
                     </div>
 
                     {/* Form Review fields core split view */}
-                    <div className="flex-1 flex overflow-hidden">
+                    <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                       
                       {/* Sticky Navigation Sidebar on the Left */}
-                      <div className="w-64 border-r border-slate-100 bg-slate-50/50 flex flex-col overflow-y-auto p-4 shrink-0 text-left">
+                      <div className="hidden md:flex w-64 border-r border-slate-100 bg-slate-50/50 flex-col overflow-y-auto p-4 shrink-0 text-left">
                         <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-3">Sections</h3>
                         <div className="space-y-1.5">
                           {visaSections.map((section, idx) => {
