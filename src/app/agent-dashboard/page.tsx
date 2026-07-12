@@ -35,6 +35,25 @@ export default function AgentDashboard() {
   const [newFormApplicantName, setNewFormApplicantName] = useState("");
   const [showCreateFormModal, setShowCreateFormModal] = useState(false);
 
+  // Toast notification state
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({
+    message: "",
+    visible: false,
+  });
+
+  const triggerToast = (message: string) => {
+    setToast({ message, visible: true });
+  };
+
+  useEffect(() => {
+    if (toast.visible) {
+      const timer = setTimeout(() => {
+        setToast((t) => ({ ...t, visible: false }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.visible]);
+
   useEffect(() => {
     // Authenticate Agent
     const session = localStorage.getItem("user_session");
@@ -931,7 +950,7 @@ export default function AgentDashboard() {
                             onClick={() => {
                               const secureUrl = `${window.location.origin}/visa-form/${selectedForm.id}`;
                               navigator.clipboard.writeText(secureUrl);
-                              alert("Client Form link copied!");
+                              triggerToast("Client Form link copied!");
                             }}
                             className="p-0.5 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-600 transition-colors"
                             title="Copy link"
@@ -1242,6 +1261,20 @@ export default function AgentDashboard() {
           </div>
         </div>
       )}
+
+      {/* Toast Notification */}
+      <div
+        className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 bg-[#0F2148]/95 text-white rounded-2xl border border-brand-gold/20 shadow-[0_15px_40px_rgba(15,33,72,0.25),0_0_20px_rgba(204,163,82,0.1)] backdrop-blur-md transition-all duration-500 transform ${
+          toast.visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+        }`}
+      >
+        <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <span className="text-xs font-bold tracking-wide">{toast.message}</span>
+      </div>
 
     </div>
   );
