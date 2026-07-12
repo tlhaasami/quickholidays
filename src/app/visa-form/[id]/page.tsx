@@ -107,6 +107,10 @@ export default function ClientVisaFormPage({ params }: PageProps) {
   const updateField = (fieldId: string, value: string) => {
     if (!clientForm || clientForm.status === "approved" || !client) return;
 
+    if (clientForm.status === "needs_approval" || clientForm.status === "client_completed") {
+      return;
+    }
+
     setSaveStatus("Saving...");
     const updatedFormData = { ...formData, [fieldId]: value };
     setFormData(updatedFormData);

@@ -46,85 +46,50 @@ export default function LoginPage() {
     setError("");
     setSuccess("");
 
-    let loginEmail = usernameOrEmail.trim();
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usernameOrEmail,
+          password,
+        }),
+      });
 
-    // If it's not a standard email, check if it's a username
-    if (!loginEmail.includes("@")) {
-      const { data: profile, error: profileErr } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("username", loginEmail.toLowerCase())
-        .single();
-      
-      if (profileErr || !profile) {
-        setError("No account found with this username.");
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || "Authentication failed.");
         return;
       }
-      loginEmail = profile.email;
-    }
 
-    // Sign in using Supabase Auth
-    const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: password,
-    });
+      const userData = result.user;
 
-    if (authErr || !authData.user) {
-      setError(authErr?.message || "Authentication failed.");
-      return;
-    }
+      // Save basic session metadata
+      localStorage.setItem("user_session", JSON.stringify(userData));
 
-    // Retrieve their dashboard role profile to verify status and select redirect
-    const { data: profile, error: dbErr } = await supabase
-      .from("profiles")
-      .select("name, username, role, status")
-      .eq("id", authData.user.id)
-      .single();
+      setSuccess("Login successful! Redirecting...");
 
-    if (dbErr || !profile) {
-      setError("Failed to fetch user profile details.");
-      await supabase.auth.signOut();
-      return;
-    }
-
-    if (profile.status === "pending") {
-      setError("Access Pending: Awaiting Admin approval.");
-      await supabase.auth.signOut();
-      return;
-    }
-
-    if (profile.status === "suspended") {
-      setError("Account Suspended: Contact administrator.");
-      await supabase.auth.signOut();
-      return;
-    }
-
-    // Save basic session metadata
-    localStorage.setItem("user_session", JSON.stringify({
-      id: authData.user.id,
-      name: profile.name,
-      username: profile.username,
-      email: loginEmail,
-      role: profile.role,
-      status: profile.status,
-    }));
-
-    setSuccess("Login successful! Redirecting...");
-
-    setTimeout(() => {
-      if (profile.role === "admin") {
-        const hostname = window.location.host;
-        if (!hostname.startsWith("admin.")) {
-          window.location.href = window.location.protocol + "//admin." + hostname + "/";
+      setTimeout(() => {
+        if (userData.role === "admin") {
+          const hostname = window.location.host;
+          if (!hostname.startsWith("admin.")) {
+            window.location.href = window.location.protocol + "//admin." + hostname + "/";
+          } else {
+            router.push("/admin");
+          }
+        } else if (userData.role === "processor") {
+          router.push("/processing-dashboard");
         } else {
-          router.push("/admin");
+          router.push(`/${userData.username.toLowerCase()}/agent-dashboard`);
         }
-      } else if (profile.role === "processor") {
-        router.push("/processing-dashboard");
-      } else {
-        router.push(`/${profile.username.toLowerCase()}/agent-dashboard`);
-      }
-    }, 1000);
+      }, 1000);
+
+    } catch (err: any) {
+      setError("An unexpected error occurred during login. Please try again.");
+    }
   };
 
   const handleRequestAccess = async (e: React.FormEvent) => {
@@ -136,9 +101,26 @@ export default function LoginPage() {
     const cleanedUsername = username.trim().toLowerCase();
     const cleanedEmail = email.trim();
 
-    // Validate format
+    // Input Validation Checks
+    if (!cleanedName) {
+      setError("Full Name is required.");
+      return;
+    }
+    if (!cleanedUsername) {
+      setError("Username is required.");
+      return;
+    }
     if (cleanedUsername.includes("@")) {
       setError("Username cannot contain '@'.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters long.");
       return;
     }
 

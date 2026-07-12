@@ -1,7 +1,20 @@
 import { NextResponse } from "next/server";
 
+// Simple in-memory rate-limiter for contact form submissions
+const contactRateLimits = new Map<string, number>();
+
 export async function POST(request: Request) {
   try {
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0] || request.headers.get("x-real-ip") || "127.0.0.1";
+    const submissionsCount = contactRateLimits.get(clientIp) || 0;
+
+    if (submissionsCount >= 3) {
+      return NextResponse.json(
+        { error: "For security reasons, you cannot submit the contact form more than 3 times." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { fullName, email, phone, nationality, city, pastVisas, responsePreferred } = body;
 
@@ -9,11 +22,16 @@ export async function POST(request: Request) {
     if (!fullName || typeof fullName !== "string" || !fullName.trim()) {
       return NextResponse.json({ error: "Full Name is required." }, { status: 400 });
     }
-    if (!email || typeof email !== "string" || !email.trim()) {
-      return NextResponse.json({ error: "Email is required." }, { status: 400 });
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+      return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
     }
-    if (!phone || typeof phone !== "string" || !phone.trim()) {
-      return NextResponse.json({ error: "Phone number is required." }, { status: 400 });
+
+    // Phone format: allows numbers, spaces, hyphens, parentheses, and starting +
+    const phoneRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
+    if (!phone || typeof phone !== "string" || !phoneRegex.test(phone.trim())) {
+      return NextResponse.json({ error: "A valid phone number is required." }, { status: 400 });
     }
 
     const payload = {
@@ -52,6 +70,9 @@ export async function POST(request: Request) {
     } else {
       console.warn("CONTACT_WEBHOOK_URL is not set. Submission logged locally only.");
     }
+
+    // Increment submission counter for IP
+    contactRateLimits.set(clientIp, submissionsCount + 1);
 
     return NextResponse.json({ success: true, message: "Consultation booked successfully!" });
   } catch (error) {
