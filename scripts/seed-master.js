@@ -53,11 +53,15 @@ async function seedMaster() {
   console.log("=== START SEEDING LIVE DATA ===");
 
   // Clean up old numeric forms if they exist in DB
-  const oldIds = ["4819582910", "7218495021", "9910543209", "3381048592"];
+  const oldIds = [
+    "4819582910", "7218495021", "9910543209", "3381048592",
+    "QH-AGENT-2607-4819", "QH-AGENT-2607-7218", "QH-CHLOE-2607-9910", "QH-AMARA-2607-3381"
+  ];
   await supabase.from('visa_forms').delete().in('id', oldIds);
 
   // 1. Create all 10 users in Supabase Auth
   const agentUserIds = [];
+  const processorIdsMap = {};
   for (const user of usersToCreate) {
     const { data: existingProfile } = await supabase
       .from('profiles')
@@ -102,6 +106,9 @@ async function seedMaster() {
 
     if (user.role === 'agent') {
       agentUserIds.push(userId);
+    }
+    if (user.role === 'processor') {
+      processorIdsMap[user.email] = userId;
     }
   }
 
@@ -299,6 +306,16 @@ async function seedMaster() {
         continue;
       }
 
+      let formData = { ...form.form_data };
+      if (form.id === "QH-AGENT-2607-7218") {
+        const procId = processorIdsMap["processor@quickholidays.co.uk"];
+        if (procId) {
+          formData.assigned_processor_id = procId;
+          formData.assigned_processor_name = "Visa Specialist";
+          formData.assigned_processor_email = "processor@quickholidays.co.uk";
+        }
+      }
+
       const { data: dbForm, error: formErr } = await supabase
         .from('visa_forms')
         .insert({
@@ -307,7 +324,7 @@ async function seedMaster() {
           title: form.title,
           applicant_name: seed.name,
           status: form.status,
-          form_data: form.form_data,
+          form_data: formData,
           approved_data: form.approved_data
         })
         .select()

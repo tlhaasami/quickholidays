@@ -172,6 +172,10 @@ export default function LoginPage() {
       return;
     }
 
+    // Force sign out immediately so they aren't auto-logged in under pending status
+    await supabase.auth.signOut();
+    localStorage.removeItem("user_session");
+
     setSuccess("Access request submitted successfully! Awaiting Admin approval.");
 
     // Clear signup form

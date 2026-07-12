@@ -14,6 +14,7 @@ interface ProcessingCase {
   approvedData: any;
   agentName: string;
   agentEmail: string;
+  forwardNote?: string;
 }
 
 export default function ProcessingDashboard() {
@@ -22,6 +23,7 @@ export default function ProcessingDashboard() {
   const [processorName, setProcessorName] = useState("Processor");
   const [cases, setCases] = useState<ProcessingCase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewForm, setPreviewForm] = useState<ProcessingCase | null>(null);
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
@@ -81,6 +83,7 @@ export default function ProcessingDashboard() {
               approvedData: f.approved_data || {},
               agentName: agentProfile?.name || "System/Unknown",
               agentEmail: agentProfile?.email || "",
+              forwardNote: f.form_data?.forward_note || "",
             };
           });
         setCases(mapped);
@@ -329,10 +332,21 @@ export default function ProcessingDashboard() {
                         <div className="text-slate-800 font-semibold">{c.agentName}</div>
                         <div className="text-[10px] text-slate-400 font-medium">{c.agentEmail}</div>
                       </td>
-                      <td className="py-4 pr-2 text-right">
+                      <td className="py-4 pr-2 text-right space-x-2">
+                        <button
+                          onClick={() => setPreviewForm(c)}
+                          className="rounded-full border border-slate-200 hover:border-brand-navy bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold px-4 py-2 transition-all duration-300 shadow-sm cursor-pointer hover:scale-[1.02] inline-flex items-center gap-1.5"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 014-4z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Preview Details
+                        </button>
+
                         <button
                           onClick={() => handleExportWord(c)}
-                          className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-4 py-2 transition-all duration-300 shadow-sm cursor-pointer hover:scale-[1.02] flex items-center gap-1.5 inline-flex"
+                          className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-4 py-2 transition-all duration-300 shadow-sm cursor-pointer hover:scale-[1.02] inline-flex items-center gap-1.5"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -347,6 +361,85 @@ export default function ProcessingDashboard() {
             </div>
           )}
         </div>
+      {/* 2. DOSSIER DETAILS PREVIEW MODAL */}
+      {previewForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 text-left">
+          <div className="bg-brand-cream border border-brand-gold/20 rounded-[32px] max-w-3xl w-full max-h-[85vh] flex flex-col p-8 shadow-2xl relative overflow-hidden">
+            <button
+              onClick={() => setPreviewForm(null)}
+              className="absolute right-6 top-6 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="border-b border-slate-200 pb-4 mb-6">
+              <h3 className="font-serif text-2xl font-bold text-brand-navy">{previewForm.applicantName}</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Reference ID: <strong className="text-slate-700">{previewForm.id}</strong> • Title: <strong className="text-slate-700">{previewForm.title}</strong> • Forwarded by: <strong className="text-slate-700">{previewForm.agentName}</strong>
+              </p>
+            </div>
+
+            {/* Agent Note Banner */}
+            {previewForm.forwardNote && (
+              <div className="bg-amber-50 border border-amber-100/70 rounded-2xl p-4 text-xs mb-6 text-left shrink-0">
+                <span className="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1 font-semibold">
+                  Agent's Note
+                </span>
+                <p className="text-slate-700 italic font-medium">"{previewForm.forwardNote}"</p>
+              </div>
+            )}
+
+            {/* Scrollable Form Content */}
+            <div className="flex-1 overflow-y-auto space-y-8 pr-2">
+              {visaSections.map((section) => {
+                const data = (previewForm.approvedData && Object.keys(previewForm.approvedData).length > 0)
+                  ? previewForm.approvedData
+                  : (previewForm.formData || {});
+
+                return (
+                  <div key={section.title} className="bg-white border border-slate-100 rounded-2xl p-6 space-y-4">
+                    <h4 className="font-sans font-bold text-xs text-brand-navy uppercase tracking-wider border-b border-slate-100 pb-2">
+                      {section.title}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 text-left">
+                      {section.fields.map((field) => (
+                        <div key={field.id} className="text-xs">
+                          <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                            {field.label}
+                          </span>
+                          <span className="text-slate-800 font-semibold break-words">
+                            {data[field.id] || <span className="text-slate-300 italic font-normal">Not provided</span>}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="border-t border-slate-200 pt-6 mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setPreviewForm(null)}
+                className="rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold px-6 py-2.5 transition-all duration-200 cursor-pointer"
+              >
+                Close Preview
+              </button>
+              <button
+                onClick={() => {
+                  handleExportWord(previewForm);
+                  setPreviewForm(null);
+                }}
+                className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-6 py-2.5 transition-all duration-300 shadow-sm cursor-pointer"
+              >
+                Export Word Doc
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </main>
     </div>
   );

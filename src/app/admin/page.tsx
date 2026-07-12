@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS, heroBg, whyChooseUsBg, formBg } from "@/constants/data";
+import { visaSections } from "@/constants/visaFields";
 import { createClient } from "@/lib/supabase/client";
 
 interface UserRequest {
@@ -109,6 +110,11 @@ export default function AdminPage() {
   const [newRole, setNewRole] = useState<"agent" | "processor" | "admin">("agent");
   const [allClients, setAllClients] = useState<any[]>([]);
   const [expandedAgentId, setExpandedAgentId] = useState<string | null>(null);
+  const [agentsSearchQuery, setAgentsSearchQuery] = useState("");
+  const [previewForm, setPreviewForm] = useState<any>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewActiveTab, setPreviewActiveTab] = useState(0);
   const [addError, setAddError] = useState("");
   const [addSuccess, setAddSuccess] = useState("");
 
@@ -316,6 +322,122 @@ export default function AdminPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError("Please log in through the main Portal sign in page.");
+  };
+
+  const openPreview = async (formId: string) => {
+    setIsPreviewOpen(true);
+    setPreviewLoading(true);
+    setPreviewActiveTab(0);
+    setPreviewForm(null);
+    try {
+      const { data, error } = await supabase
+        .from("visa_forms")
+        .select(`
+          id,
+          title,
+          applicant_name,
+          status,
+          created_at,
+          updated_at,
+          form_data,
+          approved_data,
+          clients (
+            id,
+            name,
+            email,
+            phone
+          )
+        `)
+        .eq("id", formId)
+        .single();
+
+      if (!error && data) {
+        setPreviewForm(data);
+      } else {
+        console.error("Failed to load form for preview:", error);
+      }
+    } catch (err) {
+      console.error("Error fetching preview form:", err);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  const handleApproveForm = async (formId: string) => {
+    try {
+      const { error } = await supabase
+        .from("visa_forms")
+        .update({
+          status: "approved",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", formId);
+        
+      if (error) {
+        alert("Failed to approve form: " + error.message);
+        return;
+      }
+      
+      // Update local state by setting form status to 'approved' in allClients
+      setAllClients((prevClients) => 
+        prevClients.map((client) => {
+          if (!client.visa_forms) return client;
+          return {
+            ...client,
+            visa_forms: client.visa_forms.map((f: any) => 
+              f.id === formId ? { ...f, status: "approved", updated_at: new Date().toISOString() } : f
+            )
+          };
+        })
+      );
+      
+      // Update preview form status if open
+      if (previewForm && previewForm.id === formId) {
+        setPreviewForm((prev: any) => ({ ...prev, status: "approved" }));
+      }
+      
+      alert("Visa form approved successfully!");
+    } catch (err: any) {
+      alert("Error approving form: " + err.message);
+    }
+  };
+
+  const handleDeleteForm = async (formId: string) => {
+    if (!confirm("Are you sure you want to permanently delete this visa application form?")) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from("visa_forms")
+        .delete()
+        .eq("id", formId);
+        
+      if (error) {
+        alert("Failed to delete form: " + error.message);
+        return;
+      }
+      
+      // Update local state by removing the form from allClients
+      setAllClients((prevClients) => 
+        prevClients.map((client) => {
+          if (!client.visa_forms) return client;
+          return {
+            ...client,
+            visa_forms: client.visa_forms.filter((f: any) => f.id !== formId)
+          };
+        })
+      );
+      
+      // If the deleted form was open in the preview modal, close it
+      if (previewForm && previewForm.id === formId) {
+        setIsPreviewOpen(false);
+      }
+      
+      alert("Visa form deleted successfully!");
+    } catch (err: any) {
+      alert("Error deleting form: " + err.message);
+    }
   };
 
   const handleLogout = async () => {
@@ -886,6 +1008,11 @@ export default function AdminPage() {
           title: "Website Wallpapers Manager",
           subtitle: "Upload custom background wallpapers across main website pages and portal login screens.",
         };
+      case "agents_work":
+        return {
+          title: "Agents & Client Workspaces",
+          subtitle: "Oversee agent pipelines, search all client records, and preview detailed visa application forms.",
+        };
       default:
         return {
           title: "System Control Room",
@@ -1428,7 +1555,7 @@ export default function AdminPage() {
 
           {/* Agents & Forms Work tab content */}
           {activeTab === "agents_work" && (
-            <div className="space-y-8 text-left">
+            <div className="space-y-8 text-left animate-fadeIn">
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-3xl p-6 border border-brand-gold/15 shadow-sm">
@@ -1455,126 +1582,300 @@ export default function AdminPage() {
 
               {/* Agents list */}
               <div className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm">
-                <h3 className="font-serif text-2xl font-bold text-brand-navy mb-6">
-                  Agent Workspaces ({requests.filter((r) => r.role === "agent" && r.status === "approved").length})
-                </h3>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                  <h3 className="font-serif text-2xl font-bold text-brand-navy">
+                    Agent Workspaces ({requests.filter((r) => r.role === "agent" && r.status === "approved").length})
+                  </h3>
+                  
+                  {/* Search Bar */}
+                  <div className="relative w-full md:w-80">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Search agents, clients, forms..."
+                      value={agentsSearchQuery}
+                      onChange={(e) => setAgentsSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-10 py-2.5 text-xs rounded-full border border-slate-200 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold bg-slate-50 text-slate-700 transition-all placeholder-slate-400"
+                    />
+                    {agentsSearchQuery && (
+                      <button
+                        onClick={() => setAgentsSearchQuery("")}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
 
                 <div className="space-y-4">
-                  {requests.filter((r) => r.role === "agent" && r.status === "approved").map((agent) => {
-                    const agentClients = allClients.filter((c) => c.agent_id === agent.id);
-                    const agentFormsCount = agentClients.reduce((acc, c) => acc + (c.visa_forms?.length || 0), 0);
-                    const isExpanded = expandedAgentId === agent.id;
+                  {(() => {
+                    const approvedAgents = requests.filter((r) => r.role === "agent" && r.status === "approved");
+                    const filteredAgents = approvedAgents.filter((agent) => {
+                      if (!agentsSearchQuery.trim()) return true;
+                      const query = agentsSearchQuery.toLowerCase().trim();
+                      
+                      const agentMatches = 
+                        agent.name?.toLowerCase().includes(query) ||
+                        agent.username?.toLowerCase().includes(query) ||
+                        agent.email?.toLowerCase().includes(query);
+                      if (agentMatches) return true;
+                      
+                      const agentClients = allClients.filter((c) => c.agent_id === agent.id);
+                      const clientMatches = agentClients.some((client) => 
+                        client.name?.toLowerCase().includes(query) ||
+                        client.email?.toLowerCase().includes(query) ||
+                        client.phone?.toLowerCase().includes(query) ||
+                        client.visa_forms?.some((form: any) => 
+                          form.id?.toString().toLowerCase().includes(query) ||
+                          form.title?.toLowerCase().includes(query) ||
+                          form.applicant_name?.toLowerCase().includes(query) ||
+                          form.status?.toLowerCase().includes(query)
+                        )
+                      );
+                      return clientMatches;
+                    });
 
-                    return (
-                      <div 
-                        key={agent.id} 
-                        className="border border-slate-100 rounded-2xl overflow-hidden hover:border-brand-gold/30 transition-all duration-300"
-                      >
-                        {/* Agent Summary Header Row */}
-                        <div 
-                          onClick={() => setExpandedAgentId(isExpanded ? null : agent.id)}
-                          className="bg-slate-50/50 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                        >
-                          <div className="space-y-1 text-left">
-                            <h4 className="font-sans font-bold text-slate-800 text-sm">{agent.name}</h4>
-                            <p className="text-[10px] text-slate-500 font-medium">@{agent.username} • {agent.email}</p>
-                          </div>
-
-                          <div className="flex items-center gap-6">
-                            <div className="text-right shrink-0">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase block">Clients</span>
-                              <span className="text-sm font-bold text-slate-700">{agentClients.length}</span>
-                            </div>
-                            <div className="text-right shrink-0">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase block">Forms</span>
-                              <span className="text-sm font-bold text-slate-700">{agentFormsCount}</span>
-                            </div>
-                            <button className="text-slate-400 hover:text-brand-navy">
-                              <svg 
-                                className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} 
-                                fill="none" 
-                                viewBox="0 0 24 24" 
-                                stroke="currentColor" 
-                                strokeWidth={2}
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </button>
-                          </div>
+                    if (filteredAgents.length === 0) {
+                      return (
+                        <div className="text-center py-12 text-slate-500 font-medium bg-slate-50 rounded-2xl border border-slate-100 text-xs">
+                          No agent workspaces or client forms found matching your search.
                         </div>
+                      );
+                    }
 
-                        {/* Expanded details */}
-                        {isExpanded && (
-                          <div className="p-6 bg-white border-t border-slate-100 space-y-6">
-                            {agentClients.length === 0 ? (
-                              <p className="text-xs text-slate-500 text-center py-2 font-medium">This agent has not registered any clients yet.</p>
-                            ) : (
-                              <div className="space-y-6">
-                                {agentClients.map((client) => (
-                                  <div key={client.id} className="bg-slate-50/30 rounded-2xl p-5 border border-slate-100 space-y-4 text-left">
-                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-2">
-                                      <div>
-                                        <h5 className="font-sans font-bold text-xs text-slate-800">{client.name}</h5>
-                                        <p className="text-[10px] text-slate-500">{client.email} • {client.phone}</p>
-                                      </div>
-                                      <span className="text-[10px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                                        Client ID: {client.id}
-                                      </span>
-                                    </div>
+                    return filteredAgents.map((agent) => {
+                      const agentClients = allClients.filter((c) => c.agent_id === agent.id);
+                      const agentFormsCount = agentClients.reduce((acc, c) => acc + (c.visa_forms?.length || 0), 0);
+                      
+                      // Auto-expand agent if search matches agent or agent's children
+                      const isExpanded = expandedAgentId === agent.id || (!!agentsSearchQuery.trim() && (
+                        agent.name?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                        agent.username?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                        agent.email?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                        agentClients.some(client => 
+                          client.name?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                          client.email?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                          client.phone?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                          client.visa_forms?.some((form: any) => 
+                            form.id?.toString().toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                            form.title?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                            form.applicant_name?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim()) ||
+                            form.status?.toLowerCase().includes(agentsSearchQuery.toLowerCase().trim())
+                          )
+                        )
+                      ));
 
-                                    {/* Client Forms Table */}
-                                    <div className="space-y-2">
-                                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Client Visa Applications</p>
-                                      {!client.visa_forms || client.visa_forms.length === 0 ? (
-                                        <p className="text-[11px] text-slate-500 font-medium pl-1">No visa forms created for this client.</p>
-                                      ) : (
-                                        <div className="overflow-x-auto">
-                                          <table className="w-full text-left text-[11px] text-slate-600 border-collapse">
-                                            <thead>
-                                              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
-                                                <th className="pb-2 font-medium">Application ID</th>
-                                                <th className="pb-2 font-medium">Title</th>
-                                                <th className="pb-2 font-medium">Status</th>
-                                                <th className="pb-2 font-medium">Last Updated</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {client.visa_forms.map((form: any) => (
-                                                <tr key={form.id} className="border-b border-slate-50 last:border-b-0 hover:bg-slate-50/50">
-                                                  <td className="py-2.5 font-semibold text-slate-700">{form.id}</td>
-                                                  <td className="py-2.5">{form.title}</td>
-                                                  <td className="py-2.5">
-                                                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                                                      form.status === "approved" 
-                                                        ? "bg-green-50 text-green-600 border border-green-100" 
-                                                        : form.status === "needs_approval" 
-                                                          ? "bg-amber-50 text-amber-600 border border-amber-100" 
-                                                          : form.status === "client_completed" 
-                                                            ? "bg-blue-50 text-blue-600 border border-blue-100" 
-                                                            : "bg-slate-100 text-slate-600 border border-slate-200"
-                                                    }`}>
-                                                      {form.status.replace("_", " ")}
-                                                    </span>
-                                                  </td>
-                                                  <td className="py-2.5 text-slate-500">
-                                                    {new Date(form.updated_at || form.created_at).toLocaleDateString()}
-                                                  </td>
-                                                </tr>
-                                              ))}
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
+                      const filteredClients = agentClients.filter((client) => {
+                        if (!agentsSearchQuery.trim()) return true;
+                        const query = agentsSearchQuery.toLowerCase().trim();
+                        
+                        const agentMatches = 
+                          agent.name?.toLowerCase().includes(query) ||
+                          agent.username?.toLowerCase().includes(query) ||
+                          agent.email?.toLowerCase().includes(query);
+                        if (agentMatches) return true;
+                        
+                        const clientMatches = 
+                          client.name?.toLowerCase().includes(query) ||
+                          client.email?.toLowerCase().includes(query) ||
+                          client.phone?.toLowerCase().includes(query);
+                        if (clientMatches) return true;
+                        
+                        const formMatches = client.visa_forms?.some((form: any) => 
+                          form.id?.toString().toLowerCase().includes(query) ||
+                          form.title?.toLowerCase().includes(query) ||
+                          form.applicant_name?.toLowerCase().includes(query) ||
+                          form.status?.toLowerCase().includes(query)
+                        );
+                        return formMatches;
+                      });
+
+                      return (
+                        <div 
+                          key={agent.id} 
+                          className="border border-slate-100 rounded-2xl overflow-hidden hover:border-brand-gold/30 transition-all duration-300 bg-white"
+                        >
+                          {/* Agent Summary Header Row */}
+                          <div 
+                            onClick={() => setExpandedAgentId(isExpanded ? null : agent.id)}
+                            className="bg-slate-50/50 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                          >
+                            <div className="space-y-1 text-left">
+                              <h4 className="font-sans font-bold text-slate-800 text-sm">{agent.name}</h4>
+                              <p className="text-[10px] text-slate-500 font-medium">@{agent.username} • {agent.email}</p>
+                            </div>
+
+                            <div className="flex items-center gap-6">
+                              <div className="text-right shrink-0">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase block">Clients</span>
+                                <span className="text-sm font-bold text-slate-700">{agentClients.length}</span>
                               </div>
-                            )}
+                              <div className="text-right shrink-0">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase block">Forms</span>
+                                <span className="text-sm font-bold text-slate-700">{agentFormsCount}</span>
+                              </div>
+                              <button className="text-slate-400 hover:text-brand-navy">
+                                <svg 
+                                  className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} 
+                                  fill="none" 
+                                  viewBox="0 0 24 24" 
+                                  stroke="currentColor" 
+                                  strokeWidth={2}
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+
+                          {/* Expanded details */}
+                          {isExpanded && (
+                            <div className="p-6 bg-white border-t border-slate-100 space-y-6">
+                              {filteredClients.length === 0 ? (
+                                <p className="text-xs text-slate-500 text-center py-2 font-medium">No clients found matching the filter.</p>
+                              ) : (
+                                <div className="space-y-6">
+                                  {filteredClients.map((client) => (
+                                    <div key={client.id} className="bg-slate-50/30 rounded-2xl p-5 border border-slate-100 space-y-4 text-left">
+                                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-2">
+                                        <div>
+                                          <h5 className="font-sans font-bold text-xs text-slate-800">{client.name}</h5>
+                                          <p className="text-[10px] text-slate-500">{client.email} • {client.phone}</p>
+                                        </div>
+                                        <span className="text-[10px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                                          Client ID: {client.id}
+                                        </span>
+                                      </div>
+
+                                      {/* Client Forms Table */}
+                                      <div className="space-y-2">
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Client Visa Applications</p>
+                                        {!client.visa_forms || client.visa_forms.length === 0 ? (
+                                          <p className="text-[11px] text-slate-500 font-medium pl-1">No visa forms created for this client.</p>
+                                        ) : (
+                                          <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-[11px] text-slate-600 border-collapse">
+                                              <thead>
+                                                <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
+                                                  <th className="pb-2 font-medium">Application ID</th>
+                                                  <th className="pb-2 font-medium">Title</th>
+                                                  <th className="pb-2 font-medium">Applicant</th>
+                                                  <th className="pb-2 font-medium">Status</th>
+                                                  <th className="pb-2 font-medium">Last Updated</th>
+                                                  <th className="pb-2 font-medium text-right pr-2">Actions</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {client.visa_forms.filter((form: any) => {
+                                                  if (!agentsSearchQuery.trim()) return true;
+                                                  const query = agentsSearchQuery.toLowerCase().trim();
+                                                  
+                                                  const agentMatches = 
+                                                    agent.name?.toLowerCase().includes(query) ||
+                                                    agent.username?.toLowerCase().includes(query) ||
+                                                    agent.email?.toLowerCase().includes(query);
+                                                  
+                                                  const clientMatches = 
+                                                    client.name?.toLowerCase().includes(query) ||
+                                                    client.email?.toLowerCase().includes(query) ||
+                                                    client.phone?.toLowerCase().includes(query);
+                                                    
+                                                  if (agentMatches || clientMatches) return true;
+                                                  
+                                                  return (
+                                                    form.id?.toString().toLowerCase().includes(query) ||
+                                                    form.title?.toLowerCase().includes(query) ||
+                                                    form.applicant_name?.toLowerCase().includes(query) ||
+                                                    form.status?.toLowerCase().includes(query)
+                                                  );
+                                                }).map((form: any) => (
+                                                  <tr key={form.id} className="border-b border-slate-50 last:border-b-0 hover:bg-slate-50/50">
+                                                    <td className="py-2.5 font-semibold text-slate-700">{form.id}</td>
+                                                    <td className="py-2.5 font-medium">{form.title}</td>
+                                                    <td className="py-2.5 text-slate-500">{form.applicant_name || "N/A"}</td>
+                                                    <td className="py-2.5">
+                                                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                                        form.status === "approved" 
+                                                          ? "bg-green-50 text-green-600 border border-green-100" 
+                                                          : form.status === "needs_approval" 
+                                                            ? "bg-amber-50 text-amber-600 border border-amber-100" 
+                                                            : form.status === "client_completed" 
+                                                              ? "bg-blue-50 text-blue-600 border border-blue-100" 
+                                                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                                                      }`}>
+                                                        {form.status.replace("_", " ")}
+                                                      </span>
+                                                    </td>
+                                                    <td className="py-2.5 text-slate-500">
+                                                      {new Date(form.updated_at || form.created_at).toLocaleDateString()}
+                                                    </td>
+                                                    <td className="py-2.5 text-right pr-2 space-x-1.5 whitespace-nowrap">
+                                                      <button 
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          openPreview(form.id);
+                                                        }}
+                                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0F2148] hover:text-brand-gold bg-[#CCA352]/10 hover:bg-[#0F2148]/10 px-2.5 py-1 rounded-full transition-all cursor-pointer border border-[#CCA352]/25"
+                                                      >
+                                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        Preview
+                                                      </button>
+
+                                                      {form.status !== "approved" && (
+                                                        <button 
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleApproveForm(form.id);
+                                                          }}
+                                                          className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 hover:text-white bg-emerald-500/10 hover:bg-emerald-600 px-2.5 py-1 rounded-full transition-all cursor-pointer border border-emerald-500/25"
+                                                        >
+                                                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                          </svg>
+                                                          Approve
+                                                        </button>
+                                                      )}
+
+                                                      <button 
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleDeleteForm(form.id);
+                                                        }}
+                                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 hover:text-white bg-rose-500/10 hover:bg-rose-600 px-2.5 py-1 rounded-full transition-all cursor-pointer border border-rose-500/25"
+                                                      >
+                                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        Delete
+                                                      </button>
+                                                    </td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>
@@ -2325,6 +2626,177 @@ export default function AdminPage() {
 
           </div>
           
+        </div>
+      )}
+
+      {/* VISA FORM PREVIEW MODAL */}
+      {isPreviewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 md:p-6 animate-fadeIn">
+          <div className="bg-white border border-brand-gold/20 rounded-[32px] max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl relative overflow-hidden animate-scaleUp">
+            
+            {/* Modal Header */}
+            <div className="bg-[#0F2148] text-white px-6 py-4 flex justify-between items-center border-b border-white/10 shrink-0">
+              <div className="text-left">
+                <span className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.2em] block mb-0.5">
+                  Client Form Preview
+                </span>
+                <h3 className="font-serif text-lg sm:text-xl font-bold text-white flex items-center gap-3">
+                  {previewForm?.title || "Visa Application Form"}
+                  {previewForm?.status && (
+                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                      previewForm.status === "approved" 
+                        ? "bg-green-500/20 text-green-300 border border-green-500/30" 
+                        : previewForm.status === "needs_approval" 
+                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
+                          : previewForm.status === "client_completed" 
+                            ? "bg-blue-500/20 text-blue-300 border border-blue-500/30" 
+                            : "bg-slate-500/20 text-slate-300 border border-slate-500/30"
+                    }`}>
+                      {previewForm.status.replace("_", " ")}
+                    </span>
+                  )}
+                </h3>
+              </div>
+              <button 
+                onClick={() => setIsPreviewOpen(false)}
+                className="text-white/60 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-all cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {previewLoading ? (
+              <div className="flex flex-col items-center justify-center flex-1 py-12 bg-brand-cream/15">
+                <svg className="animate-spin h-8 w-8 text-brand-gold mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={4}></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p className="text-slate-500 font-medium text-xs">Fetching visa form data...</p>
+              </div>
+            ) : !previewForm ? (
+              <div className="flex flex-col items-center justify-center flex-1 py-12 text-slate-500 bg-brand-cream/15">
+                <p className="font-semibold text-sm">Failed to load form details.</p>
+                <p className="text-xs text-slate-400 mt-1">Please try again or contact support.</p>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                {/* Sections Sidebar */}
+                <div className="w-full md:w-60 bg-slate-50 border-r border-slate-100 overflow-y-auto p-4 shrink-0 flex md:flex-col gap-1 text-left scrollbar-thin">
+                  {visaSections.map((section, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setPreviewActiveTab(idx)}
+                      className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                        previewActiveTab === idx 
+                          ? "bg-brand-navy text-white shadow-md shadow-brand-navy/15" 
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                      }`}
+                    >
+                      {section.title}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Section Content Area */}
+                <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-brand-cream/5 text-left">
+                  <div className="max-w-2xl mx-auto space-y-6">
+                    <div className="border-b border-slate-100 pb-4 mb-4">
+                      <h4 className="font-serif text-xl font-bold text-brand-navy">
+                        {visaSections[previewActiveTab].title}
+                      </h4>
+                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                        Applicant: {previewForm.applicant_name || "N/A"} • ID: {previewForm.id}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      {visaSections[previewActiveTab].fields.map((field) => {
+                        const submittedVal = previewForm.form_data?.[field.id];
+                        const approvedVal = previewForm.approved_data?.[field.id];
+                        const hasDiff = approvedVal !== undefined && approvedVal !== null && approvedVal !== "" && approvedVal !== submittedVal;
+
+                        return (
+                          <div key={field.id} className="space-y-1.5">
+                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              {field.label}
+                            </span>
+                            <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm space-y-2">
+                              {/* Submitted Value */}
+                              <div>
+                                <span className="text-[9px] font-bold text-slate-400 uppercase block leading-none mb-1">
+                                  Submitted
+                                </span>
+                                {submittedVal ? (
+                                  <span className="text-xs text-slate-800 font-medium break-words">
+                                    {submittedVal}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-slate-400 italic font-medium">
+                                    Not filled
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Approved Value (if different) */}
+                              {hasDiff && (
+                                <div className="pt-2 border-t border-slate-50">
+                                  <span className="text-[9px] font-bold text-amber-500 uppercase block leading-none mb-1">
+                                    Approved/Corrected Value
+                                  </span>
+                                  <span className="text-xs text-amber-600 font-bold break-words">
+                                    {approvedVal}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end items-center gap-3 shrink-0">
+              <span className="text-[10px] font-semibold text-slate-400 mr-auto">
+                Created: {new Date(previewForm?.created_at).toLocaleDateString()} • Updated: {new Date(previewForm?.updated_at).toLocaleDateString()}
+              </span>
+
+              {previewForm?.status !== "approved" && (
+                <button
+                  onClick={() => handleApproveForm(previewForm.id)}
+                  className="rounded-full bg-emerald-600 hover:bg-emerald-705 text-white text-xs font-bold px-5 py-2.5 transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Approve Form
+                </button>
+              )}
+
+              <button
+                onClick={() => handleDeleteForm(previewForm.id)}
+                className="rounded-full bg-rose-600 hover:bg-rose-705 text-white text-xs font-bold px-5 py-2.5 transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Form
+              </button>
+
+              <button
+                onClick={() => setIsPreviewOpen(false)}
+                className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-5 py-2.5 transition-all duration-300 shadow-md cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 

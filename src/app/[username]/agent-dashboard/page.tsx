@@ -49,6 +49,7 @@ export default function AgentDashboard() {
   const [processors, setProcessors] = useState<any[]>([]);
   const [showForwardModal, setShowForwardModal] = useState(false);
   const [selectedProcessorId, setSelectedProcessorId] = useState("");
+  const [forwardNote, setForwardNote] = useState("");
 
   const triggerToast = (message: string) => {
     setToast({ message, visible: true });
@@ -345,10 +346,17 @@ export default function AgentDashboard() {
 
   // Filter clients
   const filteredClients = clients.filter((c) => {
+    const query = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      c.forms.some((form) => form.id.includes(searchQuery));
+      c.name.toLowerCase().includes(query) ||
+      (c.email && c.email.toLowerCase().includes(query)) ||
+      (c.phone && c.phone.toLowerCase().includes(query)) ||
+      c.forms.some((form) => 
+        form.id.toLowerCase().includes(query) ||
+        form.title.toLowerCase().includes(query) ||
+        (form.applicantName && form.applicantName.toLowerCase().includes(query)) ||
+        form.status.toLowerCase().includes(query)
+      );
 
     if (filterType === "needs_approval") {
       return matchesSearch && clientNeedsApproval(c);
@@ -467,6 +475,7 @@ export default function AgentDashboard() {
         assigned_processor_id: selectedProcessorId,
         assigned_processor_name: procName,
         assigned_processor_email: procEmail,
+        forward_note: forwardNote,
       };
 
       const { error } = await supabase
@@ -495,6 +504,7 @@ export default function AgentDashboard() {
               assigned_processor_id: selectedProcessorId,
               assigned_processor_name: procName,
               assigned_processor_email: procEmail,
+              forward_note: forwardNote,
             };
             return {
               ...f,
@@ -512,6 +522,7 @@ export default function AgentDashboard() {
             assigned_processor_id: selectedProcessorId,
             assigned_processor_name: procName,
             assigned_processor_email: procEmail,
+            forward_note: forwardNote,
           };
           setSelectedForm({
             ...selectedForm,
@@ -526,6 +537,7 @@ export default function AgentDashboard() {
 
     setClients(updatedClients);
     setShowForwardModal(false);
+    setForwardNote("");
     triggerToast(`Successfully forwarded approved forms to ${procName}!`);
   };
 
@@ -1495,6 +1507,17 @@ export default function AgentDashboard() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-brand-navy uppercase tracking-widest mb-1.5 font-semibold">Add note for processing team (optional)</label>
+                  <textarea
+                    placeholder="e.g. Urgent travel date, please export promptly."
+                    value={forwardNote}
+                    onChange={(e) => setForwardNote(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-xl border border-brand-gold/30 bg-white px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy resize-none font-medium"
+                  />
                 </div>
 
                 <button
