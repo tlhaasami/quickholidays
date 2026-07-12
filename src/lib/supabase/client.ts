@@ -6,6 +6,9 @@ function getCookieDomain() {
   if (hostname === "localhost" || hostname.endsWith(".localhost")) {
     return "localhost";
   }
+  if (hostname.endsWith(".netlify.app")) {
+    return undefined;
+  }
   const parts = hostname.split(".");
   if (parts.length >= 2) {
     return "." + parts.slice(-2).join(".");
