@@ -3,6 +3,8 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { headers } from "next/headers";
+
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -90,11 +92,19 @@ const navigationJsonLd = {
   ]
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+
+  const isDashboard =
+    pathname.startsWith("/admin") ||
+    pathname.includes("/agent-dashboard") ||
+    pathname.startsWith("/processing-dashboard");
+
   return (
     <html
       lang="en"
@@ -115,9 +125,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-brand-cream text-slate-800">
-        <Navbar />
+        {!isDashboard && <Navbar />}
         <main className="grow">{children}</main>
-        <Footer />
+        {!isDashboard && <Footer />}
       </body>
     </html>
   );

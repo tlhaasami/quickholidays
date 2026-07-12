@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { TESTIMONIALS, DESTINATIONS, SCHENGEN_DESTINATIONS, heroBg, whyChooseUsBg, formBg } from "@/constants/data";
+import { createClient } from "@/lib/supabase/client";
 
 interface UserRequest {
   id: string;
   name: string;
   username: string;
   email: string;
-  role: "agent" | "processor";
+  role: "agent" | "processor" | "admin";
   status: "pending" | "approved" | "suspended";
   created_at: string;
   password?: string;
@@ -23,7 +25,7 @@ interface ConfirmModalState {
   userId: string;
   userName: string;
   userEmail: string;
-  userRole: "agent" | "processor";
+  userRole: "agent" | "processor" | "admin";
 }
 
 interface CustomSelectProps {
@@ -85,13 +87,15 @@ function CustomSelect({ value, onChange, options, className = "" }: CustomSelect
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [animateCard, setAnimateCard] = useState(false);
   const [bgLoaded, setBgLoaded] = useState(false);
   // Active Navigation Tab State
-  const [activeTab, setActiveTab] = useState<"users" | "footer" | "reviews" | "destinations" | "countries" | "backgrounds">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "footer" | "reviews" | "destinations" | "countries" | "backgrounds" | "agents_work">("users");
 
   // Dashboard state
   const [requests, setRequests] = useState<UserRequest[]>([]);
@@ -102,7 +106,9 @@ export default function AdminPage() {
   const [newUsername, setNewUsername] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [newRole, setNewRole] = useState<"agent" | "processor">("agent");
+  const [newRole, setNewRole] = useState<"agent" | "processor" | "admin">("agent");
+  const [allClients, setAllClients] = useState<any[]>([]);
+  const [expandedAgentId, setExpandedAgentId] = useState<string | null>(null);
   const [addError, setAddError] = useState("");
   const [addSuccess, setAddSuccess] = useState("");
 
@@ -168,72 +174,80 @@ export default function AdminPage() {
   const [customConsultationBg, setCustomConsultationBg] = useState<string | null>(null);
   const [reviewSortOrder, setReviewSortOrder] = useState<"newest" | "highest" | "lowest">("newest");
 
-  // Load state and sample data if empty
+  // Load state and profiles
   useEffect(() => {
-    // Trigger animation
     setAnimateCard(true);
 
-    // Check authentication
-    const authStatus = localStorage.getItem("admin_auth") === "true";
-    setIsAuthenticated(authStatus);
+    const checkAuthAndLoad = async () => {
+      const { data: { user: sbUser } } = await supabase.auth.getUser();
+      if (sbUser) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role, status")
+          .eq("id", sbUser.id)
+          .single();
+        
+        if (profile && profile.role === "admin" && profile.status === "approved") {
+          setIsAuthenticated(true);
+        } else {
+          window.location.href = window.location.origin.replace("admin.", "") + "/login";
+          return;
+        }
+      } else {
+        window.location.href = window.location.origin.replace("admin.", "") + "/login";
+        return;
+      }
 
-    // Load backgrounds
-    setCustomLoginBg(localStorage.getItem("quick_holidays_bg_login"));
-    setCustomHeroBg(localStorage.getItem("quick_holidays_bg_hero"));
-    setCustomWhyBg(localStorage.getItem("quick_holidays_bg_why_choose_us"));
-    setCustomConsultationBg(localStorage.getItem("quick_holidays_bg_consultation_form"));
+      // Load backgrounds
+      setCustomLoginBg(localStorage.getItem("quick_holidays_bg_login"));
+      setCustomHeroBg(localStorage.getItem("quick_holidays_bg_hero"));
+      setCustomWhyBg(localStorage.getItem("quick_holidays_bg_why_choose_us"));
+      setCustomConsultationBg(localStorage.getItem("quick_holidays_bg_consultation_form"));
 
-    // Load user signup requests
-    const storedRequests = localStorage.getItem("quick_holidays_user_requests");
-    if (storedRequests) {
-      setRequests(JSON.parse(storedRequests));
-    } else {
-      // Seed sample data for immediate evaluation
-      const sampleRequests: UserRequest[] = [
-        {
-          id: "req-1",
-          name: "Amara Okoye",
-          username: "amara",
-          email: "amara.o@quickholidays.co.uk",
-          role: "agent",
-          status: "pending",
-          created_at: new Date(Date.now() - 3600000 * 2).toLocaleString(),
-          password: "password123",
-        },
-        {
-          id: "req-2",
-          name: "Liam O'Connor",
-          username: "liam",
-          email: "liam.oc@quickholidays.co.uk",
-          role: "processor",
-          status: "pending",
-          created_at: new Date(Date.now() - 3600000 * 24).toLocaleString(),
-          password: "password123",
-        },
-        {
-          id: "req-3",
-          name: "Chloe Dupont",
-          username: "chloe",
-          email: "chloe.d@quickholidays.co.uk",
-          role: "agent",
-          status: "approved",
-          created_at: new Date(Date.now() - 3600000 * 48).toLocaleString(),
-          password: "password123",
-        },
-        {
-          id: "req-4",
-          name: "David Smith",
-          username: "david",
-          email: "david.s@quickholidays.co.uk",
-          role: "processor",
-          status: "approved",
-          created_at: new Date(Date.now() - 3600000 * 72).toLocaleString(),
-          password: "password123",
-        },
-      ];
-      localStorage.setItem("quick_holidays_user_requests", JSON.stringify(sampleRequests));
-      setRequests(sampleRequests);
-    }
+      // Load user signup requests from profiles
+      const { data: profiles, error } = await supabase
+        .from("profiles")
+        .select("id, name, username, email, role, status, created_at")
+        .order("created_at", { ascending: false });
+      
+      if (!error && profiles) {
+        const mapped = profiles.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          username: p.username,
+          email: p.email,
+          role: p.role,
+          status: p.status,
+          created_at: new Date(p.created_at).toLocaleString(),
+        }));
+        setRequests(mapped);
+      }
+
+      // Load all clients and forms for admin view
+      const { data: clientsData, error: clientsErr } = await supabase
+        .from("clients")
+        .select(`
+          id,
+          name,
+          email,
+          phone,
+          agent_id,
+          visa_forms (
+            id,
+            title,
+            applicant_name,
+            status,
+            created_at,
+            updated_at
+          )
+        `);
+      
+      if (!clientsErr && clientsData) {
+        setAllClients(clientsData);
+      }
+    };
+
+    checkAuthAndLoad();
 
     // Load Testimonials
     const storedTestimonials = localStorage.getItem("quick_holidays_testimonials");
@@ -301,35 +315,44 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === "admin" && password === "admin123") {
-      localStorage.setItem("admin_auth", "true");
-      setIsAuthenticated(true);
-      setError("");
-    } else {
-      setError("Invalid administrator credentials.");
-    }
+    setError("Please log in through the main Portal sign in page.");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin_auth");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem("user_session");
     setIsAuthenticated(false);
+    window.location.href = window.location.origin.replace("admin.", "") + "/login";
   };
 
-  const updateRequestStatus = (id: string, newStatus: "approved" | "suspended" | "pending") => {
-    const updated = requests.map((req) => {
-      if (req.id === id) {
-        return { ...req, status: newStatus };
-      }
-      return req;
-    });
-    localStorage.setItem("quick_holidays_user_requests", JSON.stringify(updated));
-    setRequests(updated);
+  const updateRequestStatus = async (id: string, newStatus: "approved" | "suspended" | "pending") => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      alert("Failed to update status: " + error.message);
+      return;
+    }
+
+    setRequests((prev) =>
+      prev.map((req) => (req.id === id ? { ...req, status: newStatus } : req))
+    );
   };
 
-  const deleteRequest = (id: string) => {
-    const updated = requests.filter((req) => req.id !== id);
-    localStorage.setItem("quick_holidays_user_requests", JSON.stringify(updated));
-    setRequests(updated);
+  const deleteRequest = async (id: string) => {
+    const { error } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert("Failed to delete request: " + error.message);
+      return;
+    }
+
+    setRequests((prev) => prev.filter((req) => req.id !== id));
   };
 
   // Open custom modal for approval check
@@ -369,7 +392,7 @@ export default function AdminPage() {
     setConfirmModal((m) => ({ ...m, isOpen: false }));
   };
 
-  const handleAddUser = (e: React.FormEvent) => {
+  const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError("");
     setAddSuccess("");
@@ -379,38 +402,70 @@ export default function AdminPage() {
       return;
     }
 
-    // Check unique username
-    const usernameExists = requests.some(
-      (r) => r.username && r.username.toLowerCase() === newUsername.trim().toLowerCase()
-    );
-    if (usernameExists) {
+    const cleanedFullName = newFullName.trim();
+    const cleanedUsername = newUsername.trim().toLowerCase();
+    const cleanedEmail = newEmail.trim().toLowerCase();
+
+    // Check unique username in DB
+    const { data: existingUser } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("username", cleanedUsername)
+      .maybeSingle();
+
+    if (existingUser) {
       setAddError("This username is already taken. Please choose another one.");
       return;
     }
 
-    // Check unique email
-    const emailExists = requests.some(
-      (r) => r.email.toLowerCase() === newEmail.trim().toLowerCase()
-    );
-    if (emailExists) {
-      setAddError("This email address is already registered.");
+    // Register user in Supabase
+    const { data: authData, error: signupErr } = await supabase.auth.signUp({
+      email: cleanedEmail,
+      password: newPassword,
+      options: {
+        data: {
+          name: cleanedFullName,
+          username: cleanedUsername,
+          role: newRole,
+        }
+      }
+    });
+
+    if (signupErr) {
+      setAddError(signupErr.message || "Failed to create user account.");
       return;
     }
 
-    const newUser: UserRequest = {
-      id: `req-${Date.now()}`,
-      name: newFullName.trim(),
-      username: newUsername.trim().toLowerCase(),
-      email: newEmail.trim().toLowerCase(),
-      role: newRole,
-      status: "approved", // Automatically approved when created by Admin
-      created_at: new Date().toLocaleString(),
-      password: newPassword,
-    };
+    if (authData.user) {
+      // Force update profiles status to 'approved' and save the selected role
+      const { error: updateErr } = await supabase
+        .from("profiles")
+        .update({ status: "approved", role: newRole })
+        .eq("id", authData.user.id);
+      
+      if (updateErr) {
+        console.error("Failed to set user status to approved:", updateErr.message);
+      }
+    }
 
-    const updated = [newUser, ...requests];
-    localStorage.setItem("quick_holidays_user_requests", JSON.stringify(updated));
-    setRequests(updated);
+    // Reload the requests list
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, name, username, email, role, status, created_at")
+      .order("created_at", { ascending: false });
+    
+    if (profiles) {
+      const mapped = profiles.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        username: p.username,
+        email: p.email,
+        role: p.role,
+        status: p.status,
+        created_at: new Date(p.created_at).toLocaleString(),
+      }));
+      setRequests(mapped);
+    }
 
     setAddSuccess(`Account for ${newFullName.trim()} created successfully!`);
     
@@ -840,8 +895,8 @@ export default function AdminPage() {
   };
 
   const tabHeader = getTabHeader();
-  const pendingRequests = requests.filter((r) => r.status === "pending");
-  const approvedUsers = requests.filter((r) => r.status === "approved" || r.status === "suspended");
+  const pendingRequests = requests.filter((r) => r.status === "pending" && r.role !== "admin");
+  const approvedUsers = requests.filter((r) => (r.status === "approved" || r.status === "suspended") && r.role !== "admin");
 
   return (
     <div className="min-h-screen bg-brand-cream text-slate-800 font-sans flex">
@@ -875,6 +930,22 @@ export default function AdminPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
               Users & Requests
+            </a>
+
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("agents_work");
+              }}
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 group ${
+                activeTab === "agents_work" ? "bg-brand-gold text-brand-navy font-bold shadow-md shadow-brand-gold/15" : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <svg className={`w-4 h-4 shrink-0 group-hover:scale-110 transition-transform duration-200 ${activeTab === "agents_work" ? "text-brand-navy" : "text-brand-gold"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Agents & Client Forms
             </a>
 
             <div className="pt-4 border-t border-white/10 space-y-1">
@@ -1174,6 +1245,17 @@ export default function AdminPage() {
                     >
                       Proccessing Team
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewRole("admin")}
+                      className={`flex-1 rounded-full py-2.5 text-xs font-bold transition-all border ${
+                        newRole === "admin"
+                          ? "bg-brand-navy border-brand-navy text-white shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      Admin Team
+                    </button>
                   </div>
                 </div>
 
@@ -1342,6 +1424,160 @@ export default function AdminPage() {
             )}
           </div>
           </>
+          )}
+
+          {/* Agents & Forms Work tab content */}
+          {activeTab === "agents_work" && (
+            <div className="space-y-8 text-left">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white rounded-3xl p-6 border border-brand-gold/15 shadow-sm">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Forms</p>
+                  <p className="text-3xl font-extrabold text-brand-navy mt-2">
+                    {allClients.reduce((acc, client) => acc + (client.visa_forms?.length || 0), 0)}
+                  </p>
+                </div>
+                <div className="bg-white rounded-3xl p-6 border border-brand-gold/15 shadow-sm">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Forms Awaiting Approval</p>
+                  <p className="text-3xl font-extrabold text-amber-500 mt-2">
+                    {allClients.reduce((acc, client) => 
+                      acc + (client.visa_forms?.filter((f: any) => f.status === "needs_approval")?.length || 0), 0
+                    )}
+                  </p>
+                </div>
+                <div className="bg-white rounded-3xl p-6 border border-brand-gold/15 shadow-sm">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Clients Managed</p>
+                  <p className="text-3xl font-extrabold text-emerald-600 mt-2">
+                    {allClients.length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Agents list */}
+              <div className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <h3 className="font-serif text-2xl font-bold text-brand-navy mb-6">
+                  Agent Workspaces ({requests.filter((r) => r.role === "agent" && r.status === "approved").length})
+                </h3>
+
+                <div className="space-y-4">
+                  {requests.filter((r) => r.role === "agent" && r.status === "approved").map((agent) => {
+                    const agentClients = allClients.filter((c) => c.agent_id === agent.id);
+                    const agentFormsCount = agentClients.reduce((acc, c) => acc + (c.visa_forms?.length || 0), 0);
+                    const isExpanded = expandedAgentId === agent.id;
+
+                    return (
+                      <div 
+                        key={agent.id} 
+                        className="border border-slate-100 rounded-2xl overflow-hidden hover:border-brand-gold/30 transition-all duration-300"
+                      >
+                        {/* Agent Summary Header Row */}
+                        <div 
+                          onClick={() => setExpandedAgentId(isExpanded ? null : agent.id)}
+                          className="bg-slate-50/50 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                        >
+                          <div className="space-y-1 text-left">
+                            <h4 className="font-sans font-bold text-slate-800 text-sm">{agent.name}</h4>
+                            <p className="text-[10px] text-slate-500 font-medium">@{agent.username} • {agent.email}</p>
+                          </div>
+
+                          <div className="flex items-center gap-6">
+                            <div className="text-right shrink-0">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase block">Clients</span>
+                              <span className="text-sm font-bold text-slate-700">{agentClients.length}</span>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase block">Forms</span>
+                              <span className="text-sm font-bold text-slate-700">{agentFormsCount}</span>
+                            </div>
+                            <button className="text-slate-400 hover:text-brand-navy">
+                              <svg 
+                                className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor" 
+                                strokeWidth={2}
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Expanded details */}
+                        {isExpanded && (
+                          <div className="p-6 bg-white border-t border-slate-100 space-y-6">
+                            {agentClients.length === 0 ? (
+                              <p className="text-xs text-slate-500 text-center py-2 font-medium">This agent has not registered any clients yet.</p>
+                            ) : (
+                              <div className="space-y-6">
+                                {agentClients.map((client) => (
+                                  <div key={client.id} className="bg-slate-50/30 rounded-2xl p-5 border border-slate-100 space-y-4 text-left">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-2">
+                                      <div>
+                                        <h5 className="font-sans font-bold text-xs text-slate-800">{client.name}</h5>
+                                        <p className="text-[10px] text-slate-500">{client.email} • {client.phone}</p>
+                                      </div>
+                                      <span className="text-[10px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                                        Client ID: {client.id}
+                                      </span>
+                                    </div>
+
+                                    {/* Client Forms Table */}
+                                    <div className="space-y-2">
+                                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Client Visa Applications</p>
+                                      {!client.visa_forms || client.visa_forms.length === 0 ? (
+                                        <p className="text-[11px] text-slate-500 font-medium pl-1">No visa forms created for this client.</p>
+                                      ) : (
+                                        <div className="overflow-x-auto">
+                                          <table className="w-full text-left text-[11px] text-slate-600 border-collapse">
+                                            <thead>
+                                              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
+                                                <th className="pb-2 font-medium">Application ID</th>
+                                                <th className="pb-2 font-medium">Title</th>
+                                                <th className="pb-2 font-medium">Status</th>
+                                                <th className="pb-2 font-medium">Last Updated</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {client.visa_forms.map((form: any) => (
+                                                <tr key={form.id} className="border-b border-slate-50 last:border-b-0 hover:bg-slate-50/50">
+                                                  <td className="py-2.5 font-semibold text-slate-700">{form.id}</td>
+                                                  <td className="py-2.5">{form.title}</td>
+                                                  <td className="py-2.5">
+                                                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                                      form.status === "approved" 
+                                                        ? "bg-green-50 text-green-600 border border-green-100" 
+                                                        : form.status === "needs_approval" 
+                                                          ? "bg-amber-50 text-amber-600 border border-amber-100" 
+                                                          : form.status === "client_completed" 
+                                                            ? "bg-blue-50 text-blue-600 border border-blue-100" 
+                                                            : "bg-slate-100 text-slate-600 border border-slate-200"
+                                                    }`}>
+                                                      {form.status.replace("_", " ")}
+                                                    </span>
+                                                  </td>
+                                                  <td className="py-2.5 text-slate-500">
+                                                    {new Date(form.updated_at || form.created_at).toLocaleDateString()}
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Card A: Edit Footer Info & Social Links */}

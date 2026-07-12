@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { visaSections, VisaField, VisaForm, ClientProfile } from "@/constants/visaFields";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AgentDashboard() {
   const router = useRouter();
+  const params = useParams();
+  const usernameParam = params?.username as string;
   const [agentName, setAgentName] = useState("Agent");
+  const [agentUsername, setAgentUsername] = useState("");
+  const supabase = createClient();
   
   // Navigation Tabs in Sidebar
   const [sidebarTab, setSidebarTab] = useState<"clients" | "add_client">("clients");
@@ -41,6 +46,10 @@ export default function AgentDashboard() {
     visible: false,
   });
 
+  const [processors, setProcessors] = useState<any[]>([]);
+  const [showForwardModal, setShowForwardModal] = useState(false);
+  const [selectedProcessorId, setSelectedProcessorId] = useState("");
+
   const triggerToast = (message: string) => {
     setToast({ message, visible: true });
   };
@@ -55,142 +64,118 @@ export default function AgentDashboard() {
   }, [toast.visible]);
 
   useEffect(() => {
-    // Authenticate Agent
-    const session = localStorage.getItem("user_session");
-    if (!session) {
-      router.push("/login");
-      return;
-    }
-    const user = JSON.parse(session);
-    if (user.role !== "agent") {
-      router.push("/login");
-      return;
-    }
-    setAgentName(user.name);
-
-    // Load and migrate client forms from local storage
-    const storedFormsRaw = localStorage.getItem("quick_holidays_shared_forms");
-    if (storedFormsRaw) {
-      try {
-        const parsed = JSON.parse(storedFormsRaw);
-        const migrated = migrateLegacyData(parsed);
-        setClients(migrated);
-        localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(migrated));
-      } catch (err) {
-        console.error("Failed to parse/migrate data", err);
+    const checkAuthAndLoad = async () => {
+      const session = localStorage.getItem("user_session");
+      if (!session) {
+        router.push("/login");
+        return;
       }
-    } else {
-      // Seed initial clients with nested forms
-      const seedClients: ClientProfile[] = [
-        {
-          id: "client-sarah-smith",
-          name: "Sarah Smith",
-          email: "sarahsmith@gmail.com",
-          phone: "7507677927",
-          forms: [
-            {
-              id: "4819582910",
-              title: "Portugal Tourism Visa Draft",
-              applicantName: "Sarah Smith",
-              status: "client_completed",
-              created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-              updated_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-              formData: {
-                personal_surname: "SMITH",
-                personal_first_names: "SARAH ELIZABETH",
-                personal_dob: "1987-08-27",
-                personal_pob: "LIVERPOOL, UK",
-                personal_cob: "UNITED KINGDOM",
-                personal_nationality: "BRITISH",
-                personal_nationality_birth: "BRITISH",
-                personal_sex: "FEMALE",
-                personal_marital_status: "Separated",
-                travel_submission_city: "LONDON",
-                travel_destinations: "PORTUGAL",
-                travel_purpose: "TOURISM",
-                passport_type: "ORDINARY PASSPORT",
-                passport_number: "RU4154351",
-                passport_issue_date: "2022-11-07",
-                passport_expiry_date: "2027-11-06",
-                address_street: "12 Liverpool Road",
-                address_postal_code: "L1 0AB",
-                address_city: "Liverpool",
-                address_county: "Merseyside",
-                address_country: "United Kingdom",
-                address_phone: "7507677927",
-                address_email: "sarahsmith@gmail.com"
-              },
-              approvedData: {
-                personal_surname: "SMITH",
-                personal_first_names: "SARAH ELIZABETH",
-                personal_dob: "1987-08-27",
-                personal_pob: "LIVERPOOL, UK",
-                personal_cob: "UNITED KINGDOM",
-                personal_nationality: "BRITISH",
-                personal_nationality_birth: "BRITISH",
-                personal_sex: "FEMALE"
-              }
-            }
-          ]
-        }
-      ];
-      localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(seedClients));
-      setClients(seedClients);
-    }
-  }, [router]);
+      const user = JSON.parse(session);
+      
+      const { data: { user: sbUser } } = await supabase.auth.getUser();
+      if (!sbUser || sbUser.id !== user.id) {
+        router.push("/login");
+        return;
+      }
+      
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name, username")
+        .eq("id", user.id)
+        .single();
 
-  // Migration function to convert flat list structure into client-to-forms structure
-  const migrateLegacyData = (rawList: any[]): ClientProfile[] => {
-    const clientsMap: Record<string, ClientProfile> = {};
+      const dbUsername = profile?.username || user.username || "";
+      const currentName = profile?.name || user.name;
 
-    rawList.forEach((item) => {
-      // If it already has forms array, it is already migrated
-      if (item.forms) {
-        clientsMap[item.id] = item;
+      setAgentName(currentName);
+      setAgentUsername(dbUsername);
+
+      // Validate URL parameter matches logged-in agent's username
+      if (usernameParam && dbUsername && usernameParam.toLowerCase() !== dbUsername.toLowerCase()) {
+        router.push(`/${dbUsername.toLowerCase()}/agent-dashboard`);
         return;
       }
 
-      // Convert flat old item
-      const clientId = item.email ? `client-${item.email}` : `client-${item.id}`;
-      const visaForm: VisaForm = {
-        id: item.id,
-        title: item.formData?.travel_destinations 
-          ? `${item.formData.travel_destinations} Schengen Visa`
-          : "Schengen Visa Draft Form",
-        status: item.status || "draft",
-        created_at: item.created_at || new Date().toISOString(),
-        updated_at: item.updated_at || new Date().toISOString(),
-        formData: item.formData || {},
-        approvedData: item.approvedData || {}
-      };
+      const { data: clientsData, error: clientsErr } = await supabase
+        .from("clients")
+        .select(`
+          id,
+          name,
+          email,
+          phone,
+          visa_forms (
+            id,
+            title,
+            applicant_name,
+            status,
+            created_at,
+            updated_at,
+            form_data,
+            approved_data
+          )
+        `)
+        .eq("agent_id", user.id)
+        .order("name", { ascending: true });
 
-      if (clientsMap[clientId]) {
-        clientsMap[clientId].forms.push(visaForm);
-      } else {
-        clientsMap[clientId] = {
-          id: clientId,
-          name: item.name,
-          email: item.email || item.formData?.address_email || "",
-          phone: item.phone || item.formData?.address_phone || "",
-          forms: [visaForm]
-        };
+      if (clientsErr) {
+        console.error("Error loading clients:", clientsErr.message);
+        return;
       }
-    });
 
-    return Object.values(clientsMap);
-  };
+      const formattedClients: ClientProfile[] = (clientsData || []).map((client: any) => ({
+        id: client.id,
+        name: client.name,
+        email: client.email || "",
+        phone: client.phone || "",
+        forms: (client.visa_forms || []).map((form: any) => ({
+          id: form.id,
+          title: form.title,
+          applicantName: form.applicant_name || "",
+          status: form.status,
+          created_at: form.created_at,
+          updated_at: form.updated_at,
+          formData: form.form_data || {},
+          approvedData: form.approved_data || {},
+        })),
+      }));
 
-  const handleLogout = () => {
+      setClients(formattedClients);
+
+      // Fetch all active processors to select for forwarding
+      const { data: procData } = await supabase
+        .from("profiles")
+        .select("id, name, email")
+        .eq("role", "processor")
+        .eq("status", "approved");
+
+      if (procData) {
+        setProcessors(procData);
+        if (procData.length > 0) {
+          setSelectedProcessorId(procData[0].id);
+        }
+      }
+    };
+
+    checkAuthAndLoad();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem("user_session");
     router.push("/login");
   };
 
-  const generate10DigitId = () => {
-    return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+  const generateFormId = () => {
+    const cleanUsername = (agentUsername || "agent").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const now = new Date();
+    const yy = now.getFullYear().toString().slice(-2);
+    const mm = (now.getMonth() + 1).toString().padStart(2, "0");
+    const randomDigits = Math.floor(1000 + Math.random() * 9000).toString();
+    return `QH-${cleanUsername}-${yy}${mm}-${randomDigits}`;
   };
 
   // Add Client - Only Name and Form Title are required! Email and Phone are optional.
-  const handleAddClient = (e: React.FormEvent) => {
+  const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError("");
     setAddSuccess("");
@@ -200,67 +185,123 @@ export default function AgentDashboard() {
       return;
     }
 
-    const tenDigitId = generate10DigitId();
-    const clientId = `client-${Date.now()}`;
+    const session = localStorage.getItem("user_session");
+    if (!session) return;
+    const user = JSON.parse(session);
+
+    const formId = generateFormId();
+
+    const { data: dbClient, error: clientErr } = await supabase
+      .from("clients")
+      .insert({
+        agent_id: user.id,
+        name: newClientName.trim(),
+        email: newClientEmail.trim() || null,
+        phone: newClientPhone.trim() || null,
+      })
+      .select()
+      .single();
+
+    if (clientErr || !dbClient) {
+      setAddError(clientErr?.message || "Failed to register client.");
+      return;
+    }
+
+    const { data: dbForm, error: formErr } = await supabase
+      .from("visa_forms")
+      .insert({
+        id: formId,
+        client_id: dbClient.id,
+        title: newClientFormTitle.trim(),
+        applicant_name: newClientName.trim(),
+        status: "draft",
+        form_data: {
+          address_email: newClientEmail.trim(),
+          address_phone: newClientPhone.trim(),
+        },
+        approved_data: {},
+      })
+      .select()
+      .single();
+
+    if (formErr || !dbForm) {
+      setAddError(formErr?.message || "Failed to create initial form.");
+      await supabase.from("clients").delete().eq("id", dbClient.id);
+      return;
+    }
+
     const initialForm: VisaForm = {
-      id: tenDigitId,
+      id: formId,
       title: newClientFormTitle.trim(),
       applicantName: newClientName.trim(),
       status: "draft",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      formData: {
-        address_email: newClientEmail.trim(),
-        address_phone: newClientPhone.trim()
-      },
-      approvedData: {}
+      created_at: dbForm.created_at,
+      updated_at: dbForm.updated_at,
+      formData: dbForm.form_data,
+      approvedData: dbForm.approved_data,
     };
 
     const newClient: ClientProfile = {
-      id: clientId,
-      name: newClientName.trim(),
-      email: newClientEmail.trim() || undefined,
-      phone: newClientPhone.trim() || undefined,
+      id: dbClient.id,
+      name: dbClient.name,
+      email: dbClient.email || "",
+      phone: dbClient.phone || "",
       forms: [initialForm]
     };
 
-    const updated = [newClient, ...clients];
-    localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(updated));
-    setClients(updated);
+    setClients((prev) => [newClient, ...prev]);
 
-    // Reset Form
     setNewClientName("");
     setNewClientFormTitle("");
     setNewClientEmail("");
     setNewClientPhone("");
-    setAddSuccess(`Client registered successfully! First form ID: ${tenDigitId}`);
+    setAddSuccess(`Client registered successfully! First form ID: ${formId}`);
     setSidebarTab("clients");
 
-    // Automatically select the new client and its form
     setSelectedClient(newClient);
     setSelectedForm(initialForm);
   };
 
   // Add new form to existing client profile
-  const handleCreateNewForm = (e: React.FormEvent) => {
+  const handleCreateNewForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedClient) return;
 
     const title = newFormTitle.trim() || "New Schengen Visa Form";
     const applicant = newFormApplicantName.trim() || selectedClient.name;
-    const tenDigitId = generate10DigitId();
+    const formId = generateFormId();
+
+    const { data: dbForm, error: formErr } = await supabase
+      .from("visa_forms")
+      .insert({
+        id: formId,
+        client_id: selectedClient.id,
+        title,
+        applicant_name: applicant,
+        status: "draft",
+        form_data: {
+          address_email: selectedClient.email || "",
+          address_phone: selectedClient.phone || "",
+        },
+        approved_data: {},
+      })
+      .select()
+      .single();
+
+    if (formErr || !dbForm) {
+      alert(formErr?.message || "Failed to create new visa form draft.");
+      return;
+    }
+
     const newForm: VisaForm = {
-      id: tenDigitId,
+      id: formId,
       title,
       applicantName: applicant,
       status: "draft",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      formData: {
-        address_email: selectedClient.email || "",
-        address_phone: selectedClient.phone || ""
-      },
-      approvedData: {}
+      created_at: dbForm.created_at,
+      updated_at: dbForm.updated_at,
+      formData: dbForm.form_data,
+      approvedData: dbForm.approved_data,
     };
 
     const updatedClients = clients.map((c) => {
@@ -275,7 +316,6 @@ export default function AgentDashboard() {
       return c;
     });
 
-    localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(updatedClients));
     setClients(updatedClients);
     setSelectedForm(newForm);
     setNewFormTitle("");
@@ -329,8 +369,24 @@ export default function AgentDashboard() {
   });
 
   // Edit / Approve handlers for current selected form
-  const updateLocalStorageForm = (updatedForm: VisaForm) => {
+  const updateLocalStorageForm = async (updatedForm: VisaForm) => {
     if (!selectedClient) return;
+
+    const { error } = await supabase
+      .from("visa_forms")
+      .update({
+        title: updatedForm.title,
+        applicant_name: updatedForm.applicantName || "",
+        status: updatedForm.status,
+        form_data: updatedForm.formData,
+        approved_data: updatedForm.approvedData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", updatedForm.id);
+
+    if (error) {
+      console.error("Failed to update form in database:", error.message);
+    }
 
     const updatedClients = clients.map((c) => {
       if (c.id === selectedClient.id) {
@@ -344,7 +400,6 @@ export default function AgentDashboard() {
       return c;
     });
 
-    localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(updatedClients));
     setClients(updatedClients);
   };
 
@@ -384,6 +439,125 @@ export default function AgentDashboard() {
     };
     setSelectedForm(updatedForm);
     updateLocalStorageForm(updatedForm);
+  };
+
+  const handleForwardApprovedForms = async () => {
+    if (!selectedClient) return;
+
+    // Find all approved forms for this client
+    const approvedForms = selectedClient.forms.filter(f => f.status === "approved");
+    if (approvedForms.length === 0) {
+      alert("There are no approved forms for this client to forward. Please final-approve forms first.");
+      return;
+    }
+
+    if (!selectedProcessorId) {
+      alert("Please select a processing team member first.");
+      return;
+    }
+
+    const processor = processors.find(p => p.id === selectedProcessorId);
+    const procName = processor?.name || "Processor";
+    const procEmail = processor?.email || "";
+
+    // Forward each form by merging assignment fields into its form_data
+    for (const form of approvedForms) {
+      const nextFormData = {
+        ...(form.formData || {}),
+        assigned_processor_id: selectedProcessorId,
+        assigned_processor_name: procName,
+        assigned_processor_email: procEmail,
+      };
+
+      const { error } = await supabase
+        .from("visa_forms")
+        .update({
+          status: "needs_approval",
+          form_data: nextFormData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", form.id);
+
+      if (error) {
+        alert(`Failed to forward form ${form.id}: ${error.message}`);
+        return;
+      }
+    }
+
+    // Update local state
+    const approvedFormIds = approvedForms.map(f => f.id);
+    const updatedClients = clients.map((c) => {
+      if (c.id === selectedClient.id) {
+        const updatedForms = c.forms.map((f) => {
+          if (approvedFormIds.includes(f.id)) {
+            const nextFormData = {
+              ...(f.formData || {}),
+              assigned_processor_id: selectedProcessorId,
+              assigned_processor_name: procName,
+              assigned_processor_email: procEmail,
+            };
+            return {
+              ...f,
+              status: "needs_approval" as const,
+              formData: nextFormData,
+            };
+          }
+          return f;
+        });
+        const updatedClient = { ...c, forms: updatedForms };
+        setSelectedClient(updatedClient);
+        if (selectedForm && approvedFormIds.includes(selectedForm.id)) {
+          const nextFormData = {
+            ...(selectedForm.formData || {}),
+            assigned_processor_id: selectedProcessorId,
+            assigned_processor_name: procName,
+            assigned_processor_email: procEmail,
+          };
+          setSelectedForm({
+            ...selectedForm,
+            status: "needs_approval",
+            formData: nextFormData,
+          });
+        }
+        return updatedClient;
+      }
+      return c;
+    });
+
+    setClients(updatedClients);
+    setShowForwardModal(false);
+    triggerToast(`Successfully forwarded approved forms to ${procName}!`);
+  };
+
+  const handleDeleteForm = async () => {
+    if (!selectedForm || !selectedClient) return;
+
+    if (!confirm("Are you sure you want to permanently delete this visa form application?")) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("visa_forms")
+      .delete()
+      .eq("id", selectedForm.id);
+
+    if (error) {
+      alert("Failed to delete visa form: " + error.message);
+      return;
+    }
+
+    // Update local state
+    const updatedForms = selectedClient.forms.filter((f) => f.id !== selectedForm.id);
+    const updatedClient = { ...selectedClient, forms: updatedForms };
+    
+    const updatedClients = clients.map((c) => 
+      c.id === selectedClient.id ? updatedClient : c
+    );
+
+    setClients(updatedClients);
+    setSelectedClient(updatedClient);
+    setSelectedForm(updatedForms[0] || null);
+    triggerToast("Visa form successfully deleted.");
   };
 
   const handleResetFormStatus = () => {
@@ -625,7 +799,7 @@ export default function AgentDashboard() {
             </span>
           </div>
           <p className="text-[11px] text-slate-500 mt-2 font-medium">
-            Authorized Agent: <strong className="text-slate-800 font-bold">{agentName}</strong>
+            Authorized Agent: <strong className="text-slate-800 font-bold">{agentName}</strong> {agentUsername && <span className="text-slate-400">(@{agentUsername})</span>}
           </p>
         </div>
 
@@ -913,6 +1087,7 @@ export default function AgentDashboard() {
                                     });
                                     let statusLabel = "Draft";
                                     if (f.status === "client_completed") statusLabel = "Needs Approval";
+                                    if (f.status === "needs_approval") statusLabel = "Forwarded to Processing";
                                     if (f.status === "approved") statusLabel = "Final Approved";
                                     return {
                                       value: f.id,
@@ -978,6 +1153,29 @@ export default function AgentDashboard() {
                           Word Doc
                         </button>
                         
+                        {selectedClient.forms.some(f => f.status === "approved") && (
+                          <button
+                            onClick={() => setShowForwardModal(true)}
+                            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-1.5 transition-all duration-200 cursor-pointer shadow-sm flex items-center gap-1.5"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                            </svg>
+                            Forward to Processing
+                          </button>
+                        )}
+
+                        <button
+                          onClick={handleDeleteForm}
+                          className="rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3.5 py-1.5 transition-all duration-200 cursor-pointer shadow-sm flex items-center gap-1"
+                          title="Delete this visa application form permanently"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Delete Form
+                        </button>
+
                         {selectedForm.status !== "approved" ? (
                           <button
                             onClick={handleFinalApproveAndLock}
@@ -1258,6 +1456,55 @@ export default function AgentDashboard() {
                 Create Application Draft
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 4. SELECT PROCESSOR FORWARD MODAL */}
+      {showForwardModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 text-left">
+          <div className="bg-brand-cream border border-brand-gold/20 rounded-[32px] max-w-sm w-full p-8 shadow-2xl relative">
+            <button
+              onClick={() => setShowForwardModal(false)}
+              className="absolute right-6 top-6 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h3 className="font-serif text-xl font-bold text-brand-navy mb-1">Forward to Processing</h3>
+            <p className="text-xs text-slate-500 mb-6">Select a visa processing specialist to assign and forward {selectedClient?.name}'s approved forms.</p>
+
+            {processors.length === 0 ? (
+              <div className="text-center py-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4">
+                <p className="text-[11px] text-slate-500 font-medium">No active processing team members found.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-brand-navy uppercase tracking-widest mb-1.5 font-semibold">Select Processor *</label>
+                  <select
+                    value={selectedProcessorId}
+                    onChange={(e) => setSelectedProcessorId(e.target.value)}
+                    className="w-full rounded-xl border border-brand-gold/30 bg-white px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy cursor-pointer font-semibold"
+                  >
+                    {processors.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} ({p.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleForwardApprovedForms}
+                  className="w-full rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white transition-all duration-300 py-2.5 text-xs font-bold cursor-pointer mt-2"
+                >
+                  Forward Approved Forms
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

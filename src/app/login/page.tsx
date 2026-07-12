@@ -5,21 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { heroBg } from "@/constants/data";
-
-interface UserRequest {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  role: "agent" | "processor";
-  status: "pending" | "approved" | "suspended";
-  created_at: string;
-  password?: string;
-}
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
+  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "forgot">("signin");
 
   // Form states
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -38,6 +28,8 @@ export default function LoginPage() {
   const [animateCard, setAnimateCard] = useState(false);
   const [bgLoaded, setBgLoaded] = useState(false);
 
+  const supabase = createClient();
+
   useEffect(() => {
     // Trigger animation
     setAnimateCard(true);
@@ -47,146 +39,138 @@ export default function LoginPage() {
     if (storedBg) {
       setCustomBg(storedBg);
     }
-
-    // Seed default requests if none exist
-    const storedRequests = localStorage.getItem("quick_holidays_user_requests");
-    if (storedRequests) {
-      const parsed: UserRequest[] = JSON.parse(storedRequests);
-      const updated = parsed.map((item) => ({
-        ...item,
-        username: item.username || (item.name ? item.name.split(" ")[0].toLowerCase() : "chloe"),
-        password: item.password || "password123",
-      }));
-      localStorage.setItem("quick_holidays_user_requests", JSON.stringify(updated));
-    } else {
-      const sampleRequests: UserRequest[] = [
-        {
-          id: "req-1",
-          name: "Amara Okoye",
-          username: "amara",
-          email: "amara.o@quickholidays.co.uk",
-          role: "agent",
-          status: "pending",
-          created_at: new Date(Date.now() - 3600000 * 2).toLocaleString(),
-          password: "password123",
-        },
-        {
-          id: "req-2",
-          name: "Liam O'Connor",
-          username: "liam",
-          email: "liam.oc@quickholidays.co.uk",
-          role: "processor",
-          status: "pending",
-          created_at: new Date(Date.now() - 3600000 * 24).toLocaleString(),
-          password: "password123",
-        },
-        {
-          id: "req-3",
-          name: "Chloe Dupont",
-          username: "chloe",
-          email: "chloe.d@quickholidays.co.uk",
-          role: "agent",
-          status: "approved",
-          created_at: new Date(Date.now() - 3600000 * 48).toLocaleString(),
-          password: "password123",
-        },
-        {
-          id: "req-4",
-          name: "David Smith",
-          username: "david",
-          email: "david.s@quickholidays.co.uk",
-          role: "processor",
-          status: "approved",
-          created_at: new Date(Date.now() - 3600000 * 72).toLocaleString(),
-          password: "password123",
-        },
-      ];
-      localStorage.setItem("quick_holidays_user_requests", JSON.stringify(sampleRequests));
-    }
   }, []);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    const storedRequests = localStorage.getItem("quick_holidays_user_requests");
-    const requests: UserRequest[] = storedRequests ? JSON.parse(storedRequests) : [];
+    let loginEmail = usernameOrEmail.trim();
 
-    // Allow sign in by username OR email
-    const user = requests.find(
-      (r) =>
-        r.email.toLowerCase() === usernameOrEmail.toLowerCase() ||
-        (r.username && r.username.toLowerCase() === usernameOrEmail.toLowerCase())
-    );
+    // If it's not a standard email, check if it's a username
+    if (!loginEmail.includes("@")) {
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("username", loginEmail.toLowerCase())
+        .single();
+      
+      if (profileErr || !profile) {
+        setError("No account found with this username.");
+        return;
+      }
+      loginEmail = profile.email;
+    }
 
-    if (!user) {
-      setError("No account found with this username or email. Please register first.");
+    // Sign in using Supabase Auth
+    const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: password,
+    });
+
+    if (authErr || !authData.user) {
+      setError(authErr?.message || "Authentication failed.");
       return;
     }
 
-    if (password !== (user.password || "password123")) {
-      setError("Incorrect password. (Try default: password123)");
+    // Retrieve their dashboard role profile to verify status and select redirect
+    const { data: profile, error: dbErr } = await supabase
+      .from("profiles")
+      .select("name, username, role, status")
+      .eq("id", authData.user.id)
+      .single();
+
+    if (dbErr || !profile) {
+      setError("Failed to fetch user profile details.");
+      await supabase.auth.signOut();
       return;
     }
 
-    if (user.status === "pending") {
+    if (profile.status === "pending") {
       setError("Access Pending: Awaiting Admin approval.");
+      await supabase.auth.signOut();
       return;
     }
 
-    if (user.status === "suspended") {
+    if (profile.status === "suspended") {
       setError("Account Suspended: Contact administrator.");
+      await supabase.auth.signOut();
       return;
     }
 
-    // Approved, login!
-    localStorage.setItem("user_session", JSON.stringify(user));
+    // Save basic session metadata
+    localStorage.setItem("user_session", JSON.stringify({
+      id: authData.user.id,
+      name: profile.name,
+      username: profile.username,
+      email: loginEmail,
+      role: profile.role,
+      status: profile.status,
+    }));
 
-    if (user.role === "agent") {
-      router.push("/agent-dashboard");
-    } else {
-      router.push("/processing-dashboard");
-    }
+    setSuccess("Login successful! Redirecting...");
+
+    setTimeout(() => {
+      if (profile.role === "admin") {
+        const hostname = window.location.host;
+        if (!hostname.startsWith("admin.")) {
+          window.location.href = window.location.protocol + "//admin." + hostname + "/";
+        } else {
+          router.push("/admin");
+        }
+      } else if (profile.role === "processor") {
+        router.push("/processing-dashboard");
+      } else {
+        router.push(`/${profile.username.toLowerCase()}/agent-dashboard`);
+      }
+    }, 1000);
   };
 
-  const handleRequestAccess = (e: React.FormEvent) => {
+  const handleRequestAccess = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    const storedRequests = localStorage.getItem("quick_holidays_user_requests");
-    const requests: UserRequest[] = storedRequests ? JSON.parse(storedRequests) : [];
+    const cleanedName = name.trim();
+    const cleanedUsername = username.trim().toLowerCase();
+    const cleanedEmail = email.trim();
 
-    // Verify email uniqueness
-    const emailExists = requests.some((r) => r.email.toLowerCase() === email.toLowerCase());
-    if (emailExists) {
-      setError("This email address is already registered or has a pending request.");
+    // Validate format
+    if (cleanedUsername.includes("@")) {
+      setError("Username cannot contain '@'.");
       return;
     }
 
-    // Verify username uniqueness
-    const usernameExists = requests.some(
-      (r) => r.username && r.username.toLowerCase() === username.trim().toLowerCase()
-    );
-    if (usernameExists) {
+    // Check username uniqueness in DB first
+    const { data: existingUser } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("username", cleanedUsername)
+      .maybeSingle();
+
+    if (existingUser) {
       setError("This username is already taken. Please choose a unique username.");
       return;
     }
 
-    const newRequest: UserRequest = {
-      id: `req-${Date.now()}`,
-      name,
-      username: username.trim().toLowerCase(),
-      email,
-      role,
-      status: "pending",
-      created_at: new Date().toLocaleString(),
+    // Register in Supabase Auth
+    const { data: authData, error: signupErr } = await supabase.auth.signUp({
+      email: cleanedEmail,
       password: password,
-    };
+      options: {
+        data: {
+          name: cleanedName,
+          username: cleanedUsername,
+          role: role,
+        }
+      }
+    });
 
-    const updated = [newRequest, ...requests];
-    localStorage.setItem("quick_holidays_user_requests", JSON.stringify(updated));
+    if (signupErr) {
+      setError(signupErr.message || "Failed to register account.");
+      return;
+    }
 
     setSuccess("Access request submitted successfully! Awaiting Admin approval.");
 
@@ -200,6 +184,29 @@ export default function LoginPage() {
       setActiveTab("signin");
       setSuccess("");
     }, 3000);
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!email.trim()) {
+      setError("Please enter your registered email address.");
+      return;
+    }
+
+    const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+    });
+
+    if (resetErr) {
+      setError(resetErr.message || "Failed to send reset link.");
+      return;
+    }
+
+    setSuccess("Password reset link sent! Check your inbox for instructions.");
+    setEmail("");
   };
 
   return (
@@ -340,12 +347,69 @@ export default function LoginPage() {
                     />
                   </div>
 
+                  <div className="flex justify-end text-xs pr-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("forgot");
+                        setError("");
+                        setSuccess("");
+                      }}
+                      className="text-brand-gold hover:text-brand-gold-dark font-semibold transition-all cursor-pointer"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
                   <div className="pt-3">
                     <button
                       type="submit"
                       className="w-full inline-flex items-center justify-center rounded-full bg-brand-gold hover:bg-brand-gold-dark text-brand-navy hover:scale-[1.01] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] px-8 py-3 text-sm font-bold transition-all duration-300 cursor-pointer"
                     >
                       Login to Portal
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Tab 3: FORGOT PASSWORD */}
+              {activeTab === "forgot" && (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <p className="text-white/60 text-xs leading-relaxed ml-1 mb-2">
+                    Enter your registered email address and we'll send you a secure link to reset your password.
+                  </p>
+                  <div>
+                    <label htmlFor="forgot-email" className="block text-[10px] font-bold text-white/60 uppercase tracking-wider mb-2 ml-1">
+                      Email Address
+                    </label>
+                    <input
+                      id="forgot-email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="w-full rounded-full bg-[#182C54]/60 border border-white/10 px-6 py-2.5 text-sm text-white placeholder-white/30 focus:bg-[#182C54]/80 focus:outline-none focus:border-brand-gold transition-all duration-200"
+                    />
+                  </div>
+
+                  <div className="pt-3 flex flex-col gap-3">
+                    <button
+                      type="submit"
+                      className="w-full inline-flex items-center justify-center rounded-full bg-brand-gold hover:bg-brand-gold-dark text-brand-navy hover:scale-[1.01] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(204,163,82,0.45)] px-8 py-3 text-sm font-bold transition-all duration-300 cursor-pointer"
+                    >
+                      Send Reset Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("signin");
+                        setError("");
+                        setSuccess("");
+                      }}
+                      className="w-full text-center text-white/70 hover:text-white text-xs font-semibold py-1.5 transition-all cursor-pointer"
+                    >
+                      Back to Sign In
                     </button>
                   </div>
                 </form>

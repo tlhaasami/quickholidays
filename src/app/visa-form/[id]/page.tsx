@@ -4,6 +4,7 @@ import React, { useState, useEffect, use, useRef } from "react";
 import Image from "next/image";
 import { visaSections, VisaField, VisaForm, ClientProfile } from "@/constants/visaFields";
 import { logoTop, formBg } from "@/constants/data";
+import { createClient } from "@/lib/supabase/client";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -11,12 +12,14 @@ interface PageProps {
 
 export default function ClientVisaFormPage({ params }: PageProps) {
   const { id: formId } = use(params);
+  const supabase = createClient();
   const [client, setClient] = useState<ClientProfile | null>(null);
   const [clientForm, setClientForm] = useState<VisaForm | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"Saved" | "Saving..." | "Error">("Saved");
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Add Form client-side state
   const [showAddFormModal, setShowAddFormModal] = useState(false);
@@ -24,34 +27,54 @@ export default function ClientVisaFormPage({ params }: PageProps) {
   const [newFormApplicantName, setNewFormApplicantName] = useState("");
 
   useEffect(() => {
-    // Load nested form from LocalStorage
-    const storedFormsRaw = localStorage.getItem("quick_holidays_shared_forms");
-    if (storedFormsRaw) {
-      try {
-        const clientsData: ClientProfile[] = JSON.parse(storedFormsRaw);
+    const fetchForm = async () => {
+      const { data: form, error } = await supabase
+        .from("visa_forms")
+        .select(`
+          id,
+          title,
+          applicant_name,
+          status,
+          created_at,
+          updated_at,
+          form_data,
+          approved_data,
+          clients (
+            id,
+            name,
+            email,
+            phone
+          )
+        `)
+        .eq("id", formId)
+        .single();
 
-        let foundClient: ClientProfile | null = null;
-        let foundForm: VisaForm | null = null;
-
-        for (const c of clientsData) {
-          const matched = c.forms?.find((f) => f.id === formId);
-          if (matched) {
-            foundClient = c;
-            foundForm = matched;
-            break;
-          }
-        }
-
-        if (foundClient && foundForm) {
-          setClient(foundClient);
-          setClientForm(foundForm);
-          setFormData(foundForm.formData || {});
-        }
-      } catch (err) {
-        console.error("Failed to parse localStorage forms", err);
+      if (!error && form) {
+        setClient({
+          id: (form.clients as any).id,
+          name: (form.clients as any).name,
+          email: (form.clients as any).email || "",
+          phone: (form.clients as any).phone || "",
+          forms: [],
+        });
+        setClientForm({
+          id: form.id,
+          title: form.title,
+          applicantName: form.applicant_name || "",
+          status: form.status,
+          created_at: form.created_at,
+          updated_at: form.updated_at,
+          formData: form.form_data || {},
+          approvedData: form.approved_data || {},
+        });
+        setFormData(form.form_data || {});
+      } else {
+        console.error("Failed to load form from database:", error?.message);
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    fetchForm();
   }, [formId]);
 
   useEffect(() => {
@@ -88,119 +111,93 @@ export default function ClientVisaFormPage({ params }: PageProps) {
     const updatedFormData = { ...formData, [fieldId]: value };
     setFormData(updatedFormData);
 
-    // Persist to local storage inside client's forms array
-    const storedFormsRaw = localStorage.getItem("quick_holidays_shared_forms");
-    if (storedFormsRaw) {
-      try {
-        const clientsData: ClientProfile[] = JSON.parse(storedFormsRaw);
-        const updatedClients = clientsData.map((c) => {
-          if (c.id === client.id) {
-            return {
-              ...c,
-              forms: c.forms.map((f) => {
-                if (f.id === formId) {
-                  return {
-                    ...f,
-                    formData: updatedFormData,
-                    updated_at: new Date().toISOString()
-                  };
-                }
-                return f;
-              })
-            };
-          }
-          return c;
-        });
-        localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(updatedClients));
-        setSaveStatus("Saved");
-      } catch (err) {
-        setSaveStatus("Error");
-      }
-    } else {
-      setSaveStatus("Error");
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      const { error } = await supabase
+        .from("visa_forms")
+        .update({
+          form_data: updatedFormData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", formId);
+
+      if (error) {
+        setSaveStatus("Error");
+      } else {
+        setSaveStatus("Saved");
+      }
+    }, 1000);
   };
 
-  const handleMarkAsCompleted = () => {
+  const handleMarkAsCompleted = async () => {
     if (!clientForm || clientForm.status === "approved" || !client) return;
 
-    const storedFormsRaw = localStorage.getItem("quick_holidays_shared_forms");
-    if (storedFormsRaw) {
-      try {
-        const clientsData: ClientProfile[] = JSON.parse(storedFormsRaw);
-        const updatedClients = clientsData.map((c) => {
-          if (c.id === client.id) {
-            return {
-              ...c,
-              forms: c.forms.map((f) => {
-                if (f.id === formId) {
-                  const updated = {
-                    ...f,
-                    status: "client_completed" as const,
-                    updated_at: new Date().toISOString()
-                  };
-                  setClientForm(updated);
-                  return updated;
-                }
-                return f;
-              })
-            };
-          }
-          return c;
-        });
-        localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(updatedClients));
-      } catch (err) {
-        console.error(err);
-      }
+    const updated = {
+      ...clientForm,
+      status: "client_completed" as const,
+      updated_at: new Date().toISOString()
+    };
+    setClientForm(updated);
+
+    const { error } = await supabase
+      .from("visa_forms")
+      .update({
+        status: "client_completed",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", formId);
+
+    if (error) {
+      console.error("Failed to mark form as completed:", error.message);
     }
   };
 
-  const handleClientAddForm = (e: React.FormEvent) => {
+  const handleClientAddForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!client) return;
-    if (client.forms.length >= 10) {
+
+    const { count } = await supabase
+      .from("visa_forms")
+      .select("*", { count: "exact", head: true })
+      .eq("client_id", client.id);
+
+    if (count !== null && count >= 10) {
       alert("Maximum limit of 10 visa forms reached.");
       return;
     }
 
     const applicant = newFormApplicantName.trim() || client.name;
     const tenDigitId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    const newForm: VisaForm = {
-      id: tenDigitId,
-      title: newFormTitle.trim() || `Schengen Visa Form #${client.forms.length + 1}`,
-      applicantName: applicant,
-      status: "draft",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      formData: {
-        address_email: client.email || "",
-        address_phone: client.phone || ""
-      },
-      approvedData: {}
-    };
 
-    const storedFormsRaw = localStorage.getItem("quick_holidays_shared_forms");
-    if (storedFormsRaw) {
-      try {
-        const clientsData: ClientProfile[] = JSON.parse(storedFormsRaw);
-        const updatedClients = clientsData.map((c) => {
-          if (c.id === client.id) {
-            return {
-              ...c,
-              forms: [newForm, ...c.forms]
-            };
-          }
-          return c;
-        });
-        localStorage.setItem("quick_holidays_shared_forms", JSON.stringify(updatedClients));
-        setShowAddFormModal(false);
-        setNewFormTitle("");
-        setNewFormApplicantName("");
-        window.location.href = `/visa-form/${tenDigitId}`;
-      } catch (err) {
-        console.error(err);
-      }
+    const { data: dbForm, error: formErr } = await supabase
+      .from("visa_forms")
+      .insert({
+        id: tenDigitId,
+        client_id: client.id,
+        title: newFormTitle.trim() || `Schengen Visa Form #${(count || 0) + 1}`,
+        applicant_name: applicant,
+        status: "draft",
+        form_data: {
+          address_email: client.email || "",
+          address_phone: client.phone || "",
+        },
+        approved_data: {},
+      })
+      .select()
+      .single();
+
+    if (formErr || !dbForm) {
+      alert(formErr?.message || "Failed to create new visa form.");
+      return;
     }
+
+    setShowAddFormModal(false);
+    setNewFormTitle("");
+    setNewFormApplicantName("");
+    window.location.href = `/visa-form/${tenDigitId}`;
   };
 
   if (loading) {
@@ -251,7 +248,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
     };
   };
 
-  const isLocked = clientForm.status === "approved";
+  const isLocked = clientForm.status === "approved" || clientForm.status === "needs_approval";
   const isAwaitingReview = clientForm.status === "client_completed";
 
   const hasUnapprovedChanges = Object.keys(formData).some((key) => {

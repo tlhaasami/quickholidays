@@ -2,160 +2,255 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { visaSections } from "@/constants/visaFields";
 
-interface ClientLead {
+interface ProcessingCase {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
-  destination: string;
-  nationality: string;
-  status: "new" | "contacted" | "document_pending" | "processing" | "completed";
-  created_at: string;
-  notes?: string;
-  // Processing additions
-  docsChecked?: string[]; // Array of checked document ids
-  appointmentDate?: string;
-  appointmentRef?: string;
+  title: string;
+  applicantName: string;
+  createdAt: string;
+  formData: any;
+  approvedData: any;
+  agentName: string;
+  agentEmail: string;
 }
 
 export default function ProcessingDashboard() {
   const router = useRouter();
+  const supabase = createClient();
   const [processorName, setProcessorName] = useState("Processor");
-  const [cases, setCases] = useState<ClientLead[]>([]);
-  const [selectedCase, setSelectedCase] = useState<ClientLead | null>(null);
-
-  // Document checklist options
-  const checkableDocs = [
-    { id: "passport", label: "Valid Passport (>6 months remaining)" },
-    { id: "brp", label: "Valid UK Visa / BRP (>3 months remaining)" },
-    { id: "photo", label: "Schengen-compliant Photos (x2)" },
-    { id: "flights", label: "Confirmed Flight Itinerary (Round-trip)" },
-    { id: "hotel", label: "Confirmed Hotel Reservation / Proof of Stay" },
-    { id: "insurance", label: "Travel Health Insurance (£30,000 cover)" },
-    { id: "employment", label: "Employment Letter / Enrollment Certificate" },
-    { id: "finance", label: "3 Months Bank Statements (Sufficient funds)" },
-  ];
-
-  // Appointment Form States
-  const [appointmentDate, setAppointmentDate] = useState("");
-  const [appointmentRef, setAppointmentRef] = useState("");
+  const [cases, setCases] = useState<ProcessingCase[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Authenticate Processor
-    const session = localStorage.getItem("user_session");
-    if (!session) {
-      router.push("/login");
-      return;
-    }
-    const user = JSON.parse(session);
-    if (user.role !== "processor") {
-      router.push("/login");
-      return;
-    }
-    setProcessorName(user.name);
+    const checkAuthAndLoad = async () => {
+      setLoading(true);
+      const session = localStorage.getItem("user_session");
+      if (!session) {
+        router.push("/login");
+        return;
+      }
+      const user = JSON.parse(session);
+      
+      const { data: { user: sbUser } } = await supabase.auth.getUser();
+      if (!sbUser || sbUser.id !== user.id) {
+        router.push("/login");
+        return;
+      }
+      setProcessorName(user.name);
 
-    // Load Cases (shared with agent's database)
-    const storedLeads = localStorage.getItem("quick_holidays_client_leads");
-    if (storedLeads) {
-      setCases(JSON.parse(storedLeads));
-    }
+      // Load all visa forms
+      const { data: formsData, error: formsErr } = await supabase
+        .from("visa_forms")
+        .select(`
+          id,
+          title,
+          applicant_name,
+          status,
+          created_at,
+          form_data,
+          approved_data,
+          clients (
+            id,
+            name,
+            agent_id
+          )
+        `);
+
+      // Load all profiles to identify the forwarding agent
+      const { data: profilesData, error: profilesErr } = await supabase
+        .from("profiles")
+        .select("id, name, email");
+
+      if (!formsErr && formsData) {
+        const mapped = (formsData || [])
+          .filter((f: any) => 
+            f.status === "needs_approval" && 
+            (!f.form_data?.assigned_processor_id || f.form_data.assigned_processor_id === user.id)
+          )
+          .map((f: any) => {
+            const agentId = f.clients?.agent_id;
+            const agentProfile = (profilesData || []).find((p: any) => p.id === agentId);
+            return {
+              id: f.id,
+              title: f.title,
+              applicantName: f.applicant_name || "Applicant",
+              createdAt: new Date(f.created_at).toLocaleDateString(),
+              formData: f.form_data || {},
+              approvedData: f.approved_data || {},
+              agentName: agentProfile?.name || "System/Unknown",
+              agentEmail: agentProfile?.email || "",
+            };
+          });
+        setCases(mapped);
+      }
+      setLoading(false);
+    };
+
+    checkAuthAndLoad();
   }, [router]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem("user_session");
     router.push("/login");
   };
 
-  // Toggle document check state
-  const handleToggleDoc = (docId: string) => {
-    if (!selectedCase) return;
-
-    const currentChecked = selectedCase.docsChecked || [];
-    const newChecked = currentChecked.includes(docId)
-      ? currentChecked.filter((id) => id !== docId)
-      : [...currentChecked, docId];
-
-    const updatedCase: ClientLead = {
-      ...selectedCase,
-      docsChecked: newChecked,
-      notes: selectedCase.notes
-        ? `${selectedCase.notes}\n- Document check updated: ${docId} state toggled.`
-        : `Document check updated: ${docId} state toggled.`,
-    };
-
-    const updatedList = cases.map((c) => (c.id === selectedCase.id ? updatedCase : c));
-    localStorage.setItem("quick_holidays_client_leads", JSON.stringify(updatedList));
-    setCases(updatedList);
-    setSelectedCase(updatedCase);
-  };
-
-  // Save Appointment booking details
-  const handleSaveAppointment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCase) return;
-
-    const updatedCase: ClientLead = {
-      ...selectedCase,
-      appointmentDate,
-      appointmentRef,
-      notes: selectedCase.notes
-        ? `${selectedCase.notes}\n- Appointment Booked: Ref ${appointmentRef} for date ${appointmentDate}`
-        : `Appointment Booked: Ref ${appointmentRef} for date ${appointmentDate}`,
-    };
-
-    const updatedList = cases.map((c) => (c.id === selectedCase.id ? updatedCase : c));
-    localStorage.setItem("quick_holidays_client_leads", JSON.stringify(updatedList));
-    setCases(updatedList);
-    setSelectedCase(updatedCase);
-    alert("Visa appointment details saved successfully!");
-  };
-
-  // Complete processing / update case status
-  const handleCompleteCase = () => {
-    if (!selectedCase) return;
+  // Word Document exporter
+  const handleExportWord = (form: ProcessingCase) => {
+    const data = form.approvedData || form.formData || {};
     
-    const updatedCase: ClientLead = {
-      ...selectedCase,
-      status: "completed",
-      notes: selectedCase.notes
-        ? `${selectedCase.notes}\n- Visa application completed. Documents ready for collection/submission.`
-        : `Visa application completed. Documents ready for collection/submission.`,
+    // Helper to get divider headers
+    const getDividerRow = (fieldId: string) => {
+      if (fieldId === "address_street") {
+        return `
+          <tr>
+            <td colspan="2" style="background-color: #FAFAFA; font-weight: bold; text-align: center; font-size: 10.5pt; border: 1px solid #000000; padding: 6px 10px; font-family: 'Arial', sans-serif; color: #0F2148;">
+              Full Residence Address
+            </td>
+          </tr>
+        `;
+      }
+      if (fieldId === "emp_street") {
+        return `
+          <tr>
+            <td colspan="2" style="background-color: #FAFAFA; font-weight: bold; text-align: center; font-size: 10.5pt; border: 1px solid #000000; padding: 6px 10px; font-family: 'Arial', sans-serif; color: #0F2148;">
+              Employer/University/College Full Address
+            </td>
+          </tr>
+        `;
+      }
+      return "";
     };
 
-    const updatedList = cases.map((c) => (c.id === selectedCase.id ? updatedCase : c));
-    localStorage.setItem("quick_holidays_client_leads", JSON.stringify(updatedList));
-    setCases(updatedList);
-    setSelectedCase(updatedCase);
+    const docHtml = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns:v='urn:schemas-microsoft-com:vml' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset="utf-8">
+        <title>Schengen Visa Draft Form - ${form.applicantName}</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          v\\:* { behavior: url(#default#VML); }
+          o\\:* { behavior: url(#default#VML); }
+          w\\:* { behavior: url(#default#VML); }
+          .shape { behavior: url(#default#VML); }
+          
+          @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in 1.5in 1.0in 1.5in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-header: h1;
+          }
+          div.Section1 { page: Section1; }
+          
+          body { font-family: 'Arial', sans-serif; color: #0F2148; line-height: 1.4; }
+          h1 { text-align: center; margin-bottom: 2px; }
+          .subtitle { color: #1F497D; font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 20px; }
+          h2 { color: #5B9BD5; font-size: 14pt; margin-top: 20px; margin-bottom: 8px; font-weight: bold; }
+          table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px; border: 1px solid #000000; }
+          th, td { word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; }
+        </style>
+      </head>
+      <body>
+        <div class="Section1">
+          <!-- Watermark VML Definition in Page Header -->
+          <div style="mso-element:header" id="h1">
+            <p class="MsoHeader" style="text-align:left;line-height:normal;margin:0;">
+              <!--[if gte vml 1]>
+              <v:shapetype id="_x0000_t136" coordsize="21600,21600" o:spt="136" adj="10800" path="m@7,l@8,m@5,21600l@6,21600e">
+                <v:formulas/>
+                <v:path textpathok="t" o:connecttype="custom" o:connectlocs="0,0"/>
+                <v:textpath on="t" fitshape="t"/>
+              </v:shapetype>
+              <v:shape id="WaterMark" o:spid="_x0000_s2051" type="#_x0000_t136" 
+                style="position:absolute;width:450pt;height:120pt;z-index:-251658240;
+                 mso-position-horizontal:center;mso-position-horizontal-relative:margin;
+                 mso-position-vertical:center;mso-position-vertical-relative:margin;
+                 rotation:-30;" fillcolor="#E6E9EF" stroked="f">
+                <v:textpath string="QUICK HOLIDAYS" style="font-family:'Arial';font-weight:bold;"/>
+              </v:shape>
+              <![endif]-->
+            </p>
+          </div>
+
+          <!-- Document Brand Header -->
+          <h1 style="text-align: center; margin-top: 0; margin-bottom: 2px;">
+            <span style="color: #E36C0A; font-family: 'Arial Black', sans-serif; font-weight: 900; font-size: 26pt; letter-spacing: 0.5px;">QUICK</span>
+            <span style="color: #1F497D; font-family: 'Arial Black', sans-serif; font-weight: 900; font-size: 26pt; letter-spacing: 0.5px;"> HOLIDAYS</span>
+          </h1>
+          <div class="subtitle">Future Vision Organization Limited</div>
+          
+          <div style="font-family: 'Arial', sans-serif; font-size: 10pt; color: #0F2148; line-height: 1.45; margin-bottom: 15px; text-align: left;">
+            Please fill in <strong>CLEAR BLOCK CAPITAL LETTERS</strong>.<br>
+            The details you provide will be used to complete the online application form.<br>
+            Any mistakes, faint or unclear writing may cause errors in your application.<br>
+            It is <strong>your responsibility</strong> to provide correct and readable information.<br>
+            <span style="color: #FF0000;">In case of any errors on the visa draft form, the <strong>company will not be held responsible</strong>. Please carefully <strong>re-check your form</strong> before submitting.</span>
+          </div>
+
+          <!-- Agent Name Table -->
+          <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 5px; margin-bottom: 20px; border: 1px solid #000000;">
+            <tr>
+              <th style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FAFAFA; font-weight: bold; width: 35%; font-family: 'Arial', sans-serif; color: #0F2148; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">Agent Name</th>
+              <td style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FFFFFF; width: 65%; font-family: 'Arial', sans-serif; color: #0F2148; font-weight: bold; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">${form.agentName.toUpperCase()}</td>
+            </tr>
+          </table>
+
+          <!-- Form Sections -->
+          ${visaSections.map((section) => `
+            <p style="color: #FF0000; font-size: 9.5pt; font-family: 'Arial', sans-serif; margin-top: 22px; margin-bottom: 4px; text-align: left; font-weight: bold;">
+              &#9888; Warning: <span style="font-weight: normal;">The company holds no responsibility for errors. Check form carefully before submitting.</span>
+            </p>
+            <h2 style="color: #5B9BD5; font-size: 14pt; margin-top: 0px; margin-bottom: 8px; font-weight: bold; font-family: 'Arial', sans-serif; text-align: left;">${section.title}</h2>
+            <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px; border: 1px solid #000000;">
+              ${section.fields.map((field) => `
+                ${getDividerRow(field.id)}
+                <tr>
+                  <th style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FAFAFA; font-weight: bold; width: 35%; font-family: 'Arial', sans-serif; color: #0F2148; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">${field.label}</th>
+                  <td style="border: 1px solid #000000; padding: 8px 10px; text-align: left; font-size: 10pt; background-color: #FFFFFF; width: 65%; font-family: 'Arial', sans-serif; color: #0F2148; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;">${data[field.id] || ""}</td>
+                </tr>
+              `).join("")}
+            </table>
+          `).join("")}
+
+          <!-- Footer Acknowledgment & Contact details -->
+          <p style="color: #1F497D; font-size: 11pt; font-weight: bold; text-align: center; margin-top: 25px; margin-bottom: 20px; font-family: 'Arial', sans-serif;">
+            Thank you for your cooperation and patience.
+          </p>
+
+          <div style="font-family: 'Arial', sans-serif; font-size: 10pt; color: #1F497D; text-align: left; margin-top: 15px; line-height: 1.5;">
+            <strong>☎ Contact Us</strong>
+            <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px; list-style-type: disc;">
+              <li>Phone: +44 800 058 4673</li>
+              <li>WhatsApp: +44 7428 878936</li>
+              <li>Email: info@quickholidays.co.uk</li>
+            </ul>
+          </div>
+
+        </div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob(["\ufeff" + docHtml], { type: "application/msword" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Visa_Draft_${form.applicantName.replace(/\s+/g, "_")}_${form.id}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
-
-  const handleReturnToAgent = () => {
-    if (!selectedCase) return;
-    
-    const updatedCase: ClientLead = {
-      ...selectedCase,
-      status: "document_pending",
-      notes: selectedCase.notes
-        ? `${selectedCase.notes}\n- Returned to agent: Document check failed or client contact required.`
-        : `Returned to agent: Document check failed or client contact required.`,
-    };
-
-    const updatedList = cases.map((c) => (c.id === selectedCase.id ? updatedCase : c));
-    localStorage.setItem("quick_holidays_client_leads", JSON.stringify(updatedList));
-    setCases(updatedList);
-    setSelectedCase(updatedCase);
-  };
-
-  // Filter cases: show those that are 'processing' or 'completed'
-  const processingCases = cases.filter((c) => c.status === "processing" || c.status === "completed" || c.status === "document_pending");
-
-  // Load appointment details when selected case changes
-  useEffect(() => {
-    if (selectedCase) {
-      setAppointmentDate(selectedCase.appointmentDate || "");
-      setAppointmentRef(selectedCase.appointmentRef || "");
-    }
-  }, [selectedCase]);
 
   return (
     <div className="min-h-screen bg-brand-cream text-slate-800 font-sans flex flex-col">
@@ -186,174 +281,72 @@ export default function ProcessingDashboard() {
       </header>
 
       {/* Main Workspace */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grow grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
-        
-        {/* Left Side: Client Cases Queue */}
-        <div className="lg:col-span-6 bg-white border border-brand-gold/15 rounded-3xl p-6 shadow-sm">
-          <div className="mb-6">
-            <h2 className="font-serif text-2xl font-bold text-brand-navy">Processing Queue</h2>
-            <p className="text-xs text-slate-500 mt-1">Review documents and schedule visa submission appointments.</p>
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grow flex flex-col items-stretch text-left">
+        <div className="bg-white border border-brand-gold/15 rounded-3xl p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-6 mb-6 gap-4">
+            <div>
+              <h2 className="font-serif text-2xl font-bold text-brand-navy">Forwarded Applications</h2>
+              <p className="text-xs text-slate-500 mt-1">Export approved dossiers directly into Microsoft Word document format.</p>
+            </div>
+            <span className="bg-brand-navy text-brand-gold font-bold text-xs px-4 py-1.5 rounded-full shrink-0">
+              {cases.length} Dossiers Pending
+            </span>
           </div>
 
-          {processingCases.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100">
-              <p className="text-sm text-slate-500 font-medium">No cases currently in the processing pipeline.</p>
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="w-8 h-8 border-2 border-brand-navy border-t-brand-gold rounded-full animate-spin mx-auto mb-3"></div>
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Loading applications queue...</p>
+            </div>
+          ) : cases.length === 0 ? (
+            <div className="text-center py-16 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+              <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="text-sm text-slate-500 font-medium">No forwarded applications are currently pending processing.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {processingCases.map((c) => {
-                const checkedCount = c.docsChecked?.length || 0;
-                return (
-                  <div
-                    key={c.id}
-                    onClick={() => setSelectedCase(c)}
-                    className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
-                      selectedCase?.id === c.id
-                        ? "border-brand-gold bg-brand-cream/30 shadow-xs"
-                        : "border-slate-100 hover:border-brand-gold/30 bg-slate-50/50"
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="font-bold text-brand-navy">{c.name}</h4>
-                        <span className="text-xs text-slate-500">{c.destination} • {c.nationality}</span>
-                      </div>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
-                        c.status === "processing"
-                          ? "bg-blue-50 text-blue-700 border-blue-100"
-                          : c.status === "document_pending"
-                          ? "bg-red-50 text-red-700 border-red-100 animate-pulse"
-                          : "bg-green-50 text-green-700 border-green-100"
-                      }`}>
-                        {c.status.replace("_", " ")}
-                      </span>
-                    </div>
-
-                    {/* Progress details */}
-                    <div className="mt-4 pt-3 border-t border-slate-100/50 flex justify-between items-center text-xs">
-                      <span className="text-slate-500">
-                        Documents Checked: <strong>{checkedCount}/{checkableDocs.length}</strong>
-                      </span>
-                      {c.appointmentDate && (
-                        <span className="text-brand-gold font-bold">
-                          Appt: {c.appointmentDate.split("T")[0]}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                    <th className="pb-3 pl-2">Reference ID</th>
+                    <th className="pb-3">Applicant Name</th>
+                    <th className="pb-3">Form Description</th>
+                    <th className="pb-3">Date Forwarded</th>
+                    <th className="pb-3">Forwarded By (Agent)</th>
+                    <th className="pb-3 pr-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {cases.map((c) => (
+                    <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="py-4 pl-2 font-mono font-bold text-slate-700">{c.id}</td>
+                      <td className="py-4 font-bold text-brand-navy">{c.applicantName}</td>
+                      <td className="py-4 text-slate-600 font-semibold">{c.title}</td>
+                      <td className="py-4 text-slate-500">{c.createdAt}</td>
+                      <td className="py-4">
+                        <div className="text-slate-800 font-semibold">{c.agentName}</div>
+                        <div className="text-[10px] text-slate-400 font-medium">{c.agentEmail}</div>
+                      </td>
+                      <td className="py-4 pr-2 text-right">
+                        <button
+                          onClick={() => handleExportWord(c)}
+                          className="rounded-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy text-white text-xs font-bold px-4 py-2 transition-all duration-300 shadow-sm cursor-pointer hover:scale-[1.02] flex items-center gap-1.5 inline-flex"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Export Word Doc
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
-
-        {/* Right Side: Case Processing Workspace */}
-        <div className="lg:col-span-6">
-          {selectedCase ? (
-            <div className="bg-white border border-brand-gold/15 rounded-3xl p-6 shadow-sm space-y-6">
-              <div className="border-b border-slate-100 pb-4">
-                <h3 className="font-serif text-xl font-bold text-brand-navy">
-                  Case File: {selectedCase.name}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">ID: {selectedCase.id} • Registered: {selectedCase.created_at.split(",")[0]}</p>
-              </div>
-
-              {/* Document Checklist */}
-              <div>
-                <span className="text-xs font-bold text-brand-navy uppercase tracking-wider block mb-3">
-                  1. Document Checklist Review
-                </span>
-                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-2.5">
-                  {checkableDocs.map((doc) => {
-                    const isChecked = selectedCase.docsChecked?.includes(doc.id) || false;
-                    return (
-                      <label
-                        key={doc.id}
-                        onClick={() => handleToggleDoc(doc.id)}
-                        className="flex items-center gap-3 cursor-pointer group select-none text-xs text-slate-700"
-                      >
-                        <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
-                          isChecked ? "bg-brand-navy border-brand-navy text-white" : "border-slate-300 bg-white group-hover:border-brand-navy"
-                        }`}>
-                          {isChecked && (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="w-2.5 h-2.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                            </svg>
-                          )}
-                        </div>
-                        <span className={isChecked ? "line-through text-slate-400 font-medium" : "font-semibold"}>
-                          {doc.label}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Appointment Booking */}
-              <div className="border-t border-slate-100 pt-6">
-                <span className="text-xs font-bold text-brand-navy uppercase tracking-wider block mb-3">
-                  2. Visa Submission Appointment
-                </span>
-                
-                <form onSubmit={handleSaveAppointment} className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <div>
-                    <label htmlFor="appt-date" className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Appointment Date</label>
-                    <input
-                      id="appt-date"
-                      type="date"
-                      value={appointmentDate}
-                      onChange={(e) => setAppointmentDate(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="appt-ref" className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Reference Number</label>
-                    <input
-                      id="appt-ref"
-                      type="text"
-                      value={appointmentRef}
-                      onChange={(e) => setAppointmentRef(e.target.value)}
-                      placeholder="e.g. TLS-892019"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-brand-gold"
-                    />
-                  </div>
-                  <div className="sm:col-span-2 text-right">
-                    <button
-                      type="submit"
-                      className="bg-brand-navy hover:bg-brand-gold text-white hover:text-brand-navy rounded-full px-5 py-2 text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs"
-                    >
-                      Save Appointment Info
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Final Actions */}
-              <div className="border-t border-slate-100 pt-6 flex flex-wrap gap-3">
-                <button
-                  onClick={handleCompleteCase}
-                  disabled={selectedCase.status === "completed"}
-                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-full px-6 py-2.5 text-xs font-bold transition-colors cursor-pointer shadow-xs"
-                >
-                  Approve & Complete Case
-                </button>
-                <button
-                  onClick={handleReturnToAgent}
-                  disabled={selectedCase.status === "document_pending"}
-                  className="bg-red-50 hover:bg-red-100 disabled:opacity-50 text-red-600 border border-red-100 rounded-full px-6 py-2.5 text-xs font-bold transition-colors cursor-pointer shadow-xs"
-                >
-                  Return to Agent (Fail Checks)
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white border border-brand-gold/15 rounded-3xl p-8 shadow-sm text-center">
-              <p className="text-slate-400 text-sm font-medium">Select a case from the processing queue to check documents, input appointment records, or complete processing.</p>
-            </div>
-          )}
-        </div>
-
       </main>
     </div>
   );

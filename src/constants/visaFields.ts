@@ -15,7 +15,7 @@ export interface VisaForm {
   id: string; // 10-digit number string
   title: string;
   applicantName?: string;
-  status: "draft" | "client_completed" | "approved";
+  status: "draft" | "client_completed" | "approved" | "needs_approval";
   created_at: string;
   updated_at: string;
   formData: Record<string, string>;

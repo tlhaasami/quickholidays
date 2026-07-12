@@ -35,6 +35,7 @@ export default function ConsultationForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -45,12 +46,40 @@ export default function ConsultationForm({
     setFormData((prev) => ({ ...prev, preferredContact: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setErrorMessage("");
+
+    try {
+      const responsePreferred = formData.preferredContact === "whatsapp" 
+        ? "By Whatsapp" 
+        : formData.preferredContact === "email" 
+          ? "By Email" 
+          : "By Call";
+
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          nationality: formData.nationality,
+          city: formData.city,
+          pastVisas: formData.pastVisas,
+          responsePreferred,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to book consultation.");
+      }
+
       setSuccess(true);
       // Reset form
       setFormData({
@@ -62,7 +91,11 @@ export default function ConsultationForm({
         pastVisas: "",
         preferredContact: "call",
       });
-    }, 1500);
+    } catch (err: any) {
+      setErrorMessage(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const [customBg, setCustomBg] = useState<string | null>(null);
@@ -119,6 +152,18 @@ export default function ConsultationForm({
 
         {/* Form Container */}
         <div className="max-w-4xl relative z-10 text-left">
+          
+          {errorMessage && (
+            <div className="mb-6 p-4 rounded-2xl bg-rose-50 text-rose-800 border border-rose-200 text-sm font-semibold flex items-center gap-3">
+              <div className="w-5 h-5 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           {success ? (
             <div className="bg-white rounded-3xl p-8 border border-green-200 shadow-md max-w-xl text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4">
@@ -154,7 +199,7 @@ export default function ConsultationForm({
                 <div className="space-y-6">
                   <div>
                     <label htmlFor="fullName" className="block text-sm font-bold text-brand-navy mb-2">
-                      Full Name
+                      Full Name *
                     </label>
                     <input
                       type="text"
@@ -170,7 +215,7 @@ export default function ConsultationForm({
 
                   <div>
                     <label htmlFor="phone" className="block text-sm font-bold text-brand-navy mb-2">
-                      Phone
+                      Phone *
                     </label>
                     <input
                       type="tel"
@@ -204,7 +249,7 @@ export default function ConsultationForm({
                 <div className="space-y-6">
                   <div>
                     <label htmlFor="email" className="block text-sm font-bold text-brand-navy mb-2">
-                      Email
+                      Email *
                     </label>
                     <input
                       type="email"
@@ -226,7 +271,6 @@ export default function ConsultationForm({
                       type="text"
                       id="nationality"
                       name="nationality"
-                      required
                       value={formData.nationality}
                       onChange={handleChange}
                       placeholder="e.g. British, Indian"
@@ -242,7 +286,6 @@ export default function ConsultationForm({
                       type="text"
                       id="city"
                       name="city"
-                      required
                       value={formData.city}
                       onChange={handleChange}
                       placeholder="e.g. London"
