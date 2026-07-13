@@ -58,7 +58,7 @@ function getCookieDomain(host?: string | null) {
   if (cleanHost === "localhost" || cleanHost.endsWith(".localhost")) {
     return "localhost";
   }
-  if (cleanHost.endsWith(".netlify.app")) {
+  if (cleanHost.endsWith(".netlify.app") || cleanHost.endsWith(".vercel.app")) {
     return undefined;
   }
   const parts = cleanHost.split(".");
