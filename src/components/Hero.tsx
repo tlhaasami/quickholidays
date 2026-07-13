@@ -51,15 +51,15 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full bg-brand-cream min-h-[90vh] flex items-center overflow-visible">
+    <section className="relative w-full bg-brand-cream min-h-[65vh] sm:min-h-[90vh] flex items-center overflow-visible">
       {/* Background Image Spread Across the Complete Section */}
       <div className="absolute inset-0 z-0 select-none overflow-hidden">
         {customBg ? (
           <img
             src={customBg}
             alt="Schengen Visa Background"
-            className={`w-full h-full object-cover object-right sm:object-center transition-all duration-[1200ms] ease-out ${
-              bgLoaded ? "opacity-30 sm:opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-md"
+            className={`absolute inset-0 w-full h-full object-cover object-right sm:object-center transition-all duration-[1200ms] ease-out ${
+              bgLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.05]"
             }`}
             onLoad={() => setBgLoaded(true)}
           />
@@ -70,24 +70,24 @@ export default function Hero() {
             fill
             sizes="100vw"
             className={`object-cover object-right sm:object-center transition-all duration-[1200ms] ease-out ${
-              bgLoaded ? "opacity-30 sm:opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.05] blur-md"
+              bgLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.05]"
             }`}
             onLoad={() => setBgLoaded(true)}
             priority
           />
         )}
-        {/* Readable text background overlay (stronger on mobile, fading to transparent on the right) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-cream/90 via-brand-cream/75 to-transparent sm:bg-gradient-to-r sm:from-brand-cream/95 sm:via-brand-cream/75 sm:to-transparent pointer-events-none z-10" />
+        {/* Readable text background overlay (stronger on mobile, fading to transparent on the right, hidden on desktop to keep the image clear) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-cream/90 via-brand-cream/75 to-transparent sm:hidden pointer-events-none z-10" />
         {/* Soft bottom fade-to-cream gradient to blend image seamlessly into the cream background below */}
-        <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-linear-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-t from-brand-cream via-brand-cream/80 to-transparent pointer-events-none z-10" />
       </div>
 
       {/* Content Container overlayed on background */}
-      <div className="relative z-20 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-20 pb-20 sm:pt-28 sm:pb-24 lg:pt-32 lg:pb-28">
+      <div className="relative z-20 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-10 pb-12 sm:pt-28 sm:pb-24 lg:pt-32 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column: Text Content (Spans 6 columns) */}
-          <div className="lg:col-span-6 text-left z-10">
+          <div className="lg:col-span-6 text-left z-10 -mt-6 sm:mt-0">
             <h1 className={`font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-black tracking-tight text-brand-navy leading-[1.05] mb-6 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               Schengen Visa
               <br />
