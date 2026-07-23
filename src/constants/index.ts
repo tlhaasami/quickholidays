@@ -49,12 +49,10 @@ export const MARQUEE_CONFIG = {
   repeats: 1,               // No flags repeated
 };
 
-// Configurations for the Hero text video mask and overlays
+// Configurations for the Hero video background overlays
 export const HERO_CONFIG = {
-  videoSrc: "/videos/video-bg.webm",
-  fadeOpacity: 0.25,        // Uniform black fade opacity across the entire hero section (e.g. 0.25 = 25%)
-  fontFamily: "Boldonse, Bevan, sans-serif", // Google Fonts loaded in globals.css. Boldonse is highly bold & condensed.
-  fontWeight: "bold",       // Font weight for the text mask
-  fontSize: 8,              // Font size in vw units to prevent side-cutting
+  fadeOpacity: 0.35,        // Black fade opacity overlay on the video background (e.g. 0.15 = 15% black fade overlay)
+  quickColor: "#18213bff",     // Custom hex color for the word "Quick" (Midnight Navy)
+  holidaysColor: "#C99537",  // Custom hex color for the word "Holidays" (Heritage Gold)
 };
 

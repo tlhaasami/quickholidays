@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,8 @@ export const ThreeDMarquee = ({
   scaleTablet?: number;
   scaleDesktop?: number;
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   // Insert the logo placeholder dynamically at the mathematically computed center position
   const logoPlaceholder = "logo-placeholder";
   const totalCards = images.length + 1;
@@ -47,10 +50,10 @@ export const ThreeDMarquee = ({
     return combinedImages.slice(start, start + chunkSize);
   });
 
-
-
   return (
     <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "mx-auto block h-screen w-screen overflow-hidden rounded-none",
         className,
@@ -72,9 +75,12 @@ export const ThreeDMarquee = ({
         >
           <div
             style={{
-              transform: "rotateX(55deg) rotateY(0deg) rotateZ(-45deg)",
+              transform: isHovered
+                ? "rotateX(40deg) rotateY(0deg) rotateZ(-45deg) scale(1.08) translateY(-30px)"
+                : "rotateX(55deg) rotateY(0deg) rotateZ(-45deg) scale(1) translateY(0px)",
               gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
               gap: `${gap}px`,
+              transition: "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
             className="grid size-full origin-center transform-3d"
           >
