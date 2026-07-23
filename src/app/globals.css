@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@theme {
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-dm-sans), sans-serif;
+  --font-bevan: 'Bevan', serif;
+  --font-boldonse: 'Boldonse', sans-serif;
+  
+  --color-primary: #C99537;
+  --color-ink: #0F1936;
+  --color-muted: #6D7077;
+  --color-surface-light: #FFFFFF;
+  --color-surface-ivory: #F4EFE7;
+  --color-success: #15803D;
+}
+
+@layer base {
+  body {
+    @apply bg-surface-ivory text-ink font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(command -v chromium-cli)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(npx --no-install chromium-cli --help)",
+      "Read(//a//**)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/ -o /c/Users/talha/AppData/Local/Temp/page.html)",
+      "Read(//c/Users/talha/AppData/Local/Temp/**)",
+      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__0tku12t._.css\" -o /c/Users/talha/AppData/Local/Temp/bundle.css)",
+      "Bash(grep -n \"bg-black\" /c/Users/talha/AppData/Local/Temp/bundle.css)"
+    ]
+  }
+}
