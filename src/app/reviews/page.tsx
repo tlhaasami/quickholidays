@@ -138,17 +138,6 @@ export default function Reviews() {
           </motion.p>
         </div>
 
-        {/* Mock Trustpilot Widget slot (hidden until 10+ reviews) */}
-        <div className="bg-zinc-100 dark:bg-zinc-950/60 border border-zinc-200 dark:border-white/5 rounded-2xl p-6 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto">
-          <div className="flex items-center gap-3">
-            <span className="text-emerald-500 font-bold text-lg">★</span>
-            <span className="font-sans font-bold text-sm text-zinc-900 dark:text-white">Trustpilot Widget</span>
-          </div>
-          <div className="text-zinc-500 text-xs italic">
-            Connecting dynamic Trustpilot API (enabled upon reaching 10+ reviews)
-          </div>
-        </div>
-
         {/* Reviews Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mb-16">
           {reviewsData.map((rev, idx) => (
@@ -180,7 +169,7 @@ export default function Reviews() {
                   <span className="font-sans text-xs text-zinc-500">{rev.city} • </span>
                   <span className="font-sans text-xs text-primary">{rev.country}</span>
                 </div>
-                <span className="text-[10px] uppercase font-bold tracking-wider font-sans bg-emerald-600/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/10">
+                <span className="text-[10px] uppercase font-bold tracking-wider font-sans bg-emerald-600/10 text-emerald-450 dark:text-emerald-450 px-2 py-1 rounded border border-emerald-500/10">
                   {rev.outcome}
                 </span>
               </div>

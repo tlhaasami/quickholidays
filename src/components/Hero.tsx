@@ -12,6 +12,7 @@ import { Highlighter } from "@/components/ui/highlighter";
 import { VerticalAccordion } from "@/components/VerticalAccordion";
 import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
+import FloatingLines from "@/components/ui/floating-lines";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -80,8 +81,8 @@ function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm text-left flex items-center justify-between focus:outline-none transition-colors duration-200"
-        style={{ borderColor: isOpen ? "var(--color-primary)" : "rgba(255,255,255,0.1)" }}
+        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm text-left flex items-center justify-between focus:outline-none transition-colors duration-200"
+        style={{ borderColor: isOpen ? "var(--color-primary)" : "" }}
       >
         <span>{selectedOption ? selectedOption.label : placeholder}</span>
         <svg
@@ -96,7 +97,7 @@ function CustomSelect({
 
       {/* Options Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-2 z-50 bg-zinc-950 border border-white/10 rounded-lg shadow-2xl overflow-hidden max-h-60 overflow-y-auto no-scrollbar">
+        <div className="absolute left-0 right-0 mt-2 z-50 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-lg shadow-2xl overflow-hidden max-h-60 overflow-y-auto no-scrollbar">
           {options.map((opt) => {
             const isSelected = opt.value === value;
             return (
@@ -110,7 +111,7 @@ function CustomSelect({
                 className={`w-full text-left px-4 py-3 text-sm font-sans transition-colors ${
                   isSelected 
                     ? "bg-primary text-white font-semibold" 
-                    : "text-zinc-300 hover:bg-zinc-900 hover:text-white"
+                    : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white"
                 }`}
               >
                 {opt.label}
@@ -126,6 +127,87 @@ function CustomSelect({
 export default function Hero() {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    // Check initially
+    const isDarkTheme = document.documentElement.classList.contains("dark");
+    setIsDark(isDarkTheme);
+
+    // Watch for theme changes on html tag
+    const observer = new MutationObserver(() => {
+      const isDarkTheme = document.documentElement.classList.contains("dark");
+      setIsDark(isDarkTheme);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // --- Load Dynamic Custom FloatingLines Settings ---
+  const [flLineCount, setFlLineCount] = useState<number | number[]>([10, 15, 20]);
+  const [flLineDistance, setFlLineDistance] = useState<number | number[]>([8, 6, 4]);
+  const [flBendRadius, setFlBendRadius] = useState(5.0);
+  const [flBendStrength, setFlBendStrength] = useState(-0.5);
+  const [flAnimationSpeed, setFlAnimationSpeed] = useState(1);
+  const [flGradientStart, setFlGradientStart] = useState<string | undefined>(undefined);
+  const [flGradientMid, setFlGradientMid] = useState<string | undefined>(undefined);
+  const [flGradientEnd, setFlGradientEnd] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const loadCustomSettings = () => {
+      try {
+        const savedCount = localStorage.getItem("fl_lineCount");
+        if (savedCount) {
+          setFlLineCount(parseInt(savedCount));
+        } else {
+          setFlLineCount([10, 15, 20]);
+        }
+
+        const savedDistance = localStorage.getItem("fl_lineDistance");
+        if (savedDistance) {
+          setFlLineDistance(parseInt(savedDistance));
+        } else {
+          setFlLineDistance([8, 6, 4]);
+        }
+
+        const savedRadius = localStorage.getItem("fl_bendRadius");
+        if (savedRadius) setFlBendRadius(parseFloat(savedRadius));
+        else setFlBendRadius(5.0);
+
+        const savedStrength = localStorage.getItem("fl_bendStrength");
+        if (savedStrength) setFlBendStrength(parseFloat(savedStrength));
+        else setFlBendStrength(-0.5);
+
+        const savedSpeed = localStorage.getItem("fl_animationSpeed");
+        if (savedSpeed) setFlAnimationSpeed(parseFloat(savedSpeed));
+        else setFlAnimationSpeed(1);
+
+        const savedStart = localStorage.getItem("fl_gradientStart");
+        if (savedStart) setFlGradientStart(savedStart);
+        else setFlGradientStart(undefined);
+
+        const savedMid = localStorage.getItem("fl_gradientMid");
+        if (savedMid) setFlGradientMid(savedMid);
+        else setFlGradientMid(undefined);
+
+        const savedEnd = localStorage.getItem("fl_gradientEnd");
+        if (savedEnd) setFlGradientEnd(savedEnd);
+        else setFlGradientEnd(undefined);
+      } catch (e) {
+        console.error("Failed to load settings in Hero.tsx", e);
+      }
+    };
+
+    loadCustomSettings();
+    window.addEventListener("storage", loadCustomSettings);
+    return () => window.removeEventListener("storage", loadCustomSettings);
+  }, []);
 
   // Multiply the flag images array to create more rows in the columns
   const repeatedFlagImages = Array(MARQUEE_CONFIG.repeats).fill(FLAG_IMAGES).flat();
@@ -144,13 +226,39 @@ export default function Hero() {
   ];
 
   return (
-    <div className="relative w-full min-h-screen bg-black text-white">
+    <div className="relative w-full min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white transition-colors duration-300">
       {/* Premium dark gradient overlays for editorial depth (Fixed Position) */}
-      <div className="fixed inset-0 bg-linear-to-b from-black/60 via-transparent to-black/60 pointer-events-none z-10" />
+      <div className="fixed inset-0 bg-linear-to-b from-black/60 via-transparent to-black/60 pointer-events-none z-10 hidden dark:block" />
+
 
       {/* 1. Hero Section (7.1) - Now 1st Section at the top */}
       <section id="hero" className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Video with Poster state */}
+        {/* FloatingLines React Bits Canvas Background - Commented out as requested */}
+        {/* 
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <FloatingLines 
+            enabledWaves={['top', 'middle', 'bottom']}
+            lineCount={flLineCount}
+            lineDistance={flLineDistance}
+            bendRadius={flBendRadius}
+            bendStrength={flBendStrength}
+            interactive={true}
+            parallax={true}
+            animationSpeed={flAnimationSpeed}
+            linesGradient={(!flGradientStart && !flGradientMid && !flGradientEnd)
+              ? (isDark 
+                  ? ['#C99537', '#ffffff', '#C99537', '#ffffff'] 
+                  : ['#C99537', '#18213b', '#C99537', '#18213b'])
+              : undefined
+            }
+            gradientStart={flGradientStart}
+            gradientMid={flGradientMid}
+            gradientEnd={flGradientEnd}
+          />
+        </div>
+        */}
+        {/* Background Video with Poster state - commented out temporarily */}
+        {/* 
         <div className="absolute inset-0 overflow-hidden">
           {!videoLoaded && (
             <img
@@ -181,33 +289,26 @@ export default function Hero() {
               videoLoaded ? "opacity-100" : "opacity-0"
             }`}
           />
-          {/* Configurable black fade overlay controlled from constants */}
           <div
             className="absolute inset-0 bg-black pointer-events-none z-10"
             style={{ opacity: HERO_CONFIG.fadeOpacity }}
           />
         </div>
+        */}
 
-        {/* Content Container (Bottom Left style matching the reference picture) */}
-        <div className="absolute bottom-7 right-9 sm:right-16 z-20 select-none pointer-events-none">
-          <img
-            src="/assets/logos/quick-holidays-logo-search.png"
-            alt="Quick Holidays Logo"
-            className="h-12 sm:h-16 md:h-20 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
-          />
-        </div>
+        {/* Three Offset Video Columns (Right Side) - Removed as requested */}
+
         <div className="absolute bottom-8 left-8 sm:left-16 z-20 max-w-4xl text-left select-none pointer-events-none">
           {/* Ambient Backdrop Glow Blob */}
           <div 
             style={{ backgroundColor: HERO_CONFIG.holidaysColor }}
-            className="absolute -inset-10 rounded-full blur-[80px] opacity-15 pointer-events-none mix-blend-screen animate-slow-glow" 
+            className="absolute -inset-10 rounded-full blur-[80px] opacity-15 pointer-events-none mix-blend-screen animate-slow-glow hidden dark:block" 
           />
-          <h1 className="text-6xl sm:text-8xl md:text-[9rem] font-sans font-bold tracking-tighter leading-[0.95] animate-text-shadow">
-            <Highlighter action="highlight" color="#C9953755" isView={true}>
-              <span style={{ color: HERO_CONFIG.quickColor }}>Quick</span>
+          <h1 className="text-5xl sm:text-7xl md:text-[6.5rem] lg:text-[7.5rem] font-sans font-bold tracking-tighter leading-none animate-text-shadow flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <Highlighter action="highlight" color={isDark ? "#C9953755" : "#C9953733"} isView={true}>
+              <span style={{ color: isDark ? "#ffffff" : "#71717a" }}>Quick</span>
             </Highlighter>
-            <br />
-            <Highlighter action="highlight" color="#18213b66" isView={true}>
+            <Highlighter action="highlight" color={isDark ? "#18213b88" : "#18213b33"} isView={true}>
               <span style={{ color: HERO_CONFIG.holidaysColor }}>Holidays</span>
             </Highlighter>
           </h1>
@@ -236,12 +337,12 @@ export default function Hero() {
               Clear costs. Honest advice. A team that stands behind each application. We prepare Schengen tourist visa applications for{" "}
               <Tooltip
                 content={
-                  <div className="flex flex-col gap-1.5 font-sans">
-                    <p className="text-[11px] text-[#C99537] font-bold uppercase tracking-wider">Eligible Residents</p>
-                    <p className="text-xs font-light text-zinc-300 leading-normal">
+                  <span className="flex flex-col gap-1.5 font-sans">
+                    <span className="text-[11px] text-[#C99537] font-bold uppercase tracking-wider block">Eligible Residents</span>
+                    <span className="text-xs font-light text-zinc-300 leading-normal block">
                       Includes BRP holders, Work visa, Student visa, Spouse visa, and Indefinite Leave to Remain (ILR) holders living in the UK.
-                    </p>
-                  </div>
+                    </span>
+                  </span>
                 }
               >
                 <span className="underline decoration-dotted decoration-primary/40 cursor-help font-semibold hover:text-primary transition-colors text-zinc-900 dark:text-zinc-100">non-UK nationals</span>
@@ -300,35 +401,59 @@ export default function Hero() {
         </div>
       </section>
 
-      {/* 2.3 Proof Strip */}
-      <section id="proof-strip" className="relative w-full py-8 border-t border-b border-zinc-200 dark:border-white/5 bg-zinc-100 dark:bg-zinc-950 text-zinc-800 dark:text-white z-20 flex items-center justify-center transition-colors duration-300">
-        <div className="max-w-7xl w-full mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs sm:text-sm font-sans tracking-wide">
-          <a 
-            href="https://find-and-update.company-information.service.gov.uk/company/15948457" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors flex items-center gap-2 group text-center md:text-left"
+      {/* 2.3 Proof & Verification Section */}
+      <section id="proof-strip" className="relative w-full py-20 border-t border-b border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 text-zinc-800 dark:text-white z-20 transition-colors duration-300">
+        <div className="max-w-7xl w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Column: Details */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="space-y-6 text-left"
           >
-            <span>Quick Holidays Ltd is a UK-registered company — Companies House No.{" "}
-              <Tooltip
-                content={
-                  <div className="flex flex-col gap-2 font-sans w-64 text-left">
-                    <p className="text-[11px] text-[#C99537] font-bold uppercase tracking-wider">UK Registered Entity</p>
-                    <p className="text-xs font-light text-zinc-300 leading-normal">
-                      Quick Holidays Ltd is officially incorporated under Company Number 15948457 at Companies House, Cardiff, Wales & England.
-                    </p>
-                  </div>
-                }
+            <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest block">UK Registered Company</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-medium text-zinc-900 dark:text-white tracking-tight">
+              Registered & verified at Companies House.
+            </h2>
+            <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
+              We operate with complete corporate transparency. Quick Holidays Ltd is officially registered in England and Wales under Company Number <strong>15948457</strong>. You can verify our active business registration details, filing history, and company records directly on the UK government registry.
+            </p>
+            <div className="pt-2">
+              <ThemeButton 
+                href="https://find-and-update.company-information.service.gov.uk/company/15948457" 
+                target="_blank" 
+                rel="noopener noreferrer"
               >
-                <strong className="underline decoration-dotted decoration-primary/40 cursor-help text-zinc-900 dark:text-white group-hover:text-primary transition-colors">15948457</strong>
-              </Tooltip>
-              . Verify us before you pay us. We recommend it.</span>
-            <span className="text-primary transform group-hover:translate-x-1 transition-transform">→</span>
-          </a>
-          <div className="text-zinc-500 italic text-[11px] flex items-center gap-2 shrink-0">
-            <span className="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-700 animate-pulse" />
-            <span>Trustpilot widget (integrating soon)</span>
-          </div>
+                Verify on Companies House
+              </ThemeButton>
+            </div>
+            
+            {/* Additional Trust Indicators */}
+            <div className="border-t border-zinc-200 dark:border-white/10 pt-6 mt-8 flex flex-col sm:flex-row gap-6 text-xs text-zinc-555 dark:text-zinc-500">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-700 animate-pulse" />
+                <span>Verify us before you pay us. We recommend it.</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column: Image */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative flex justify-center"
+          >
+            <div className="relative group max-w-md w-full rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl p-3 transition-transform duration-500 hover:scale-[1.02]">
+              <img
+                src="/assets/images/companyverification.png"
+                alt="Companies House Verification Record"
+                className="w-full h-auto rounded-xl object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -359,12 +484,12 @@ export default function Hero() {
             Most visa consultancies disappear when something goes wrong. We do the opposite. If we make a mistake, we{" "}
             <Tooltip
               content={
-                <div className="flex flex-col gap-1.5 font-sans">
-                  <p className="text-[11px] text-[#C99537] font-bold uppercase tracking-wider">Refund Scope</p>
-                  <p className="text-xs font-light text-zinc-300 leading-normal text-left">
+                <span className="flex flex-col gap-1.5 font-sans">
+                  <span className="text-[11px] text-[#C99537] font-bold uppercase tracking-wider block">Refund Scope</span>
+                  <span className="text-xs font-light text-zinc-300 leading-normal text-left block">
                     Covers 100% of our consulting service fee. Note that third-party VFS appointment fees, embassy visa fees, and travel insurance costs are non-refundable.
-                  </p>
-                </div>
+                  </span>
+                </span>
               }
             >
               <span className="underline decoration-dotted decoration-primary/40 cursor-help font-semibold hover:text-primary transition-colors text-zinc-900 dark:text-zinc-100">refund our service fee</span>
@@ -385,6 +510,7 @@ export default function Hero() {
         </div>
 
         {/* 3D Marquee moved to About Us section */}
+        {/* 
         <div className="relative w-full h-[55vh] flex items-center justify-center overflow-hidden border-t border-zinc-200 dark:border-white/5 bg-zinc-100/40 dark:bg-zinc-950/40 transition-colors duration-300">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <ThreeDMarquee
@@ -402,6 +528,7 @@ export default function Hero() {
             />
           </div>
         </div>
+        */}
       </section>
  
       {/* 2.5 QuickVisa Assurance Process Section */}

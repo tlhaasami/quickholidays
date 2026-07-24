@@ -9,9 +9,13 @@ interface ThemeButtonProps {
   onClick?: () => void;
   className?: string;
   children: React.ReactNode;
+  type?: "button" | "submit" | "reset";
+  hideArrow?: boolean;
+  target?: string;
+  rel?: string;
 }
 
-export function ThemeButton({ href, onClick, className, children }: ThemeButtonProps) {
+export function ThemeButton({ href, onClick, className, children, type = "button", hideArrow = false, target, rel }: ThemeButtonProps) {
   const content = (
     <div className="relative group inline-block w-full sm:w-auto select-none">
       {/* Bottom Shadow Background (exposes to bottom-left when button moves up-right, transitions to gold) */}
@@ -25,23 +29,25 @@ export function ThemeButton({ href, onClick, className, children }: ThemeButtonP
         )}
       >
         <span>{children}</span>
-        <span className="text-zinc-950 group-hover:text-[#C99537] transition-colors duration-200 text-base shrink-0">
-          →
-        </span>
+        {!hideArrow && (
+          <span className="text-zinc-950 group-hover:text-[#C99537] transition-colors duration-200 text-base shrink-0">
+            →
+          </span>
+        )}
       </div>
     </div>
   );
 
   if (href) {
     return (
-      <Link href={href} className="inline-block w-full sm:w-auto">
+      <Link href={href} target={target} rel={rel} className="inline-block w-full sm:w-auto">
         {content}
       </Link>
     );
   }
 
   return (
-    <button type="button" onClick={onClick} className="inline-block w-full sm:w-auto border-none p-0 bg-transparent">
+    <button type={type} onClick={onClick} className="inline-block w-full sm:w-auto border-none p-0 bg-transparent">
       {content}
     </button>
   );

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { COUNTRIES } from "@/constants";
 import { trackLead, trackFormAbandon } from "@/lib/analytics";
 import Link from "next/link";
+import { ThemeButton } from "@/components/ThemeButton";
 
 const COMMON_NATIONALITIES = [
   "Indian", "Pakistani", "Nigerian", "Chinese", "Filipino", 
@@ -92,9 +93,9 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
   );
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden shadow-2xl relative">
+    <div className="w-full max-w-xl mx-auto bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl relative transition-colors duration-300">
       {/* Step Progress Bar */}
-      <div className="w-full h-1.5 bg-zinc-900">
+      <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-900">
         <motion.div
           className="h-full bg-primary"
           initial={{ width: "20%" }}
@@ -116,7 +117,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
             >
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 01 / 04</span>
-                <h3 className="text-white font-serif text-2xl mt-1 font-semibold">Introduce yourself</h3>
+                <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Introduce yourself</h3>
               </div>
               <div className="space-y-4">
                 <div>
@@ -127,7 +128,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. John Doe"
-                    className="w-full bg-zinc-900/50 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -139,7 +140,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="e.g. +44 7700 900077"
-                      className="w-full bg-zinc-900/50 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                      className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
                   <div>
@@ -150,7 +151,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="e.g. john@example.com"
-                      className="w-full bg-zinc-900/50 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                      className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
                 </div>
@@ -169,7 +170,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
             >
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 02 / 04</span>
-                <h3 className="text-white font-serif text-2xl mt-1 font-semibold">Nationality & Destination</h3>
+                <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Nationality & Destination</h3>
               </div>
               <div className="space-y-4">
                 {/* Searchable Nationality */}
@@ -185,10 +186,10 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       setFormData({ ...formData, nationality: e.target.value });
                     }}
                     placeholder="Search nationality (e.g. Indian)"
-                    className="w-full bg-zinc-900/50 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
                   />
                   {showNationalityDropdown && filteredNationalities.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-1 bg-zinc-900 border border-white/10 rounded-lg z-50 shadow-2xl max-h-40 overflow-y-auto no-scrollbar">
+                    <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg z-50 shadow-2xl max-h-40 overflow-y-auto no-scrollbar">
                       {filteredNationalities.map((nat) => (
                         <button
                           key={nat}
@@ -198,7 +199,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                             setNationalitySearch(nat);
                             setShowNationalityDropdown(false);
                           }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white transition-colors"
                         >
                           {nat}
                         </button>
@@ -213,10 +214,10 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   <select
                     value={formData.destination}
                     onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                    className="w-full bg-zinc-900/50 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
                   >
                     {COUNTRIES.map((c) => (
-                      <option key={c.slug} value={c.slug} className="bg-zinc-950">
+                      <option key={c.slug} value={c.slug} className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white">
                         {c.name}
                       </option>
                     ))}
@@ -237,7 +238,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
             >
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 03 / 04</span>
-                <h3 className="text-white font-serif text-2xl mt-1 font-semibold">Your Travel History</h3>
+                <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Your Travel History</h3>
               </div>
               <div>
                 <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-3">
@@ -254,7 +255,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                         className={`py-4 rounded-xl border text-sm font-sans font-medium transition-all ${
                           isSelected
                             ? "bg-primary border-primary text-white font-semibold"
-                            : "bg-zinc-900/30 border-white/10 text-zinc-400 hover:border-white/20 hover:text-white"
+                            : "bg-zinc-100 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 text-zinc-650 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:text-zinc-900 dark:hover:text-white"
                         }`}
                       >
                         {num === "None" ? "No Prior Visas" : `${num} Visa${num !== "1" ? "s" : ""}`}
@@ -277,7 +278,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
             >
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 04 / 04</span>
-                <h3 className="text-white font-serif text-2xl mt-1 font-semibold">Preferred Response Channel</h3>
+                <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Preferred Response Channel</h3>
               </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-3">
@@ -298,7 +299,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                             ? isWhatsApp
                               ? "bg-emerald-600 border-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)] animate-pulse"
                               : "bg-primary border-primary text-white"
-                            : "bg-zinc-900/30 border-white/10 text-zinc-400 hover:border-white/20"
+                            : "bg-zinc-100 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 text-zinc-650 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:text-zinc-900 dark:hover:text-white"
                         }`}
                       >
                         <span className="text-lg">{ch.icon}</span>
@@ -314,7 +315,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                     value={formData.comment}
                     onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                     placeholder="e.g. Travel dates, visa refusal history..."
-                    className="w-full bg-zinc-900/50 border border-white/10 rounded-lg px-4 py-3 text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors resize-none"
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors resize-none"
                   />
                 </div>
               </div>
@@ -332,17 +333,14 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               <div className="w-16 h-16 bg-primary/25 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/45">
                 <span className="text-3xl text-primary">✓</span>
               </div>
-              <h3 className="text-white font-serif text-3xl font-bold tracking-tight">Thank you!</h3>
-              <p className="font-sans text-zinc-400 text-sm font-light leading-relaxed max-w-sm mx-auto">
+              <h3 className="text-zinc-900 dark:text-white font-serif text-3xl font-bold tracking-tight">Thank you!</h3>
+              <p className="font-sans text-zinc-650 dark:text-zinc-400 text-sm font-light leading-relaxed max-w-sm mx-auto">
                 Your consultation request has been submitted successfully. We will reach back to you via <strong className="text-primary">{formData.channel}</strong> within 1 working day.
               </p>
               <div className="pt-6">
-                <Link
-                  href="/how-it-works"
-                  className="px-6 py-3 bg-zinc-900 border border-white/10 hover:bg-zinc-800 text-white font-sans font-bold text-xs uppercase tracking-widest rounded-lg transition-colors inline-block"
-                >
-                  See what happens next →
-                </Link>
+                <ThemeButton href="/how-it-works">
+                  See what happens next
+                </ThemeButton>
               </div>
             </motion.div>
           )}
@@ -350,43 +348,41 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
 
         {/* Wizard Controls */}
         {step < 5 && (
-          <div className="border-t border-white/5 pt-6 mt-8 flex flex-col space-y-4">
+          <div className="border-t border-zinc-200 dark:border-white/5 pt-6 mt-8 flex flex-col space-y-4">
             <div className="flex justify-between items-center w-full gap-4">
               {step > 1 ? (
-                <button
+                <ThemeButton
                   type="button"
                   onClick={prevStep}
-                  className="px-5 py-3 border border-white/15 hover:bg-white/5 text-zinc-300 font-sans font-bold text-xs uppercase tracking-wider rounded-lg transition-colors"
+                  hideArrow={true}
                 >
                   Back
-                </button>
+                </ThemeButton>
               ) : (
                 <div />
               )}
 
               {step < 4 ? (
-                <button
+                <ThemeButton
                   type="button"
                   onClick={nextStep}
-                  className="px-6 py-3 bg-primary hover:bg-primary/95 text-white font-sans font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center gap-1 shadow-lg ml-auto"
                 >
-                  Continue →
-                </button>
+                  Continue
+                </ThemeButton>
               ) : (
-                <button
+                <ThemeButton
                   type="submit"
-                  className="px-6 py-3 bg-primary hover:bg-primary/95 text-white font-sans font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-lg ml-auto"
                 >
                   Book My Free Consultation
-                </button>
+                </ThemeButton>
               )}
             </div>
             
             <p className="text-[10px] text-zinc-500 leading-normal text-left">
               {step === 4 ? (
-                <span>We'll come back to you within one working day. Your details are handled under our <Link href="/privacy-policy" className="underline hover:text-white transition-colors">Privacy Policy</Link> and never sold or shared for marketing.</span>
+                <span>We'll come back to you within one working day. Your details are handled under our <Link href="/privacy-policy" className="underline hover:text-zinc-900 dark:hover:text-white transition-colors">Privacy Policy</Link> and never sold or shared for marketing.</span>
               ) : (
-                <span>By continuing, you agree to our <Link href="/service-terms" className="underline hover:text-white transition-colors">Service Terms</Link> and data handling.</span>
+                <span>By continuing, you agree to our <Link href="/service-terms" className="underline hover:text-zinc-900 dark:hover:text-white transition-colors">Service Terms</Link> and data handling.</span>
               )}
             </p>
           </div>

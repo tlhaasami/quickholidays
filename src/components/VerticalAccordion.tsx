@@ -95,9 +95,9 @@ const Panel = ({ open, setOpen, id, Icon, title, imgSrc, description }: PanelPro
               initial="closed"
               animate="open"
               exit="closed"
-              className="absolute bottom-0 left-0 right-0 px-8 py-6 bg-black/55 backdrop-blur-md text-white border-t border-white/10 text-left z-10"
+              className="absolute bottom-0 left-0 right-0 px-8 py-6 bg-white/60 dark:bg-black/55 backdrop-blur-md text-zinc-950 dark:text-white border-t border-zinc-200/50 dark:border-white/10 text-left z-10"
             >
-              <p className="font-sans text-sm sm:text-base font-light leading-relaxed text-zinc-200">
+              <p className="font-sans text-sm sm:text-base font-light leading-relaxed text-zinc-850 dark:text-zinc-200">
                 {description}
               </p>
             </motion.div>
@@ -112,8 +112,8 @@ export function VerticalAccordion() {
   const [open, setOpen] = useState(items[0].id);
 
   return (
-    <section className="p-4 bg-zinc-100/60 dark:bg-zinc-900/40 rounded-3xl border border-zinc-200 dark:border-white/5 w-full max-w-6xl mx-auto shadow-2xl transition-colors duration-300">
-      <div className="flex flex-col lg:flex-row h-[550px] lg:h-[450px] w-full border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+    <section className="w-full max-w-6xl mx-auto transition-colors duration-300">
+      <div className="flex flex-col lg:flex-row h-[550px] lg:h-[450px] w-full rounded-none overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
         {items.map((item) => (
           <Panel
             key={item.id}

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Pointer } from "@/components/ui/pointer";
+import { DockWrapper } from "@/components/DockWrapper";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -61,6 +62,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <FloatingWhatsApp />
+        <DockWrapper />
       </body>
     </html>
   );

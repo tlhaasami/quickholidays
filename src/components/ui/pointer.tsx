@@ -61,12 +61,14 @@ export function Pointer({
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null
       if (target) {
+        const isInsideDock = target.closest(".magnetic-dock-container")
         const isClickable =
           target.closest("a") ||
           target.closest("button") ||
           target.closest("input") ||
           target.closest("select") ||
           target.closest("[role='button']") ||
+          isInsideDock ||
           window.getComputedStyle(target).cursor === "pointer"
         setIsHoveringInteractive(!!isClickable)
       }

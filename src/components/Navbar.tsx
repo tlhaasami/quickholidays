@@ -59,7 +59,7 @@ export function Navbar() {
     : {
         bgColor: "#FAF9F5e6",      // Ivory color with 90% opacity (Official Light color)
         borderColor: "#0f19361a",  // Subtle dark border (10% opacity)
-        activeColor: "#18213b",    // Midnight Navy for active links
+        activeColor: "#C99537",    // Heritage Gold for active links
         inactiveColor: "#71717a",  // Zinc-500
         hoverColor: "#18213b",     // Midnight Navy for hover states
       };
