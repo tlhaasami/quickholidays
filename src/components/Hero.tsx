@@ -13,7 +13,9 @@ import { VerticalAccordion } from "@/components/VerticalAccordion";
 import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
 import FloatingLines from "@/components/ui/floating-lines";
-import { PixelImage } from "@/components/ui/pixel-image";
+import Stack from "@/components/ui/stack";
+import { trackContact } from "@/lib/analytics";
+import { CoolMode } from "@/components/ui/cool-mode";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -77,7 +79,7 @@ function CustomSelect({
       <label className="block text-zinc-400 font-sans text-xs font-semibold uppercase tracking-wider mb-2">
         {label}
       </label>
-      
+
       {/* Trigger Button */}
       <button
         type="button"
@@ -109,11 +111,10 @@ function CustomSelect({
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-3 text-sm font-sans transition-colors ${
-                  isSelected 
-                    ? "bg-primary text-white font-semibold" 
+                className={`w-full text-left px-4 py-3 text-sm font-sans transition-colors ${isSelected
+                    ? "bg-primary text-white font-semibold"
                     : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 {opt.label}
               </button>
@@ -244,25 +245,7 @@ export default function Hero() {
     return () => window.removeEventListener("storage", loadOverlay);
   }, []);
 
-  // --- Shuffle 5 unique random flags for the right-side layout ---
-  const [activeFlags, setActiveFlags] = useState<string[]>([]);
-
-  useEffect(() => {
-    const get5UniqueFlags = () => {
-      const shuffled = [...FLAG_IMAGES].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, 5);
-    };
-
-    setActiveFlags(get5UniqueFlags());
-
-    const interval = setInterval(() => {
-      setActiveFlags(get5UniqueFlags());
-    }, 8000); // Shuffles every 8 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Multiply the flag images array to create more rows in the columns
+  // Repeated flag images for other sections if needed
   const repeatedFlagImages = Array(MARQUEE_CONFIG.repeats).fill(FLAG_IMAGES).flat();
 
   const [residency, setResidency] = useState("brp-work");
@@ -295,6 +278,12 @@ export default function Hero() {
             muted
             loop
             playsInline
+            onEnded={() => {
+              if (videoRef.current) {
+                videoRef.current.currentTime = 0;
+                videoRef.current.play().catch(() => {});
+              }
+            }}
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
@@ -310,11 +299,11 @@ export default function Hero() {
           />
         )}
 
-        {/* Hero content split container — centered vertically, brand on left, flags on right */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-8 sm:left-16 z-10 w-[calc(100%-4rem)] sm:w-[calc(100%-8rem)] max-w-7xl flex flex-col lg:flex-row justify-between items-center gap-12 pointer-events-none">
-          
+        {/* Hero content split container — centered vertically (shifted slightly up on mobile), brand on left, flags on right, pinned using vw */}
+        <div className="absolute top-[40%] lg:top-1/2 -translate-y-[40%] lg:-translate-y-1/2 left-0 z-10 w-full px-[6vw] lg:px-[8vw] flex flex-col lg:flex-row justify-between items-center gap-8 lg:gap-12 pointer-events-none">
+
           {/* Left Column: Brand Block */}
-          <motion.div 
+          <motion.div
             initial="hidden"
             animate="visible"
             variants={{
@@ -330,7 +319,7 @@ export default function Hero() {
             className={`w-full lg:max-w-xl flex flex-col gap-4 pointer-events-auto`}
           >
             {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
-            <motion.div 
+            <motion.div
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
@@ -357,7 +346,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Row 2: Description */}
-            <motion.div 
+            <motion.div
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
@@ -365,74 +354,107 @@ export default function Hero() {
               className={HERO_CONFIG.paragraphMaxWidth}
             >
               <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
-                 style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
+                style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
                 Quick Holidays is a UK-based Schengen visa consultancy trusted by hundreds of non-UK nationals — BRP holders, spouse, work, and student visa holders — who need expert, honest help securing their European tourist visas. No hidden fees, no guesswork, just resulTS.
               </p>
             </motion.div>
 
-            {/* Row 3: CTA Buttons */}
-            <motion.div 
+            <motion.div
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className="flex flex-col sm:flex-row gap-4 items-start mt-2"
+              className="flex flex-col sm:flex-row flex-wrap gap-4 items-start mt-2"
             >
-              <ThemeButton href="/contact-us" size="sm">
-                Book a Free Consultation
-              </ThemeButton>
-              <ThemeButton href="/how-it-works" size="sm">
-                See how it works
-              </ThemeButton>
+              <CoolMode>
+                <ThemeButton href="/contact-us" size="sm">
+                  Book a Free Consultation
+                </ThemeButton>
+              </CoolMode>
+              <CoolMode>
+                <ThemeButton href="/how-it-works" size="sm">
+                  See how it works
+                </ThemeButton>
+              </CoolMode>
+              <CoolMode>
+                <a 
+                  href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa." 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={() => trackContact("WhatsApp")}
+                  className="inline-block w-full sm:w-auto md:hidden"
+                >
+                  <div className="relative group inline-block w-full sm:w-auto select-none">
+                    {/* Bottom Shadow Background */}
+                    <div className="absolute inset-0 bg-black border border-black z-0 transition-colors duration-200 group-hover:bg-[#C99537]" />
+                    
+                    {/* Top Active Button */}
+                    <div className="relative bg-[#25D366] text-white border border-black font-sans font-bold tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 px-5 py-3 text-[11px] group-hover:translate-x-2 group-hover:-translate-y-2">
+                      <span className="flex items-center gap-2">
+                        <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                          <path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01m-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18l-3.12.82l.83-3.04l-.2-.31a8.26 8.26 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.02 4.54-3.68 8.23-8.22 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81c-.23-.08-.39-.12-.56.12c-.17.25-.64.81-.78.97c-.14.17-.29.19-.54.06c-.25-.12-1.05-.39-1.99-1.23c-.74-.66-1.23-1.47-1.38-1.72c-.14-.25-.02-.38.11-.51c.11-.11.25-.29.37-.43s.17-.25.25-.41c.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31c-.22.25-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74c.59.26 1.05.41 1.41.52c.59.19 1.13.16 1.56.1c.48-.07 1.47-.6 1.67-1.18c.21-.58.21-1.07.14-1.18s-.22-.16-.47-.28" />
+                        </svg>
+                        Chat on WhatsApp
+                      </span>
+                      <span className="text-white group-hover:text-[#C99537] transition-colors duration-200 text-base shrink-0">
+                        →
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </CoolMode>
             </motion.div>
           </motion.div>
 
-          {/* Right Column: Staggered Flag Grid (matches layout diagram) */}
-          {activeFlags.length >= 5 && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.4 }}
-              className="hidden lg:flex items-center gap-8 pr-4 sm:pr-8 pointer-events-auto select-none"
-            >
-              {/* Left Column of Grid (3 flags) */}
-              <div className="flex flex-col gap-8">
-                {/* Flag 1 */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[-3deg] hover:rotate-[2deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
-                  <PixelImage src={activeFlags[0]} className="w-full h-full" />
-                </div>
-                {/* Flag 2 */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[2deg] hover:rotate-[-3deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
-                  <PixelImage src={activeFlags[1]} className="w-full h-full" />
-                </div>
-                {/* Flag 3 */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[-1.5deg] hover:rotate-[3deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
-                  <PixelImage src={activeFlags[2]} className="w-full h-full" />
-                </div>
-              </div>
-
-              {/* Right Column of Grid (2 flags, shifted down) */}
-              <div className="flex flex-col gap-8 pt-16">
-                {/* Flag 4 */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[3deg] hover:rotate-[-2deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
-                  <PixelImage src={activeFlags[3]} className="w-full h-full" />
-                </div>
-                {/* Flag 5 */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[-2.5deg] hover:rotate-[2deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
-                  <PixelImage src={activeFlags[4]} className="w-full h-full" />
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {/* Right Column: Swipable Polaroid Flag Stack */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="block relative w-[280px] xs:w-[320px] sm:w-[420px] h-[180px] xs:h-[200px] sm:h-[265px] pr-0 sm:pr-8 pointer-events-auto select-none mt-14 lg:mt-0"
+          >
+            <div className="w-full h-full">
+              <Stack
+                randomRotation={true}
+                sensitivity={45}
+                sendToBackOnClick={true}
+                autoplay={true}
+                autoplayDelay={3500}
+                pauseOnHover={true}
+                cards={FLAG_IMAGES.map((src, i) => {
+                  const countryName = COUNTRIES[i]?.name || "Schengen Country";
+                  return (
+                    <div key={i} className="w-full h-full p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl flex flex-col justify-between select-none">
+                      <div className="w-full h-[84%] overflow-hidden rounded-xl border border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
+                        <img 
+                          src={src} 
+                          alt={countryName} 
+                          className="w-full h-full object-cover pointer-events-none"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between px-1 pt-1 shrink-0">
+                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                          {countryName}
+                        </span>
+                        <span className="text-[10px] font-sans font-extrabold uppercase text-[#C99537]">
+                          Schengen Visa
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* 2. Stat Counters Section (7.2) - Now 2nd Section */}
       <section id="stat-counters" className="relative w-full min-h-screen lg:h-screen flex items-center justify-center py-20 px-8 sm:px-16 md:px-24 bg-white dark:bg-black text-zinc-900 dark:text-white z-20 overflow-hidden border-t border-zinc-200 dark:border-white/5 transition-colors duration-300">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full max-w-7xl mx-auto">
-          
+
           {/* Left Column: Heading, Subheading, CTAs */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -472,7 +494,7 @@ export default function Hero() {
           </motion.div>
 
           {/* Right Column: Animated Counters */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -532,15 +554,15 @@ export default function Hero() {
               We operate with complete corporate transparency. Quick Holidays Ltd is officially registered in England and Wales under Company Number <strong>15948457</strong>. You can verify our active business registration details, filing history, and company records directly on the UK government registry.
             </p>
             <div className="pt-2">
-              <ThemeButton 
-                href="https://find-and-update.company-information.service.gov.uk/company/15948457" 
-                target="_blank" 
+              <ThemeButton
+                href="https://find-and-update.company-information.service.gov.uk/company/15948457"
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 Verify on Companies House
               </ThemeButton>
             </div>
-            
+
             {/* Additional Trust Indicators */}
             <div className="border-t border-zinc-200 dark:border-white/10 pt-6 mt-8 flex flex-col sm:flex-row gap-6 text-xs text-zinc-555 dark:text-zinc-500">
               <div className="flex items-center gap-2">
@@ -572,7 +594,7 @@ export default function Hero() {
       {/* 2.4 Accountability Promise Section (About Us) - Includes 3D Marquee at the bottom */}
       <section id="about-us" className="relative w-full bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-8 py-24 text-center flex flex-col items-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -586,7 +608,7 @@ export default function Hero() {
               </Highlighter>
             </span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -642,11 +664,11 @@ export default function Hero() {
         </div>
         */}
       </section>
- 
+
       {/* 2.5 QuickVisa Assurance Process Section */}
       <section id="how-it-works" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -655,7 +677,7 @@ export default function Hero() {
           >
             QuickVisa Assurance Process
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -678,7 +700,7 @@ export default function Hero() {
       {/* 2.6 Country Grid Section */}
       <section id="schengen-visa" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -687,7 +709,7 @@ export default function Hero() {
           >
             Where do you want to go?
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -696,7 +718,7 @@ export default function Hero() {
           >
             Fees, documents and timelines for every Schengen country — see exactly what your application needs before you talk to anyone.
           </motion.p>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {COUNTRIES.map((country, idx) => (
               <motion.div
@@ -706,16 +728,16 @@ export default function Hero() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: Math.min(idx * 0.03, 0.5) }} // Cap delay to avoid excessive staggered delay on 29 items
               >
-                <Link 
+                <Link
                   href={`/schengen-visa/${country.slug}`}
                   className="group relative flex flex-col justify-between overflow-hidden border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/60 rounded-xl p-6 hover:border-primary/50 hover:bg-zinc-100 dark:hover:bg-zinc-950/80 transition-all duration-300 h-full text-left"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <span className="font-serif text-lg sm:text-xl font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{country.name}</span>
-                    <img 
-                      src={country.flag} 
+                    <img
+                      src={country.flag}
                       alt={`${country.name} Flag`}
-                      className="w-12 h-8 object-cover rounded-sm border border-zinc-200/50 dark:border-white/10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" 
+                      className="w-12 h-8 object-cover rounded-sm border border-zinc-200/50 dark:border-white/10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
                     />
                   </div>
                   <span className="text-zinc-500 font-sans text-xs tracking-wider uppercase group-hover:text-zinc-900 dark:group-hover:text-white transition-colors inline-flex items-center gap-1 self-start mt-2">
@@ -731,7 +753,7 @@ export default function Hero() {
       {/* 2.7 Reviews Section */}
       <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -740,7 +762,7 @@ export default function Hero() {
           >
             Real clients. Real decisions.
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -749,7 +771,7 @@ export default function Hero() {
           >
             Read what our clients say about our document verification and biometrics search process.
           </motion.p>
- 
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mb-12">
             {[
               {
@@ -768,7 +790,7 @@ export default function Hero() {
                 text: "Very professional from start to finish. Everything handled online, and they accompanied me right until my VFS appointment day. Excellent service.",
               }
             ].map((rev, idx) => (
-              <motion.div 
+              <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -809,7 +831,7 @@ export default function Hero() {
       {/* 2.8 Consultation Form Section */}
       <section id="contact-us" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-3xl mx-auto text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -818,7 +840,7 @@ export default function Hero() {
           >
             Start with a free consultation.
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -836,7 +858,7 @@ export default function Hero() {
       {/* 2.9 FAQ Section */}
       <section id="faq" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -845,7 +867,7 @@ export default function Hero() {
           >
             Frequently Asked Questions
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -870,7 +892,7 @@ export default function Hero() {
                 a: "Our promise is simple: if we make a mistake on your document compilation or checking that directly leads to a visa rejection, we refund our service fee in full. Third-party costs like VFS appointment bookings, embassy visa fees, and travel insurance cannot be refunded."
               }
             ].map((faq, idx) => (
-              <motion.div 
+              <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -889,10 +911,10 @@ export default function Hero() {
       {/* Sitewide Footer (1.2) */}
       <footer className="relative w-full bg-zinc-100 dark:bg-zinc-950 border-t border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white z-20 pt-20 pb-12 px-8 sm:px-16 md:px-24 transition-colors duration-300">
         <div className="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          
+
           {/* Brand Column */}
           <div className="flex flex-col gap-6 text-left">
-            <img 
+            <img
               src="/logos/logo-search.png"
               alt="Quick Holidays Logo"
               className="h-10 w-auto object-contain self-start filter brightness-95"
@@ -901,10 +923,10 @@ export default function Hero() {
               Quick Holidays Ltd — Schengen visa specialists for Non-UK nationals living in the UK. Clear costs, honest advice, and full accountability, every step.
             </p>
             <div className="flex gap-4">
-              <a 
-                href="https://wa.me/447828707425" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://wa.me/447828707425"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600/10 hover:bg-emerald-600/25 border border-emerald-500/20 text-emerald-400 font-sans text-xs font-semibold rounded-lg transition-colors"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

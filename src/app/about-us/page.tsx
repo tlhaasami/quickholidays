@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { Highlighter } from "@/components/ui/highlighter";
+import { WobbleCard } from "@/components/ui/wobble-card";
 
 export default function AboutUs() {
   return (
@@ -50,43 +51,34 @@ export default function AboutUs() {
 
         {/* Core Beliefs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-8 rounded-2xl"
+          <WobbleCard 
+            containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10" 
+            className="p-8"
           >
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white mb-3">Transparency First</h3>
             <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
               We charge fixed, clear consultancy fees agreed in writing beforehand. We do not bundle VFS/embassy costs or mark them up. You always know exactly what your application costs and why.
             </p>
-          </motion.div>
+          </WobbleCard>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-8 rounded-2xl"
+          <WobbleCard 
+            containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10" 
+            className="p-8"
           >
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white mb-3">Quality Over Quantity</h3>
             <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
               We deliberately accept fewer clients to ensure that every single application gets checked by a trained specialist. We prepare every document, flight layout, and checklist manually.
             </p>
-          </motion.div>
+          </WobbleCard>
         </div>
 
         {/* Team Story */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-8 sm:p-12 rounded-2xl mb-16 text-left"
+        <WobbleCard 
+          containerClassName="bg-[#101b37] border border-[#C99537]/20" 
+          className="p-8 sm:p-12 text-left"
         >
-          <h3 className="font-serif text-2xl sm:text-3xl text-zinc-900 dark:text-white mb-4">Our Team</h3>
-          <div className="font-sans text-sm sm:text-base text-zinc-600 dark:text-zinc-400 font-light leading-relaxed space-y-4">
+          <h3 className="font-serif text-2xl sm:text-3xl text-[#C99537] mb-4">Our Team</h3>
+          <div className="font-sans text-sm sm:text-base text-zinc-300 font-light leading-relaxed space-y-4">
             <p>
               Behind every application is a dedicated, professional team — trained specifically in Schengen visa requirements, and focused on one thing: getting your application right, the first time.
             </p>
@@ -97,7 +89,7 @@ export default function AboutUs() {
               You're never just a case number. Every application gets a real person checking it, start to finish.
             </p>
           </div>
-        </motion.div>
+        </WobbleCard>
 
         {/* Verification Link */}
         <motion.div 

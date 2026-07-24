@@ -3,6 +3,7 @@ import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
+import { FloatingAssistant } from "@/components/FloatingAssistant";
 import { Pointer } from "@/components/ui/pointer";
 import { DockWrapper } from "@/components/DockWrapper";
 
@@ -64,9 +65,9 @@ export default function RootLayout({
       </head>
       <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen">
         <Pointer />
-        {/* <Navbar /> */}
+        <Navbar />
         <main>{children}</main>
-        {/* <FloatingWhatsApp /> */}
+        <FloatingAssistant />
         <DockWrapper />
       </body>
     </html>

@@ -6,6 +6,7 @@ import { COUNTRIES } from "@/constants";
 import { trackLead, trackFormAbandon } from "@/lib/analytics";
 import Link from "next/link";
 import { ThemeButton } from "@/components/ThemeButton";
+import { CoolMode } from "@/components/ui/cool-mode";
 
 const COMMON_NATIONALITIES = [
   "Indian", "Pakistani", "Nigerian", "Chinese", "Filipino", 
@@ -34,10 +35,25 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
   const [nationalitySearch, setNationalitySearch] = useState("");
   const [showNationalityDropdown, setShowNationalityDropdown] = useState(false);
   const nationalityContainerRef = useRef<HTMLDivElement>(null);
-
+  const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
+  const destinationContainerRef = useRef<HTMLDivElement>(null);
+  
   // Tracks the current step ref for abandonment analytics
   const stepRef = useRef(1);
   const hasSubmitted = useRef(false);
+
+  const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
+
+  const showWarning = (msg: string) => {
+    setNotification({ message: msg, type: "error" });
+  };
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   useEffect(() => {
     stepRef.current = step;
@@ -63,9 +79,42 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Handle outside clicks for destination dropdown
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (destinationContainerRef.current && !destinationContainerRef.current.contains(e.target as Node)) {
+        setShowDestinationDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const nextStep = () => {
-    if (step === 1 && (!formData.name || !formData.phone || !formData.email)) return;
-    if (step === 2 && (!formData.nationality || !formData.destination)) return;
+    if (step === 1) {
+      if (!formData.name.trim()) {
+        showWarning("Please enter your full name.");
+        return;
+      }
+      if (!formData.phone.trim()) {
+        showWarning("Please enter your phone number.");
+        return;
+      }
+      if (!formData.email.trim() || !formData.email.includes("@")) {
+        showWarning("Please enter a valid email address.");
+        return;
+      }
+    }
+    if (step === 2) {
+      if (!formData.nationality.trim()) {
+        showWarning("Please select or enter your nationality.");
+        return;
+      }
+      if (!formData.destination.trim()) {
+        showWarning("Please choose a destination country.");
+        return;
+      }
+    }
     setStep((prev) => prev + 1);
   };
 
@@ -209,19 +258,47 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                 </div>
 
                 {/* Destination Country */}
-                <div className="brutalist-container">
-                  <select
-                    value={formData.destination}
-                    onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                    className="brutalist-input cursor-pointer font-bold"
+                <div ref={destinationContainerRef} className="brutalist-container">
+                  <button
+                    type="button"
+                    onClick={() => setShowDestinationDropdown(!showDestinationDropdown)}
+                    className="w-full text-left brutalist-input cursor-pointer font-bold flex items-center justify-between pointer-events-auto bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white"
                   >
-                    {COUNTRIES.map((c) => (
-                      <option key={c.slug} value={c.slug} className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white font-bold">
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                    <span>
+                      {COUNTRIES.find((c) => c.slug === formData.destination)?.name || "Select Country"}
+                    </span>
+                    <svg
+                      className={`w-4 h-4 text-zinc-500 transition-transform duration-200 shrink-0 ${showDestinationDropdown ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
                   <label className="brutalist-label">Destination Country</label>
+                  {showDestinationDropdown && (
+                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border-3 border-black dark:border-white z-50 shadow-2xl max-h-[252px] overflow-y-auto no-scrollbar pointer-events-auto">
+                      {COUNTRIES.map((c) => (
+                        <button
+                          key={c.slug}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, destination: c.slug });
+                            setShowDestinationDropdown(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-colors ${
+                            formData.destination === c.slug
+                              ? "bg-[#C99537] text-white"
+                              : "text-zinc-900 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5"
+                          }`}
+                        >
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -363,18 +440,22 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               )}
 
               {step < 4 ? (
-                <ThemeButton
-                  type="button"
-                  onClick={nextStep}
-                >
-                  Continue
-                </ThemeButton>
+                <CoolMode>
+                  <ThemeButton
+                    type="button"
+                    onClick={nextStep}
+                  >
+                    Continue
+                  </ThemeButton>
+                </CoolMode>
               ) : (
-                <ThemeButton
-                  type="submit"
-                >
-                  Book My Free Consultation
-                </ThemeButton>
+                <CoolMode>
+                  <ThemeButton
+                    type="submit"
+                  >
+                    Book My Free Consultation
+                  </ThemeButton>
+                </CoolMode>
               )}
             </div>
             
@@ -388,6 +469,37 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
           </div>
         )}
       </form>
+
+      {/* Floating Side Toast Validation Notice */}
+      <AnimatePresence>
+        {notification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9, x: 20 }}
+            animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9, transition: { duration: 0.2 } }}
+            className="fixed bottom-24 right-6 sm:bottom-6 sm:right-6 z-[99999] bg-zinc-950 border border-red-500/30 text-white px-5 py-4 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] flex items-center gap-3.5 max-w-sm pointer-events-auto"
+          >
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="flex-1 text-left">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-red-500">Validation Notice</h4>
+              <p className="text-[13px] text-zinc-300 font-medium leading-normal mt-0.5">{notification.message}</p>
+            </div>
+            <button 
+              type="button"
+              onClick={() => setNotification(null)} 
+              className="text-zinc-500 hover:text-white transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

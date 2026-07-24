@@ -28,9 +28,24 @@ export function Pointer({
   const y = useMotionValue(0)
   const [isActive, setIsActive] = useState<boolean>(false)
   const [isHoveringInteractive, setIsHoveringInteractive] = useState<boolean>(false)
+  const [isMobile, setIsMobile] = useState<boolean>(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(
+        window.innerWidth < 768 || 
+        ('ontouchstart' in window) || 
+        navigator.maxTouchPoints > 0
+      )
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+  useEffect(() => {
+    if (isMobile) return;
     const parentElement =
       typeof window !== "undefined"
         ? (containerRef.current?.parentElement ?? null)
@@ -92,7 +107,9 @@ export function Pointer({
         parentElement.removeEventListener("mouseover", handleMouseOver)
       }
     }
-  }, [x, y])
+  }, [x, y, isMobile])
+
+  if (isMobile) return null;
 
   return (
     <>
