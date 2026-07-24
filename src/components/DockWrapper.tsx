@@ -68,34 +68,147 @@ const DefaultWhatsappIcon = (props: React.SVGProps<SVGSVGElement>) => (
    colourful — inspired by the theme toggle)
 ───────────────────────────────────────── */
 
-/** Home – a golden sun rising over a horizon arc */
+/** Home – a premium handcrafted house with sun, clouds, and tree */
 const CreativeHomeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 32 32" fill="none" {...props}>
+  <svg viewBox="0 0 512 512" fill="none" {...props}>
     <defs>
+      {/* Terracotta Roof Gradient */}
+      <linearGradient id="roofGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#f97316" />
+        <stop offset="100%" stopColor="#c2410c" />
+      </linearGradient>
+      {/* Warm Cream Walls Gradient */}
+      <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#fef3c7" />
+        <stop offset="100%" stopColor="#fde68a" />
+      </linearGradient>
+      {/* Terracotta Wood Door Gradient */}
+      <linearGradient id="doorGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#92400e" />
+        <stop offset="100%" stopColor="#451a03" />
+      </linearGradient>
+      {/* Sky Blue Glass Window Gradient */}
+      <linearGradient id="windowGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#38bdf8" />
+        <stop offset="100%" stopColor="#0284c7" />
+      </linearGradient>
+      {/* Glowing Golden Sun Gradient */}
       <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#FFD700" />
-        <stop offset="100%" stopColor="#FF8C00" />
+        <stop offset="0%" stopColor="#fde047" />
+        <stop offset="70%" stopColor="#eab308" />
+        <stop offset="100%" stopColor="#ca8a04" />
       </radialGradient>
-      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#0EA5E9" />
-        <stop offset="100%" stopColor="#7DD3FC" />
+      {/* Emerald Green Leaves Gradient */}
+      <linearGradient id="foliageGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#34d399" />
+        <stop offset="100%" stopColor="#047857" />
+      </linearGradient>
+      {/* Dark Wood Trunk Gradient */}
+      <linearGradient id="trunkGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="#78350f" />
+        <stop offset="100%" stopColor="#451a03" />
+      </linearGradient>
+      {/* Fluffy White Cloud Gradient */}
+      <linearGradient id="cloudGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#ffffff" />
+        <stop offset="100%" stopColor="#e2e8f0" />
       </linearGradient>
     </defs>
-    {/* Sky arc */}
-    <path d="M4 22 Q16 4 28 22" fill="url(#skyGrad)" opacity="0.55" />
-    {/* Horizon */}
-    <line x1="3" y1="22" x2="29" y2="22" stroke="#C99537" strokeWidth="2" strokeLinecap="round" />
-    {/* Sun */}
-    <circle cx="16" cy="18" r="5" fill="url(#sunGrad)" />
-    {/* Sun rays */}
-    {[0,45,90,135,180,225,270,315].map((deg, i) => {
-      const rad = (deg * Math.PI) / 180;
-      const x1 = 16 + 7 * Math.cos(rad);
-      const y1 = 18 + 7 * Math.sin(rad);
-      const x2 = 16 + 9.5 * Math.cos(rad);
-      const y2 = 18 + 9.5 * Math.sin(rad);
-      return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" />;
-    })}
+
+    {/* Sun (behind roof) */}
+    <g id="sun">
+      <circle cx="170" cy="170" r="60" fill="url(#sunGrad)" />
+      {/* Sun rays */}
+      <g stroke="#eab308" strokeWidth="6" strokeLinecap="round">
+        <line x1="170" y1="80" x2="170" y2="100" />
+        <line x1="170" y1="240" x2="170" y2="260" />
+        <line x1="80" y1="170" x2="100" y2="170" />
+        <line x1="240" y1="170" x2="260" y2="170" />
+        <line x1="106" y1="106" x2="120" y2="120" />
+        <line x1="220" y1="220" x2="234" y2="234" />
+        <line x1="220" y1="120" x2="234" y2="106" />
+        <line x1="106" y1="234" x2="120" y2="220" />
+      </g>
+    </g>
+
+    {/* Clouds */}
+    <g id="clouds">
+      <path d="M 400 130 C 400 110, 420 100, 440 110 C 455 100, 475 110, 475 130 C 485 130, 495 140, 495 155 C 495 170, 485 180, 470 180 L 390 180 C 375 180, 365 170, 365 155 C 365 140, 375 130, 390 130 Z" 
+            fill="url(#cloudGrad)" stroke="#1c1917" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M 60 110 C 60 95, 75 88, 90 95 C 100 88, 115 95, 115 110 C 122 110, 130 118, 130 130 C 130 142, 122 150, 110 150 L 50 150 C 38 150, 30 142, 30 130 C 30 118, 38 110, 50 110 Z" 
+            fill="url(#cloudGrad)" stroke="#1c1917" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
+    </g>
+
+    {/* Smoke (emitted from chimney) */}
+    <g id="smoke" stroke="#94a3b8" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.6">
+      <path d="M 370 120 Q 380 90 365 70" />
+      <path d="M 382 100 Q 395 80 385 60" />
+    </g>
+
+    {/* Chimney */}
+    <g id="chimney">
+      <rect x="350" y="150" width="38" height="85" rx="4" fill="url(#roofGrad)" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+      {/* Chimney rim */}
+      <rect x="342" y="140" width="54" height="15" rx="2" fill="#7c2d12" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+    </g>
+
+    {/* Tree (beside house) */}
+    <g id="tree">
+      {/* Tree trunk */}
+      <rect x="85" y="280" width="22" height="130" rx="6" fill="url(#trunkGrad)" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+      {/* Fluffy green foliage */}
+      <path d="M 96 150 C 60 150 40 180 40 210 C 20 220 20 260 45 275 C 40 300 70 310 96 310 C 122 310 152 300 147 275 C 172 260 172 220 152 210 C 152 180 132 150 96 150 Z" 
+            fill="url(#foliageGrad)" stroke="#1c1917" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Leaf detail details */}
+      <path d="M 75 200 Q 96 220 85 250" stroke="#047857" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M 120 210 Q 96 230 110 260" stroke="#047857" strokeWidth="6" strokeLinecap="round" fill="none" />
+    </g>
+
+    {/* House Base */}
+    <g id="house-base">
+      <rect x="175" y="240" width="215" height="170" rx="12" fill="url(#wallGrad)" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+    </g>
+
+    {/* Roof */}
+    <g id="roof">
+      <path d="M 140 245 L 282.5 110 L 425 245 Z" fill="url(#roofGrad)" stroke="#1c1917" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Roof window */}
+      <circle cx="282.5" cy="180" r="18" fill="url(#windowGrad)" stroke="#1c1917" strokeWidth="10" />
+      <line x1="282.5" y1="162" x2="282.5" y2="198" stroke="#1c1917" strokeWidth="8" />
+      <line x1="264.5" y1="180" x2="300.5" y2="180" stroke="#1c1917" strokeWidth="8" />
+    </g>
+
+    {/* Door */}
+    <g id="door">
+      <rect x="257.5" y="305" width="50" height="105" rx="6" fill="url(#doorGrad)" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+      {/* Brass doorknob */}
+      <circle cx="270" cy="355" r="5" fill="#facc15" stroke="#1c1917" strokeWidth="8" />
+    </g>
+
+    {/* Windows */}
+    <g id="windows">
+      {/* Left rounded window */}
+      <rect x="202" y="260" width="40" height="50" rx="8" fill="url(#windowGrad)" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+      <line x1="222" y1="260" x2="222" y2="310" stroke="#1c1917" strokeWidth="8" />
+      <line x1="202" y1="285" x2="242" y2="285" stroke="#1c1917" strokeWidth="8" />
+
+      {/* Right rounded window */}
+      <rect x="323" y="260" width="40" height="50" rx="8" fill="url(#windowGrad)" stroke="#1c1917" strokeWidth="12" strokeLinejoin="round" />
+      <line x1="343" y1="260" x2="343" y2="310" stroke="#1c1917" strokeWidth="8" />
+      <line x1="323" y1="285" x2="363" y2="285" stroke="#1c1917" strokeWidth="8" />
+    </g>
+
+    {/* Grass & Ground */}
+    <g id="grass">
+      {/* Flat ground line */}
+      <line x1="25" y1="410" x2="487" y2="410" stroke="#1c1917" strokeWidth="12" strokeLinecap="round" />
+      {/* Grass tufts left */}
+      <path d="M 45 410 L 40 395 M 45 410 L 45 390 M 45 410 L 50 395" stroke="#047857" strokeWidth="8" strokeLinecap="round" />
+      <path d="M 140 410 L 135 398 M 140 410 L 140 394 M 140 410 L 145 398" stroke="#047857" strokeWidth="8" strokeLinecap="round" />
+      {/* Grass tufts right */}
+      <path d="M 410 410 L 405 395 M 410 410 L 410 390 M 410 410 L 415 395" stroke="#047857" strokeWidth="8" strokeLinecap="round" />
+      <path d="M 450 410 L 445 398 M 450 410 L 450 394 M 450 410 L 455 398" stroke="#047857" strokeWidth="8" strokeLinecap="round" />
+    </g>
   </svg>
 );
 
@@ -302,6 +415,37 @@ export function DockWrapper() {
   const [variant, setVariant] = useState<"glass" | "solid" | "transparent">("glass");
   const [showLabels, setShowLabels] = useState(true);
   const [iconStyle, setIconStyle] = useState<"default" | "creative">("default");
+  const [dockDesign, setDockDesign] = useState<"classic" | "sketchy">("classic");
+
+  // --- Inactivity Tracking to hide the Dock ---
+  const [isUserActive, setIsUserActive] = useState(true);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const handleActivity = () => {
+      setIsUserActive(true);
+      clearTimeout(timeoutId);
+      // Hides the dock after 4 seconds of idle inactivity
+      timeoutId = setTimeout(() => {
+        setIsUserActive(false);
+      }, 4000);
+    };
+
+    const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "click"];
+    events.forEach((event) => {
+      window.addEventListener(event, handleActivity);
+    });
+
+    handleActivity();
+
+    return () => {
+      events.forEach((event) => {
+        window.removeEventListener(event, handleActivity);
+      });
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   // --- Theme toggle states & callbacks ---
   const [isDark, setIsDark] = useState(true);
@@ -363,6 +507,9 @@ export function DockWrapper() {
 
         const savedIconStyle = localStorage.getItem("dock_iconStyle");
         if (savedIconStyle) setIconStyle(savedIconStyle as "default" | "creative");
+
+        const savedDesign = localStorage.getItem("dock_design");
+        if (savedDesign) setDockDesign(savedDesign as "classic" | "sketchy");
       } catch (e) {
         console.error(e);
       }
@@ -534,8 +681,18 @@ export function DockWrapper() {
     right: "fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden md:block",
   }[position];
 
+  const activeClasses = isUserActive 
+    ? "translate-y-0 opacity-100 scale-100" 
+    : position === "top"
+      ? "-translate-y-24 opacity-0 scale-95"
+      : position === "left"
+        ? "-translate-x-24 opacity-0 scale-95"
+        : position === "right"
+          ? "translate-x-24 opacity-0 scale-95"
+          : "translate-y-24 opacity-0 scale-95";
+
   return (
-    <div className={containerClasses}>
+    <div className={`${containerClasses} transition-all duration-700 ease-out transform ${activeClasses}`}>
       {/* SVG sketchy turbulence filter definitions required for the theme switch inside the dock */}
       <svg
         style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
@@ -585,6 +742,7 @@ export function DockWrapper() {
         showLabels={showLabels}
         position={position} 
         variant={variant} 
+        dockDesign={dockDesign}
       />
     </div>
   );

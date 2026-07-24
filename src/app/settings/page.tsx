@@ -33,6 +33,7 @@ export default function SettingsPage() {
   const [dockVariant, setDockVariant] = useState<"glass" | "solid" | "transparent">("glass");
   const [dockShowLabels, setDockShowLabels] = useState(true);
   const [dockIconStyle, setDockIconStyle] = useState<"default" | "creative">("default");
+  const [dockDesign, setDockDesign] = useState<"classic" | "sketchy">("classic");
 
   // --- Hero Section Settings ---
   const [heroGoldenOverlay, setHeroGoldenOverlay] = useState(false);
@@ -86,6 +87,9 @@ export default function SettingsPage() {
       const savedDockIconStyle = localStorage.getItem("dock_iconStyle");
       if (savedDockIconStyle) setDockIconStyle(savedDockIconStyle as any);
 
+      const savedDockDesign = localStorage.getItem("dock_design");
+      if (savedDockDesign) setDockDesign(savedDockDesign as any);
+
       const savedGoldenOverlay = localStorage.getItem("hero_goldenOverlay");
       if (savedGoldenOverlay) setHeroGoldenOverlay(savedGoldenOverlay === "true");
     } catch (e) {
@@ -112,6 +116,7 @@ export default function SettingsPage() {
       localStorage.setItem("dock_variant", dockVariant);
       localStorage.setItem("dock_showLabels", dockShowLabels.toString());
       localStorage.setItem("dock_iconStyle", dockIconStyle);
+      localStorage.setItem("dock_design", dockDesign);
       localStorage.setItem("hero_goldenOverlay", heroGoldenOverlay.toString());
 
       // Trigger custom storage update event to sync on active components in DOM immediately
@@ -140,6 +145,7 @@ export default function SettingsPage() {
       localStorage.removeItem("dock_variant");
       localStorage.removeItem("dock_showLabels");
       localStorage.removeItem("dock_iconStyle");
+      localStorage.removeItem("dock_design");
       localStorage.removeItem("hero_goldenOverlay");
 
       // Reload state variables
@@ -159,6 +165,7 @@ export default function SettingsPage() {
       setDockVariant("glass");
       setDockShowLabels(true);
       setDockIconStyle("default");
+      setDockDesign("classic");
       setHeroGoldenOverlay(false);
 
       window.dispatchEvent(new Event("storage"));
@@ -575,7 +582,67 @@ export default function SettingsPage() {
                     <span className="text-[10px] text-zinc-400 text-center">Artistic travel-themed</span>
                   </button>
                 </div>
+              {/* Dock Design Style Toggle */}
+              <div className="py-3 border-t border-zinc-200/50 dark:border-white/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium block">Dock Container Design</span>
+                    <span className="text-[10px] font-light text-zinc-500">Pick the container rendering aesthetic</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Classic Option */}
+                  <button
+                    onClick={() => setDockDesign("classic")}
+                    className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${
+                      dockDesign === "classic"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockDesign === "classic" && (
+                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Classic layout preview */}
+                    <div className="w-16 h-8 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 border border-zinc-300 dark:border-white/10 flex items-center justify-center gap-1 shadow-sm">
+                      <div className="w-4 h-4 rounded-full bg-[#C99537] opacity-80" />
+                      <div className="w-4 h-4 rounded-full bg-blue-500 opacity-85" />
+                      <div className="w-4 h-4 rounded-full bg-green-500 opacity-85" />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 mt-1">Classic</span>
+                    <span className="text-[10px] text-zinc-400 text-center">Glowing glass & vibrant feedback</span>
+                  </button>
+
+                  {/* Sketchy Option */}
+                  <button
+                    onClick={() => setDockDesign("sketchy")}
+                    className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${
+                      dockDesign === "sketchy"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockDesign === "sketchy" && (
+                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Sketchy layout preview */}
+                    <div 
+                      className="w-16 h-8 rounded-md bg-white dark:bg-zinc-950 border border-zinc-700 flex items-center justify-center gap-1"
+                      style={{
+                        filter: "url(#sketchy-sm)",
+                        boxShadow: "1.5px 2px 0 1px rgba(0, 0, 0, 0.25)",
+                        transform: "rotate(-1.5deg)"
+                      }}
+                    >
+                      <div className="w-3 h-3 border border-zinc-600 rounded-xs bg-[#C99537]/80" />
+                      <div className="w-3 h-3 border border-zinc-600 rounded-xs bg-blue-500/80" />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 mt-1">Sketchy</span>
+                    <span className="text-[10px] text-zinc-400 text-center">Hand-drawn offset lines & rotation</span>
+                  </button>
+                </div>
               </div>
+            </div>
             </div>
           </div>
         </div>

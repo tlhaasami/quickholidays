@@ -13,6 +13,7 @@ import { VerticalAccordion } from "@/components/VerticalAccordion";
 import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
 import FloatingLines from "@/components/ui/floating-lines";
+import { PixelImage } from "@/components/ui/pixel-image";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -243,6 +244,24 @@ export default function Hero() {
     return () => window.removeEventListener("storage", loadOverlay);
   }, []);
 
+  // --- Shuffle 5 unique random flags for the right-side layout ---
+  const [activeFlags, setActiveFlags] = useState<string[]>([]);
+
+  useEffect(() => {
+    const get5UniqueFlags = () => {
+      const shuffled = [...FLAG_IMAGES].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 5);
+    };
+
+    setActiveFlags(get5UniqueFlags());
+
+    const interval = setInterval(() => {
+      setActiveFlags(get5UniqueFlags());
+    }, 8000); // Shuffles every 8 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Multiply the flag images array to create more rows in the columns
   const repeatedFlagImages = Array(MARQUEE_CONFIG.repeats).fill(FLAG_IMAGES).flat();
 
@@ -291,80 +310,121 @@ export default function Hero() {
           />
         )}
 
-        {/* Hero brand block — matches user image layout with premium staggered entry animation */}
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.15,
-                delayChildren: 0.25
+        {/* Hero content split container — centered vertically, brand on left, flags on right */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-8 sm:left-16 z-10 w-[calc(100%-4rem)] sm:w-[calc(100%-8rem)] max-w-7xl flex flex-col lg:flex-row justify-between items-center gap-12 pointer-events-none">
+          
+          {/* Left Column: Brand Block */}
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.15,
+                  delayChildren: 0.25
+                }
               }
-            }
-          }}
-          className={`absolute bottom-36 left-8 sm:left-16 z-10 w-[calc(100%-4rem)] sm:w-[calc(100%-8rem)] ${HERO_CONFIG.containerMaxWidth} flex flex-col gap-4`}
-        >
-
-          {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
             }}
-            className="flex items-center gap-6"
+            className={`w-full lg:max-w-xl flex flex-col gap-4 pointer-events-auto`}
           >
-            {/* Logo */}
-            <div className={`shrink-0 flex items-center justify-center ${HERO_CONFIG.logoSizeMobile} ${HERO_CONFIG.logoSizeTablet} ${HERO_CONFIG.logoSizeDesktop}`}>
-              <img
-                src="/logos/logo.svg"
-                alt="Quick Holidays"
-                className="w-full h-full object-contain drop-shadow-md"
-              />
-            </div>
-            {/* Stacked Heading */}
-            <div className={`flex flex-col leading-none select-none tracking-tighter ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
-              <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
-                QUICK
-              </span>
-              <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.holidaysColor }}>
-                HOLIDAYS
-              </span>
-            </div>
+            {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+              }}
+              className="flex items-center gap-6"
+            >
+              {/* Logo */}
+              <div className={`shrink-0 flex items-center justify-center ${HERO_CONFIG.logoSizeMobile} ${HERO_CONFIG.logoSizeTablet} ${HERO_CONFIG.logoSizeDesktop}`}>
+                <img
+                  src="/logos/logo.svg"
+                  alt="Quick Holidays"
+                  className="w-full h-full object-contain drop-shadow-md"
+                />
+              </div>
+              {/* Stacked Heading */}
+              <div className={`flex flex-col leading-none select-none tracking-tighter ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
+                <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
+                  QUICK
+                </span>
+                <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.holidaysColor }}>
+                  HOLIDAYS
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Row 2: Description */}
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+              }}
+              className={HERO_CONFIG.paragraphMaxWidth}
+            >
+              <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
+                 style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
+                Quick Holidays is a UK-based Schengen visa consultancy trusted by hundreds of non-UK nationals — BRP holders, spouse, work, and student visa holders — who need expert, honest help securing their European tourist visas. No hidden fees, no guesswork, just resulTS.
+              </p>
+            </motion.div>
+
+            {/* Row 3: CTA Buttons */}
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+              }}
+              className="flex flex-col sm:flex-row gap-4 items-start mt-2"
+            >
+              <ThemeButton href="/contact-us" size="sm">
+                Book a Free Consultation
+              </ThemeButton>
+              <ThemeButton href="/how-it-works" size="sm">
+                See how it works
+              </ThemeButton>
+            </motion.div>
           </motion.div>
 
-          {/* Row 2: Description */}
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-            }}
-            className={HERO_CONFIG.paragraphMaxWidth}
-          >
-            <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
-               style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
-              Quick Holidays is a UK-based Schengen visa consultancy trusted by hundreds of non-UK nationals — BRP holders, spouse, work, and student visa holders — who need expert, honest help securing their European tourist visas. No hidden fees, no guesswork, just resulTS.
-            </p>
-          </motion.div>
+          {/* Right Column: Staggered Flag Grid (matches layout diagram) */}
+          {activeFlags.length >= 5 && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.4 }}
+              className="hidden lg:flex items-center gap-8 pr-4 sm:pr-8 pointer-events-auto select-none"
+            >
+              {/* Left Column of Grid (3 flags) */}
+              <div className="flex flex-col gap-8">
+                {/* Flag 1 */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[-3deg] hover:rotate-[2deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
+                  <PixelImage src={activeFlags[0]} className="w-full h-full" />
+                </div>
+                {/* Flag 2 */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[2deg] hover:rotate-[-3deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
+                  <PixelImage src={activeFlags[1]} className="w-full h-full" />
+                </div>
+                {/* Flag 3 */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[-1.5deg] hover:rotate-[3deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
+                  <PixelImage src={activeFlags[2]} className="w-full h-full" />
+                </div>
+              </div>
 
-          {/* Row 3: CTA Buttons */}
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-            }}
-            className="flex flex-col sm:flex-row gap-4 items-start mt-2"
-          >
-            <ThemeButton href="/contact-us">
-              Book a Free Consultation
-            </ThemeButton>
-            <ThemeButton href="/how-it-works">
-              See how it works
-            </ThemeButton>
-          </motion.div>
-        </motion.div>
+              {/* Right Column of Grid (2 flags, shifted down) */}
+              <div className="flex flex-col gap-8 pt-16">
+                {/* Flag 4 */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[3deg] hover:rotate-[-2deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
+                  <PixelImage src={activeFlags[3]} className="w-full h-full" />
+                </div>
+                {/* Flag 5 */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/40 rotate-[-2.5deg] hover:rotate-[2deg] hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
+                  <PixelImage src={activeFlags[4]} className="w-full h-full" />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
       </section>
 
       {/* 2. Stat Counters Section (7.2) - Now 2nd Section */}

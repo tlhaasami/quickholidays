@@ -13,9 +13,10 @@ interface ThemeButtonProps {
   hideArrow?: boolean;
   target?: string;
   rel?: string;
+  size?: "sm" | "md";
 }
 
-export function ThemeButton({ href, onClick, className, children, type = "button", hideArrow = false, target, rel }: ThemeButtonProps) {
+export function ThemeButton({ href, onClick, className, children, type = "button", hideArrow = false, target, rel, size = "md" }: ThemeButtonProps) {
   const content = (
     <div className="relative group inline-block w-full sm:w-auto select-none">
       {/* Bottom Shadow Background (exposes to bottom-left when button moves up-right, transitions to gold) */}
@@ -24,7 +25,8 @@ export function ThemeButton({ href, onClick, className, children, type = "button
       {/* Top Active Button */}
       <div 
         className={cn(
-          "relative bg-white text-zinc-950 border border-black px-8 py-4 font-sans font-bold text-xs sm:text-sm tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 group-hover:translate-x-2 group-hover:-translate-y-2",
+          "relative bg-white text-zinc-950 border border-black font-sans font-bold tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 group-hover:translate-x-2 group-hover:-translate-y-2",
+          size === "sm" ? "px-5 py-3 text-[11px]" : "px-8 py-4 text-xs sm:text-sm",
           className
         )}
       >

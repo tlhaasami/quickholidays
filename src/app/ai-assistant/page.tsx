@@ -63,8 +63,8 @@ export default function AiAssistant() {
   }, [messages, isTyping]);
 
   return (
-    <div className="bg-white dark:bg-black h-[100dvh] w-full text-zinc-950 dark:text-white pt-24 pb-36 px-4 sm:px-8 transition-colors duration-300 overflow-hidden flex flex-col justify-between">
-      <div className="max-w-4xl mx-auto flex flex-col h-full w-full justify-between min-h-0">
+    <div className="bg-white dark:bg-black min-h-screen w-full text-zinc-950 dark:text-white pt-24 pb-48 px-4 sm:px-8 transition-colors duration-300 flex flex-col justify-between">
+      <div className="max-w-4xl mx-auto flex flex-col h-full w-full justify-between">
         
         {/* Header */}
         <div className="text-center mb-4 w-full shrink-0">
@@ -86,9 +86,9 @@ export default function AiAssistant() {
         </div>
 
         {/* Chat Window */}
-        <div className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 flex flex-col flex-1 min-h-0 mb-4 relative">
+        <div className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 flex flex-col h-[480px] mb-4 relative">
           {/* Scrollable messages container */}
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2 no-scrollbar">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800">
             {messages.map((msg, index) => (
               <motion.div
                 key={index}
