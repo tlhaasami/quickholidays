@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "motion/react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface FAQItem {
   q: string;
@@ -89,16 +90,6 @@ export default function FAQ() {
     }
   ];
 
-  const [activeIndices, setActiveIndices] = useState<{ [key: string]: boolean }>({});
-
-  const toggleFAQ = (catIndex: number, itemIndex: number) => {
-    const key = `${catIndex}-${itemIndex}`;
-    setActiveIndices((prev) => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
   // Compile schema structure for SEO
   const schemaQuestions = faqData.flatMap((cat) => cat.items).map((item) => ({
     "@type": "Question",
@@ -116,7 +107,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0A0D16] min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
         
         {/* Schema Script Injection */}
@@ -152,39 +143,22 @@ export default function FAQ() {
               <h2 className="font-serif text-2xl sm:text-3xl text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-white/10 pb-2 text-left">
                 {cat.category}
               </h2>
-              <div className="space-y-3">
-                {cat.items.map((item, itemIdx) => {
-                  const key = `${catIdx}-${itemIdx}`;
-                  const isOpen = activeIndices[key] || false;
-                  return (
-                    <div 
-                      key={item.q} 
-                      className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 rounded-xl overflow-hidden transition-all duration-300 hover:border-zinc-300 dark:hover:border-white/10"
+                <Accordion type="multiple" className="w-full space-y-3">
+                  {cat.items.map((item, itemIdx) => (
+                    <AccordionItem
+                      key={item.q}
+                      value={`${catIdx}-${itemIdx}`}
+                      className="border-b border-zinc-200 dark:border-white/10"
                     >
-                      <button
-                        onClick={() => toggleFAQ(catIdx, itemIdx)}
-                        className="w-full flex justify-between items-center text-left p-6 font-sans font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 focus:outline-none focus:text-primary transition-colors"
-                      >
-                        <span>{item.q}</span>
-                        <svg
-                          className={`w-4 h-4 shrink-0 text-primary transition-transform duration-300 ${isOpen ? "transform rotate-180" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-
-                      {isOpen && (
-                        <div className="px-6 pb-6 text-zinc-650 dark:text-zinc-400 font-sans text-sm font-light leading-relaxed text-left border-t border-zinc-200 dark:border-white/5 pt-4">
-                          {item.a}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                      <AccordionTrigger className="hover:underline font-sans font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 py-4">
+                        {item.q}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-zinc-650 dark:text-zinc-400 font-sans text-sm font-light leading-relaxed pb-4 pt-1">
+                        {item.a}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
             </div>
           ))}
         </div>

@@ -31,11 +31,11 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="bg-white dark:bg-[#0A0D16] min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         {/* Intro */}
         <div className="text-center mb-20">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -48,7 +48,7 @@ export default function HowItWorks() {
               </Highlighter>
             </span>
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -82,7 +82,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Closing CTA */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}

@@ -63,7 +63,7 @@ export default function AiAssistant() {
   }, [messages, isTyping]);
 
   return (
-    <div className="bg-white dark:bg-[#120F0A] min-h-screen w-full text-zinc-950 dark:text-white pt-24 pb-32 px-4 sm:px-8 transition-colors duration-300 flex flex-col justify-start">
+    <div className="bg-white dark:bg-black min-h-screen w-full text-zinc-950 dark:text-white pt-24 pb-32 px-4 sm:px-8 transition-colors duration-300 flex flex-col justify-start">
       <div className="max-w-4xl mx-auto flex flex-col w-full gap-4">
         
         {/* Header */}

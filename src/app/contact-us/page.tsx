@@ -14,7 +14,7 @@ function ContactUsFormWrapper() {
 
 export default function ContactUs() {
   return (
-    <div className="bg-white dark:bg-[#120F0A] min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-6 sm:px-16 flex flex-col items-center justify-center transition-colors duration-300">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-6 sm:px-16 flex flex-col items-center justify-center transition-colors duration-300">
       <div className="max-w-6xl w-full text-left mb-12">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}

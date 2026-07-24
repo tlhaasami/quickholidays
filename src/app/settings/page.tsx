@@ -171,7 +171,7 @@ export default function SettingsPage() {
 />`;
 
   return (
-    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-[#0A0D16] text-zinc-900 dark:text-zinc-100 transition-colors duration-300 pt-32 pb-24 px-4">
+    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 transition-colors duration-300 pt-32 pb-24 px-4">
       <div className="relative z-10 max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">

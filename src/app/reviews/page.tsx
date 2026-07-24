@@ -110,7 +110,7 @@ export default function Reviews() {
   }));
 
   return (
-    <div className="bg-white dark:bg-[#120F0A] min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         
         {/* Schema Script Injection */}

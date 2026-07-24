@@ -18,6 +18,7 @@ import InfiniteMenu from "@/components/ui/infinite-menu";
 import { trackContact } from "@/lib/analytics";
 import { CoolMode } from "@/components/ui/cool-mode";
 import { WobbleCard } from "@/components/ui/wobble-card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -559,7 +560,7 @@ export default function Hero() {
       </section>
 
       {/* 2.4 Accountability Promise Section (About Us) - Includes 3D Marquee at the bottom */}
-      <section id="about-us" className="relative w-full bg-white dark:bg-[#120F0A] z-20 border-t border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
+      <section id="about-us" className="relative w-full bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-8 py-24 text-center flex flex-col items-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -633,7 +634,7 @@ export default function Hero() {
       </section>
 
       {/* 2.5 QuickVisa Assurance Process Section */}
-      <section id="how-it-works" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-[#0A0D16] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="how-it-works" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -665,7 +666,7 @@ export default function Hero() {
       </section>
 
       {/* 2.6 Country Grid Section */}
-      <section id="schengen-visa" className="relative w-full py-24 bg-white dark:bg-[#120F0A] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="schengen-visa" className="relative w-full py-24 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center px-8 sm:px-16 mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -701,7 +702,7 @@ export default function Hero() {
       </section>
 
       {/* 2.7 Reviews Section */}
-      <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-[#0A0D16] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -825,8 +826,8 @@ export default function Hero() {
                   key={idx}
                   onClick={() => setActiveReviewIndex(idx)}
                   className={`transition-all duration-300 h-2 cursor-pointer ${activeReviewIndex === idx
-                      ? "w-6 rounded-full bg-[#C99537]"
-                      : "w-2 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:bg-[#C99537]"
+                    ? "w-6 rounded-full bg-[#C99537]"
+                    : "w-2 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:bg-[#C99537]"
                     }`}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
@@ -848,7 +849,7 @@ export default function Hero() {
       </section>
 
       {/* 2.8 Consultation Form Section */}
-      <section id="contact-us" className="relative w-full py-24 px-6 sm:px-16 bg-white dark:bg-[#120F0A] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300 flex flex-col items-center justify-center">
+      <section id="contact-us" className="relative w-full py-24 px-6 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300 flex flex-col items-center justify-center">
         <div className="max-w-6xl w-full text-left mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -906,7 +907,7 @@ export default function Hero() {
       </section>
 
       {/* 2.9 FAQ Section */}
-      <section id="faq" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-[#0A0D16] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="faq" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -927,7 +928,7 @@ export default function Hero() {
             Answers to the most common questions about Schengen visa applications for UK residents.
           </motion.p>
 
-          <div className="space-y-6">
+          <Accordion type="multiple" className="w-full space-y-3">
             {[
               {
                 q: "Who is eligible to apply for a Schengen visa from the UK?",
@@ -942,24 +943,25 @@ export default function Hero() {
                 a: "Our promise is simple: if we make a mistake on your document compilation or checking that directly leads to a visa rejection, we refund our service fee in full. Third-party costs like VFS appointment bookings, embassy visa fees, and travel insurance cannot be refunded."
               }
             ].map((faq, idx) => (
-              <motion.div
+              <AccordionItem
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 rounded-xl p-6 sm:p-8"
+                value={`home-faq-${idx}`}
+                className="border-b border-zinc-200 dark:border-white/10"
               >
-                <h4 className="font-sans font-bold text-base sm:text-lg text-zinc-900 dark:text-white mb-2">{faq.q}</h4>
-                <p className="font-sans text-zinc-650 dark:text-zinc-400 text-sm font-light leading-relaxed">{faq.a}</p>
-              </motion.div>
+                <AccordionTrigger className="hover:underline font-sans font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 py-4">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-zinc-650 dark:text-zinc-400 font-sans text-sm font-light leading-relaxed pb-4 pt-1">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       </section>
 
       {/* Sitewide Footer (1.2) */}
-      <footer className="relative w-full bg-zinc-100 dark:bg-[#120F0A] border-t border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white z-20 pt-20 pb-12 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+      <footer className="relative w-full bg-zinc-100 dark:bg-black border-t border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white z-20 pt-20 pb-12 px-8 sm:px-16 md:px-24 transition-colors duration-300">
         <div className="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 
           {/* Brand Column */}

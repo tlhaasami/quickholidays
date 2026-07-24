@@ -58,7 +58,7 @@ export default function Pricing() {
   ];
 
   return (
-    <div className="bg-white dark:bg-[#0A0D16] min-h-screen text-zinc-950 dark:text-white pt-20 pb-36 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-20 pb-36 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-10">
           <motion.h1
@@ -92,11 +92,10 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: idx * 0.15 }}
-              className={`flex flex-col justify-between p-8 rounded-2xl border transition-all duration-300 relative ${
-                tier.popular
+              className={`flex flex-col justify-between p-8 rounded-2xl border transition-all duration-300 relative ${tier.popular
                   ? "bg-zinc-50 dark:bg-zinc-900/60 border-primary shadow-2xl scale-102 z-10"
                   : "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-white/10"
-              }`}
+                }`}
             >
               {tier.popular && (
                 <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] tracking-widest font-sans font-bold uppercase py-1 px-3 rounded-full shadow-lg">
