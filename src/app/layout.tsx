@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${playfair.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -59,9 +59,9 @@ export default function RootLayout({
       </head>
       <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen">
         <Pointer />
-        <Navbar />
+        {/* <Navbar /> */}
         <main>{children}</main>
-        <FloatingWhatsApp />
+        {/* <FloatingWhatsApp /> */}
         <DockWrapper />
       </body>
     </html>

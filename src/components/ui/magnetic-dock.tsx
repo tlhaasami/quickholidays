@@ -135,6 +135,7 @@ function DockItem({
                 {/* Icon */}
                 <div className={cn(
                     "flex items-center justify-center text-neutral-700 dark:text-white",
+                    item.id !== "theme-toggle" && "filter drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.22)] dark:drop-shadow-[0_1px_1.5px_rgba(255,255,255,0.25)]",
                     item.id === "theme-toggle" ? "w-full h-full" : "w-[60%] h-[60%]"
                 )}>
                     {item.icon}

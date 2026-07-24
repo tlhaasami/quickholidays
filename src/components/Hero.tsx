@@ -129,8 +129,10 @@ export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [isDark, setIsDark] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Check initially
     const isDarkTheme = document.documentElement.classList.contains("dark");
     setIsDark(isDarkTheme);
@@ -148,6 +150,8 @@ export default function Hero() {
 
     return () => observer.disconnect();
   }, []);
+
+  const activeDark = mounted ? isDark : true;
 
   // --- Load Dynamic Custom FloatingLines Settings ---
   const [flLineCount, setFlLineCount] = useState<number | number[]>([10, 15, 20]);
@@ -232,83 +236,26 @@ export default function Hero() {
 
 
       {/* 1. Hero Section (7.1) - Now 1st Section at the top */}
-      <section id="hero" className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-        {/* FloatingLines React Bits Canvas Background - Commented out as requested */}
-        {/* 
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          <FloatingLines 
-            enabledWaves={['top', 'middle', 'bottom']}
-            lineCount={flLineCount}
-            lineDistance={flLineDistance}
-            bendRadius={flBendRadius}
-            bendStrength={flBendStrength}
-            interactive={true}
-            parallax={true}
-            animationSpeed={flAnimationSpeed}
-            linesGradient={(!flGradientStart && !flGradientMid && !flGradientEnd)
-              ? (isDark 
-                  ? ['#C99537', '#ffffff', '#C99537', '#ffffff'] 
-                  : ['#C99537', '#18213b', '#C99537', '#18213b'])
-              : undefined
-            }
-            gradientStart={flGradientStart}
-            gradientMid={flGradientMid}
-            gradientEnd={flGradientEnd}
-          />
-        </div>
-        */}
-        {/* Background Video with Poster state - commented out temporarily */}
-        {/* 
-        <div className="absolute inset-0 overflow-hidden">
-          {!videoLoaded && (
-            <img
-              src="/videos/hero-section-bg-first-frame.jpg"
-              alt="Hero Background Poster"
-              className="absolute inset-0 w-full h-full object-cover z-0"
-            />
-          )}
+      <section id="hero" className="relative w-full h-screen flex items-start justify-start overflow-hidden bg-white dark:bg-black">
+        {/* Background Video (bg-video.mp4) without any fade - completely clear */}
+        <div className="absolute inset-0 overflow-hidden z-0">
           <video
-            ref={videoRef}
-            src="/videos/hero-section-bg.mp4"
+            src="/videos/bg-video.mp4"
             autoPlay
             muted
             loop
             playsInline
-            onCanPlayThrough={() => {
-              setVideoLoaded(true);
-              if (videoRef.current) {
-                videoRef.current.playbackRate = 0.8;
-              }
-            }}
-            onPlay={() => {
-              if (videoRef.current) {
-                videoRef.current.playbackRate = 0.8;
-              }
-            }}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 z-0 ${
-              videoLoaded ? "opacity-100" : "opacity-0"
-            }`}
-          />
-          <div
-            className="absolute inset-0 bg-black pointer-events-none z-10"
-            style={{ opacity: HERO_CONFIG.fadeOpacity }}
+            className="absolute inset-0 w-full h-full object-cover opacity-100"
           />
         </div>
-        */}
 
-        {/* Three Offset Video Columns (Right Side) - Removed as requested */}
-
-        <div className="absolute bottom-8 left-8 sm:left-16 z-20 max-w-4xl text-left select-none pointer-events-none">
-          {/* Ambient Backdrop Glow Blob */}
-          <div 
-            style={{ backgroundColor: HERO_CONFIG.holidaysColor }}
-            className="absolute -inset-10 rounded-full blur-[80px] opacity-15 pointer-events-none mix-blend-screen animate-slow-glow hidden dark:block" 
-          />
-          <h1 className="text-5xl sm:text-7xl md:text-[6.5rem] lg:text-[7.5rem] font-sans font-bold tracking-tighter leading-none animate-text-shadow flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <Highlighter action="highlight" color={isDark ? "#C9953755" : "#C9953733"} isView={true}>
-              <span style={{ color: isDark ? "#ffffff" : "#71717a" }}>Quick</span>
+        {/* Company Name positioned in top left corner */}
+        <div className="absolute top-12 left-8 sm:left-16 z-20 text-left select-none pointer-events-none">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-sans font-bold tracking-tighter leading-none animate-text-shadow flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Highlighter action="highlight" color={activeDark ? "#C9953755" : "#C9953733"} isView={true}>
+              <span style={{ color: activeDark ? "#ffffff" : "#71717a" }}>Quick</span>
             </Highlighter>
-            <Highlighter action="highlight" color={isDark ? "#18213b88" : "#18213b33"} isView={true}>
+            <Highlighter action="highlight" color={activeDark ? "#18213b88" : "#18213b33"} isView={true}>
               <span style={{ color: HERO_CONFIG.holidaysColor }}>Holidays</span>
             </Highlighter>
           </h1>
@@ -448,7 +395,7 @@ export default function Hero() {
           >
             <div className="relative group max-w-md w-full rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl p-3 transition-transform duration-500 hover:scale-[1.02]">
               <img
-                src="/assets/images/companyverification.png"
+                src={activeDark ? "/assets/images/companyverification-dark.png" : "/assets/images/companyverification.png"}
                 alt="Companies House Verification Record"
                 className="w-full h-auto rounded-xl object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
               />
@@ -833,21 +780,29 @@ export default function Hero() {
             <h4 className="font-sans text-xs font-bold uppercase tracking-widest text-primary">Contact Info</h4>
             <div className="flex flex-col gap-4 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400">
               <div className="flex items-start gap-3">
-                <span className="text-primary mt-1">✉</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
                 <div>
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Email</span>
                   <a href="mailto:info@quickholidays.co.uk" className="hover:text-primary dark:hover:text-white transition-colors">info@quickholidays.co.uk</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-primary mt-1">📞</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
                 <div>
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Phone</span>
                   <a href="tel:+448000584673" className="hover:text-primary dark:hover:text-white transition-colors">+44 800 058 4673</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-primary mt-1">📍</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
                 <div>
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Address</span>
                   <span className="leading-relaxed">Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ</span>
