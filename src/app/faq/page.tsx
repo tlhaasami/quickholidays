@@ -116,7 +116,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className="bg-black min-h-screen text-white pt-32 pb-24 px-8 sm:px-16 md:px-24">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
         
         {/* Schema Script Injection */}
@@ -131,7 +131,7 @@ export default function FAQ() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4"
+            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
           >
             Frequently Asked Questions
           </motion.h1>
@@ -139,7 +139,7 @@ export default function FAQ() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-400 font-light max-w-xl mx-auto"
+            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-xl mx-auto"
           >
             Answers to your queries about UK residence rules, fees, timelines, and document checklists.
           </motion.p>
@@ -149,7 +149,7 @@ export default function FAQ() {
         <div className="space-y-12">
           {faqData.map((cat, catIdx) => (
             <div key={cat.category} className="space-y-4">
-              <h2 className="font-serif text-2xl sm:text-3xl text-zinc-100 border-b border-white/10 pb-2 text-left">
+              <h2 className="font-serif text-2xl sm:text-3xl text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-white/10 pb-2 text-left">
                 {cat.category}
               </h2>
               <div className="space-y-3">
@@ -159,11 +159,11 @@ export default function FAQ() {
                   return (
                     <div 
                       key={item.q} 
-                      className="border border-white/5 bg-zinc-950/40 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/10"
+                      className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 rounded-xl overflow-hidden transition-all duration-300 hover:border-zinc-300 dark:hover:border-white/10"
                     >
                       <button
                         onClick={() => toggleFAQ(catIdx, itemIdx)}
-                        className="w-full flex justify-between items-center text-left p-6 font-sans font-bold text-sm sm:text-base text-zinc-100 focus:outline-none focus:text-primary transition-colors"
+                        className="w-full flex justify-between items-center text-left p-6 font-sans font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 focus:outline-none focus:text-primary transition-colors"
                       >
                         <span>{item.q}</span>
                         <svg
@@ -177,7 +177,7 @@ export default function FAQ() {
                       </button>
 
                       {isOpen && (
-                        <div className="px-6 pb-6 text-zinc-400 font-sans text-sm font-light leading-relaxed text-left border-t border-white/5 pt-4">
+                        <div className="px-6 pb-6 text-zinc-650 dark:text-zinc-400 font-sans text-sm font-light leading-relaxed text-left border-t border-zinc-200 dark:border-white/5 pt-4">
                           {item.a}
                         </div>
                       )}

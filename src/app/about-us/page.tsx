@@ -6,7 +6,7 @@ import { Highlighter } from "@/components/ui/highlighter";
 
 export default function AboutUs() {
   return (
-    <div className="bg-black min-h-screen text-white pt-32 pb-24 px-8 sm:px-16 md:px-24">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-4xl mx-auto text-left">
         
         {/* H1 Header */}
@@ -15,7 +15,7 @@ export default function AboutUs() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4"
+            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
           >
             Why Quick Holidays exists.
           </motion.h1>
@@ -23,7 +23,7 @@ export default function AboutUs() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-400 font-light max-w-xl mx-auto"
+            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-xl mx-auto"
           >
             Our founding mission, our team, and our commitment to premium trust.
           </motion.p>
@@ -35,7 +35,7 @@ export default function AboutUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="bg-zinc-950 border border-white/5 rounded-2xl p-8 sm:p-12 space-y-6 mb-16 shadow-2xl font-serif text-lg sm:text-xl text-zinc-300 leading-relaxed italic"
+          className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 rounded-2xl p-8 sm:p-12 space-y-6 mb-16 shadow-2xl font-serif text-lg sm:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed italic"
         >
           <p>
             Schengen visas are confusing. Consultancies contradict each other. Forums give bad advice. Small mistakes get you rejected. Most consultancies don't fix this. They're expensive. Impersonal. Disorganised.
@@ -55,10 +55,10 @@ export default function AboutUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="border border-white/5 bg-zinc-950/40 p-8 rounded-2xl"
+            className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-8 rounded-2xl"
           >
-            <h3 className="font-serif text-xl sm:text-2xl text-white mb-3">Transparency First</h3>
-            <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">
+            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white mb-3">Transparency First</h3>
+            <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
               We charge fixed, clear consultancy fees agreed in writing beforehand. We do not bundle VFS/embassy costs or mark them up. You always know exactly what your application costs and why.
             </p>
           </motion.div>
@@ -68,10 +68,10 @@ export default function AboutUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="border border-white/5 bg-zinc-950/40 p-8 rounded-2xl"
+            className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-8 rounded-2xl"
           >
-            <h3 className="font-serif text-xl sm:text-2xl text-white mb-3">Quality Over Quantity</h3>
-            <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">
+            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white mb-3">Quality Over Quantity</h3>
+            <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
               We deliberately accept fewer clients to ensure that every single application gets checked by a trained specialist. We prepare every document, flight layout, and checklist manually.
             </p>
           </motion.div>
@@ -83,10 +83,10 @@ export default function AboutUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="border border-white/5 bg-zinc-950/40 p-8 sm:p-12 rounded-2xl mb-16 text-left"
+          className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-8 sm:p-12 rounded-2xl mb-16 text-left"
         >
-          <h3 className="font-serif text-2xl sm:text-3xl text-white mb-4">Our Team</h3>
-          <div className="font-sans text-sm sm:text-base text-zinc-400 font-light leading-relaxed space-y-4">
+          <h3 className="font-serif text-2xl sm:text-3xl text-zinc-900 dark:text-white mb-4">Our Team</h3>
+          <div className="font-sans text-sm sm:text-base text-zinc-600 dark:text-zinc-400 font-light leading-relaxed space-y-4">
             <p>
               Behind every application is a dedicated, professional team — trained specifically in Schengen visa requirements, and focused on one thing: getting your application right, the first time.
             </p>
@@ -105,14 +105,14 @@ export default function AboutUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="border-t border-white/10 pt-8 text-center text-zinc-500 font-sans text-sm font-light"
+          className="border-t border-zinc-200 dark:border-white/10 pt-8 text-center text-zinc-500 font-sans text-sm font-light"
         >
           Quick Holidays Ltd is registered in England and Wales, Company No. 15948457. You can check our official business status by viewing our record at{" "}
           <a
             href="https://find-and-update.company-information.service.gov.uk/company/15948457"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:text-white underline transition-colors font-semibold"
+            className="text-primary hover:text-zinc-900 dark:hover:text-white underline transition-colors font-semibold"
           >
             Companies House →
           </a>

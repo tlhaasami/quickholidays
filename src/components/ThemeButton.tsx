@@ -1,0 +1,48 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+interface ThemeButtonProps {
+  href?: string;
+  onClick?: () => void;
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function ThemeButton({ href, onClick, className, children }: ThemeButtonProps) {
+  const content = (
+    <div className="relative group inline-block w-full sm:w-auto select-none">
+      {/* Bottom Shadow Background (exposes to bottom-left when button moves up-right, transitions to gold) */}
+      <div className="absolute inset-0 bg-black border border-black z-0 transition-colors duration-200 group-hover:bg-[#C99537]" />
+      
+      {/* Top Active Button */}
+      <div 
+        className={cn(
+          "relative bg-white text-zinc-950 border border-black px-8 py-4 font-sans font-bold text-xs sm:text-sm tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 group-hover:translate-x-2 group-hover:-translate-y-2",
+          className
+        )}
+      >
+        <span>{children}</span>
+        <span className="text-zinc-950 group-hover:text-[#C99537] transition-colors duration-200 text-base shrink-0">
+          →
+        </span>
+      </div>
+    </div>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className="inline-block w-full sm:w-auto">
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} className="inline-block w-full sm:w-auto border-none p-0 bg-transparent">
+      {content}
+    </button>
+  );
+}

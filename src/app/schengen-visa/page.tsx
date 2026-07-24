@@ -31,7 +31,7 @@ export default function SchengenVisaHub() {
   ];
 
   return (
-    <div className="bg-black min-h-screen text-white pt-32 pb-24 px-8 sm:px-16 md:px-24">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         
         {/* Intro Hub Header */}
@@ -40,7 +40,7 @@ export default function SchengenVisaHub() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6"
+            className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6 text-zinc-900 dark:text-white"
           >
             Schengen tourist visas,<br />
             <span className="text-primary">
@@ -53,7 +53,7 @@ export default function SchengenVisaHub() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-400 font-light leading-relaxed"
+            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light leading-relaxed"
           >
             The embassy fee is set by EU regulation and is the same for every Schengen country. What can vary is your document checklist and processing time — we confirm both for your exact destination, free, before you pay anything.
           </motion.p>
@@ -61,8 +61,8 @@ export default function SchengenVisaHub() {
 
         {/* 1. QuickVisa Assurance Process Block (2.5) */}
         <div className="mb-24 text-center">
-          <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-3 text-white">The QuickVisa Assurance Process</h2>
-          <p className="font-sans text-sm sm:text-base text-zinc-500 font-light mb-12 max-w-xl mx-auto">
+          <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-3 text-zinc-900 dark:text-white">The QuickVisa Assurance Process</h2>
+          <p className="font-sans text-sm sm:text-base text-zinc-550 dark:text-zinc-555 font-light mb-12 max-w-xl mx-auto">
             Our systematic approach to auditing files, preparing applications, and booking appointments.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -73,20 +73,20 @@ export default function SchengenVisaHub() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className="group relative overflow-hidden border border-white/5 rounded-xl p-8 bg-zinc-950/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/50 h-72 flex flex-col justify-between"
+                className="group relative overflow-hidden border border-zinc-200 dark:border-white/5 rounded-xl p-8 bg-zinc-50 dark:bg-zinc-950/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/50 h-72 flex flex-col justify-between"
               >
                 <div className="text-left">
                   <span className="text-primary font-sans font-extrabold text-2xl tracking-widest block opacity-75">{step.step}</span>
-                  <h3 className="text-white font-serif text-xl sm:text-2xl mt-4 font-semibold">{step.title}</h3>
+                  <h3 className="text-zinc-900 dark:text-white font-serif text-xl sm:text-2xl mt-4 font-semibold">{step.title}</h3>
                 </div>
 
-                <div className="text-left text-zinc-400 font-sans text-xs sm:text-sm font-light mt-auto">
+                <div className="text-left text-zinc-500 dark:text-zinc-400 font-sans text-xs sm:text-sm font-light mt-auto">
                   Hover to view details <span className="text-primary">→</span>
                 </div>
 
-                <div className="absolute inset-0 bg-zinc-950 p-8 rounded-xl flex flex-col justify-center border border-primary/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 text-left">
+                <div className="absolute inset-0 bg-white dark:bg-zinc-950 p-8 rounded-xl flex flex-col justify-center border border-primary/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 text-left">
                   <span className="text-primary font-sans font-bold text-xs tracking-wider uppercase mb-3">Step {step.step}: {step.title}</span>
-                  <p className="text-sm font-light leading-relaxed text-zinc-100 font-sans">{step.description}</p>
+                  <p className="text-sm font-light leading-relaxed text-zinc-800 dark:text-zinc-100 font-sans">{step.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -95,8 +95,8 @@ export default function SchengenVisaHub() {
 
         {/* 2. Interactive Country Grid (2.6) */}
         <div className="text-center">
-          <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-3 text-white">Schengen Destinations</h2>
-          <p className="font-sans text-sm sm:text-base text-zinc-500 font-light mb-12 max-w-xl mx-auto">
+          <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-3 text-zinc-900 dark:text-white">Schengen Destinations</h2>
+          <p className="font-sans text-sm sm:text-base text-zinc-550 dark:text-zinc-500 font-light mb-12 max-w-xl mx-auto">
             Choose your destination below to see specific fees, checklists, and embassy guidelines.
           </p>
           
@@ -111,17 +111,17 @@ export default function SchengenVisaHub() {
               >
                 <Link 
                   href={`/schengen-visa/${country.slug}`}
-                  className="group relative flex flex-col justify-between overflow-hidden border border-white/5 bg-zinc-950/60 rounded-xl p-6 hover:border-primary/50 transition-all duration-300 h-full text-left"
+                  className="group relative flex flex-col justify-between overflow-hidden border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/60 rounded-xl p-6 hover:border-primary/50 hover:bg-zinc-100 dark:hover:bg-zinc-950/80 transition-all duration-300 h-full text-left"
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <span className="font-serif text-lg sm:text-xl font-semibold text-white group-hover:text-primary transition-colors">{country.name}</span>
+                    <span className="font-serif text-lg sm:text-xl font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{country.name}</span>
                     <img 
                       src={country.flag} 
                       alt={`${country.name} Flag`}
-                      className="w-12 h-8 object-cover rounded-sm border border-white/10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" 
+                      className="w-12 h-8 object-cover rounded-sm border border-zinc-200/50 dark:border-white/10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" 
                     />
                   </div>
-                  <span className="text-zinc-500 font-sans text-xs tracking-wider uppercase group-hover:text-white transition-colors inline-flex items-center gap-1 self-start mt-2">
+                  <span className="text-zinc-550 font-sans text-xs tracking-wider uppercase group-hover:text-zinc-900 dark:group-hover:text-white transition-colors inline-flex items-center gap-1 self-start mt-2">
                     Visa Guide <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                   </span>
                 </Link>

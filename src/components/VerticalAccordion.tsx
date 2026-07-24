@@ -40,8 +40,8 @@ const Panel = ({ open, setOpen, id, Icon, title, imgSrc, description }: PanelPro
       <button
         type="button"
         className={cn(
-          "bg-zinc-950 hover:bg-zinc-900 transition-colors border-r border-b border-white/10 flex flex-row-reverse lg:flex-col justify-end items-center gap-4 relative group shrink-0 lg:w-[80px] cursor-pointer",
-          isOpen ? "bg-zinc-900" : ""
+          "bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors border-r border-b border-zinc-200 dark:border-white/10 flex flex-row-reverse lg:flex-col justify-end items-center gap-4 relative group shrink-0 lg:w-[80px] cursor-pointer",
+          isOpen ? "bg-zinc-200 dark:bg-zinc-900" : ""
         )}
         onClick={() => setOpen(id)}
       >
@@ -49,11 +49,11 @@ const Panel = ({ open, setOpen, id, Icon, title, imgSrc, description }: PanelPro
           style={{
             writingMode: "vertical-lr",
           }}
-          className="hidden lg:block text-xs font-sans font-bold uppercase tracking-widest text-zinc-400 group-hover:text-primary transition-colors rotate-180 my-auto py-6"
+          className="hidden lg:block text-xs font-sans font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 group-hover:text-primary transition-colors rotate-180 my-auto py-6"
         >
           {title}
         </span>
-        <span className="block lg:hidden text-xs font-sans font-bold uppercase tracking-widest text-zinc-400 group-hover:text-primary transition-colors py-2">
+        <span className="block lg:hidden text-xs font-sans font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 group-hover:text-primary transition-colors py-2">
           {title}
         </span>
         
@@ -65,8 +65,8 @@ const Panel = ({ open, setOpen, id, Icon, title, imgSrc, description }: PanelPro
         {/* Active Indicator Arrow pointing towards open image panel */}
         <span 
           className={cn(
-            "w-4 h-4 transition-colors border-r border-b lg:border-b-0 lg:border-t border-white/10 rotate-45 absolute bottom-0 lg:bottom-[50%] right-[50%] lg:right-0 translate-y-[50%] translate-x-[50%] z-20",
-            isOpen ? "bg-zinc-900" : "bg-zinc-950 group-hover:bg-zinc-900"
+            "w-4 h-4 transition-colors border-r border-b lg:border-b-0 lg:border-t border-zinc-200 dark:border-white/10 rotate-45 absolute bottom-0 lg:bottom-[50%] right-[50%] lg:right-0 translate-y-[50%] translate-x-[50%] z-20",
+            isOpen ? "bg-zinc-200 dark:bg-zinc-900" : "bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-900"
           )} 
         />
       </button>
@@ -112,8 +112,8 @@ export function VerticalAccordion() {
   const [open, setOpen] = useState(items[0].id);
 
   return (
-    <section className="p-4 bg-zinc-900/40 rounded-3xl border border-white/5 w-full max-w-6xl mx-auto shadow-2xl">
-      <div className="flex flex-col lg:flex-row h-[550px] lg:h-[450px] w-full border border-white/10 rounded-2xl overflow-hidden bg-zinc-950">
+    <section className="p-4 bg-zinc-100/60 dark:bg-zinc-900/40 rounded-3xl border border-zinc-200 dark:border-white/5 w-full max-w-6xl mx-auto shadow-2xl transition-colors duration-300">
+      <div className="flex flex-col lg:flex-row h-[550px] lg:h-[450px] w-full border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
         {items.map((item) => (
           <Panel
             key={item.id}

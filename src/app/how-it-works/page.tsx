@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Highlighter } from "@/components/ui/highlighter";
+import { ThemeButton } from "@/components/ThemeButton";
 
 export default function HowItWorks() {
   const steps = [
@@ -30,7 +31,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="bg-black min-h-screen text-white pt-32 pb-24 px-8 sm:px-16 md:px-24">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         {/* Intro */}
         <div className="text-center mb-20">
@@ -38,7 +39,7 @@ export default function HowItWorks() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6"
+            className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6 text-zinc-900 dark:text-white"
           >
             How it works — <br className="hidden sm:inline" />
             <span className="text-primary">
@@ -51,14 +52,14 @@ export default function HowItWorks() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-lg sm:text-xl text-zinc-400 font-light leading-relaxed max-w-2xl mx-auto"
+            className="font-sans text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 font-light leading-relaxed max-w-2xl mx-auto"
           >
             No black box. Here's the whole journey, including when you pay what.
           </motion.p>
         </div>
 
         {/* Timeline */}
-        <div className="relative border-l-2 border-white/5 pl-8 sm:pl-16 py-8 space-y-16 max-w-3xl mx-auto mb-24">
+        <div className="relative border-l-2 border-zinc-200 dark:border-white/5 pl-8 sm:pl-16 py-8 space-y-16 max-w-3xl mx-auto mb-24">
           {steps.map((step, idx) => (
             <motion.div
               key={step.num}
@@ -69,13 +70,13 @@ export default function HowItWorks() {
               className="relative group text-left"
             >
               {/* Timeline Indicator Dot */}
-              <div className="absolute -left-[41px] sm:-left-[73px] top-1.5 w-6 h-6 rounded-full bg-zinc-950 border-2 border-primary/40 flex items-center justify-center group-hover:border-primary transition-colors">
+              <div className="absolute -left-[41px] sm:-left-[73px] top-1.5 w-6 h-6 rounded-full bg-white dark:bg-zinc-950 border-2 border-primary/40 flex items-center justify-center group-hover:border-primary transition-colors">
                 <div className="w-2 h-2 rounded-full bg-primary" />
               </div>
 
               <span className="font-sans text-primary text-sm font-bold tracking-widest block uppercase mb-1">Step {step.num}</span>
-              <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-white mb-3 group-hover:text-primary transition-colors">{step.title}</h3>
-              <p className="font-sans text-sm sm:text-base text-zinc-400 font-light leading-relaxed">{step.description}</p>
+              <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-white mb-3 group-hover:text-primary transition-colors">{step.title}</h3>
+              <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">{step.description}</p>
             </motion.div>
           ))}
         </div>
@@ -86,21 +87,18 @@ export default function HowItWorks() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="bg-zinc-950 border border-white/10 rounded-2xl p-12 text-center max-w-3xl mx-auto shadow-2xl relative overflow-hidden"
+          className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl p-12 text-center max-w-3xl mx-auto shadow-2xl relative overflow-hidden"
         >
           <div className="absolute -inset-10 rounded-full bg-primary/10 blur-[80px] opacity-20 pointer-events-none" />
-          <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-4 text-white">
+          <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-4 text-zinc-900 dark:text-white">
             Know exactly where you stand — from day one.
           </h2>
-          <p className="font-sans text-zinc-400 text-sm sm:text-base font-light max-w-lg mx-auto mb-8 leading-relaxed">
+          <p className="font-sans text-zinc-600 dark:text-zinc-400 text-sm sm:text-base font-light max-w-lg mx-auto mb-8 leading-relaxed">
             Ready to secure your appointment and start compiling your Schengen checklist? Book a free qualification assessment now.
           </p>
-          <Link
-            href="/contact-us"
-            className="px-8 py-4 bg-primary text-white font-sans font-bold uppercase tracking-wider text-xs rounded-lg shadow-lg hover:bg-primary/90 transition-all duration-300 inline-block"
-          >
+          <ThemeButton href="/contact-us">
             Book a Free Consultation
-          </Link>
+          </ThemeButton>
         </motion.div>
       </div>
     </div>

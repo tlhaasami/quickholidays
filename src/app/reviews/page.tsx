@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { ThemeButton } from "@/components/ThemeButton";
 
 interface ReviewItem {
   name: string;
@@ -105,7 +106,7 @@ export default function Reviews() {
   }));
 
   return (
-    <div className="bg-black min-h-screen text-white pt-32 pb-24 px-8 sm:px-16 md:px-24">
+    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         
         {/* Schema Script Injection */}
@@ -123,7 +124,7 @@ export default function Reviews() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4"
+            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
           >
             Real clients. Real decisions.
           </motion.h1>
@@ -131,17 +132,17 @@ export default function Reviews() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-400 font-light max-w-xl mx-auto"
+            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-xl mx-auto"
           >
             Read what UK resident permit holders say about our service and our Accountability Promise.
           </motion.p>
         </div>
 
         {/* Mock Trustpilot Widget slot (hidden until 10+ reviews) */}
-        <div className="bg-zinc-950/60 border border-white/5 rounded-2xl p-6 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto">
+        <div className="bg-zinc-100 dark:bg-zinc-950/60 border border-zinc-200 dark:border-white/5 rounded-2xl p-6 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto">
           <div className="flex items-center gap-3">
             <span className="text-emerald-500 font-bold text-lg">★</span>
-            <span className="font-sans font-bold text-sm text-white">Trustpilot Widget</span>
+            <span className="font-sans font-bold text-sm text-zinc-900 dark:text-white">Trustpilot Widget</span>
           </div>
           <div className="text-zinc-500 text-xs italic">
             Connecting dynamic Trustpilot API (enabled upon reaching 10+ reviews)
@@ -157,7 +158,7 @@ export default function Reviews() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: Math.min(idx * 0.1, 0.4) }}
-              className="border border-white/5 bg-zinc-950/40 rounded-2xl p-8 flex flex-col justify-between hover:border-white/10 transition-colors"
+              className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 rounded-2xl p-8 flex flex-col justify-between hover:border-zinc-350 dark:hover:border-white/10 transition-colors"
             >
               <div>
                 <div className="flex justify-between items-center mb-4">
@@ -168,14 +169,14 @@ export default function Reviews() {
                   </div>
                   <span className="text-zinc-500 font-sans text-xs">{rev.date}</span>
                 </div>
-                <p className="text-zinc-300 font-sans text-sm sm:text-base font-light leading-relaxed mb-6">
+                <p className="text-zinc-650 dark:text-zinc-300 font-sans text-sm sm:text-base font-light leading-relaxed mb-6">
                   "{rev.text}"
                 </p>
               </div>
 
-              <div className="flex justify-between items-center border-t border-white/5 pt-4 mt-auto">
+              <div className="flex justify-between items-center border-t border-zinc-200 dark:border-white/5 pt-4 mt-auto">
                 <div>
-                  <h4 className="font-sans font-bold text-sm text-white">{rev.name}</h4>
+                  <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white">{rev.name}</h4>
                   <span className="font-sans text-xs text-zinc-500">{rev.city} • </span>
                   <span className="font-sans text-xs text-primary">{rev.country}</span>
                 </div>
@@ -189,12 +190,9 @@ export default function Reviews() {
 
         {/* Closing CTA */}
         <div className="text-center">
-          <Link
-            href="/contact-us"
-            className="px-8 py-4 bg-primary text-white font-sans font-bold uppercase tracking-wider text-xs rounded-lg shadow-lg hover:bg-primary/90 transition-all duration-300 inline-block"
-          >
+          <ThemeButton href="/contact-us">
             Start Your Schengen Application
-          </Link>
+          </ThemeButton>
         </div>
       </div>
     </div>
