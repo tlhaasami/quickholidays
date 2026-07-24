@@ -80,7 +80,7 @@ export default function Reviews() {
     "itemReviewed": {
       "@type": "LocalBusiness",
       "name": "Quick Holidays Ltd",
-      "image": "/assets/logos/quick-holidays-logo-search.png",
+      "image": "/logos/logo-search.png",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Office 25 Innovation Park, Edge Lane",

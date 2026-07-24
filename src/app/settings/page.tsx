@@ -32,6 +32,10 @@ export default function SettingsPage() {
   const [dockPosition, setDockPosition] = useState<"bottom" | "top" | "left" | "right">("bottom");
   const [dockVariant, setDockVariant] = useState<"glass" | "solid" | "transparent">("glass");
   const [dockShowLabels, setDockShowLabels] = useState(true);
+  const [dockIconStyle, setDockIconStyle] = useState<"default" | "creative">("default");
+
+  // --- Hero Section Settings ---
+  const [heroGoldenOverlay, setHeroGoldenOverlay] = useState(false);
 
   // --- Load Saved Settings ---
   useEffect(() => {
@@ -78,6 +82,12 @@ export default function SettingsPage() {
 
       const savedDockLabels = localStorage.getItem("dock_showLabels");
       if (savedDockLabels) setDockShowLabels(savedDockLabels === "true");
+
+      const savedDockIconStyle = localStorage.getItem("dock_iconStyle");
+      if (savedDockIconStyle) setDockIconStyle(savedDockIconStyle as any);
+
+      const savedGoldenOverlay = localStorage.getItem("hero_goldenOverlay");
+      if (savedGoldenOverlay) setHeroGoldenOverlay(savedGoldenOverlay === "true");
     } catch (e) {
       console.error("Failed to load settings from localStorage", e);
     }
@@ -101,6 +111,8 @@ export default function SettingsPage() {
       localStorage.setItem("dock_position", dockPosition);
       localStorage.setItem("dock_variant", dockVariant);
       localStorage.setItem("dock_showLabels", dockShowLabels.toString());
+      localStorage.setItem("dock_iconStyle", dockIconStyle);
+      localStorage.setItem("hero_goldenOverlay", heroGoldenOverlay.toString());
 
       // Trigger custom storage update event to sync on active components in DOM immediately
       window.dispatchEvent(new Event("storage"));
@@ -127,6 +139,8 @@ export default function SettingsPage() {
       localStorage.removeItem("dock_position");
       localStorage.removeItem("dock_variant");
       localStorage.removeItem("dock_showLabels");
+      localStorage.removeItem("dock_iconStyle");
+      localStorage.removeItem("hero_goldenOverlay");
 
       // Reload state variables
       setLineCount(8);
@@ -144,6 +158,8 @@ export default function SettingsPage() {
       setDockPosition("bottom");
       setDockVariant("glass");
       setDockShowLabels(true);
+      setDockIconStyle("default");
+      setHeroGoldenOverlay(false);
 
       window.dispatchEvent(new Event("storage"));
       alert("Settings reset to default values.");
@@ -186,7 +202,7 @@ export default function SettingsPage() {
 />`;
 
   return (
-    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300 pt-32 pb-24 px-4">
+    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300 pt-32 pb-48 px-4">
       {/* Dynamic Background Preview block */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-20">
         <FloatingLines
@@ -467,7 +483,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Show Labels Toggle */}
-              <div className="flex justify-between items-center py-2">
+              <div className="flex justify-between items-center py-2 border-b border-zinc-200/50 dark:border-white/5">
                 <span className="font-medium">Render Hover Tooltip Labels</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -478,6 +494,127 @@ export default function SettingsPage() {
                   />
                   <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C99537]"></div>
                 </label>
+              </div>
+
+              {/* Icon Style Toggle */}
+              <div className="py-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Dock Icon Style</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Live Preview</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Default Option */}
+                  <button
+                    onClick={() => setDockIconStyle("default")}
+                    className={`relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 ${
+                      dockIconStyle === "default"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockIconStyle === "default" && (
+                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Default icon preview row */}
+                    <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
+                      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
+                      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="6" cy="19" r="3" /><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /><circle cx="18" cy="5" r="3" />
+                      </svg>
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Default</span>
+                    <span className="text-[10px] text-zinc-400 text-center">Clean minimal strokes</span>
+                  </button>
+
+                  {/* Creative Option */}
+                  <button
+                    onClick={() => setDockIconStyle("creative")}
+                    className={`relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 ${
+                      dockIconStyle === "creative"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockIconStyle === "creative" && (
+                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Creative icon preview row */}
+                    <div className="flex items-center gap-2">
+                      {/* Mini sun */}
+                      <svg viewBox="0 0 32 32" className="w-6 h-6" fill="none">
+                        <defs><radialGradient id="s1" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#FFD700" /><stop offset="100%" stopColor="#FF8C00" /></radialGradient></defs>
+                        <circle cx="16" cy="16" r="7" fill="url(#s1)" />
+                        {/* Pre-computed ray endpoints for 0,60,120,180,240,300 degrees — avoids SSR/CSR float mismatch */}
+                        <line x1="25" y1="16" x2="28" y2="16" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="20.5" y1="23.8" x2="22" y2="26.4" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="11.5" y1="23.8" x2="10" y2="26.4" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="7" y1="16" x2="4" y2="16" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="11.5" y1="8.2" x2="10" y2="5.6" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="20.5" y1="8.2" x2="22" y2="5.6" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                      {/* Mini star */}
+                      <svg viewBox="0 0 32 32" className="w-6 h-6" fill="none">
+                        <defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFD700" /><stop offset="100%" stopColor="#C99537" /></linearGradient></defs>
+                        <polygon points="16,3 19.5,12 29,12.5 22,19 24.5,29 16,23.5 7.5,29 10,19 3,12.5 12.5,12" fill="url(#sg1)" />
+                      </svg>
+                      {/* Mini globe */}
+                      <svg viewBox="0 0 32 32" className="w-6 h-6" fill="none">
+                        <defs><radialGradient id="gg1" cx="40%" cy="40%" r="55%"><stop offset="0%" stopColor="#38bdf8" /><stop offset="100%" stopColor="#0369a1" /></radialGradient></defs>
+                        <circle cx="16" cy="16" r="12" fill="url(#gg1)" />
+                        <ellipse cx="16" cy="16" rx="12" ry="5" fill="none" stroke="#bae6fd" strokeWidth="0.8" opacity="0.5" />
+                        <path d="M10 12 Q13 9 15 12 Q17 14 20 12 Q22 10 22 14 Q21 18 18 18 Q15 19 13 17 Q10 15 10 12Z" fill="#22c55e" opacity="0.7" />
+                      </svg>
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Creative</span>
+                    <span className="text-[10px] text-zinc-400 text-center">Artistic travel-themed</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Section Settings Card */}
+        <div className="bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm border border-zinc-200/80 dark:border-white/8 rounded-3xl p-8 space-y-6">
+          <div>
+            <h2 className="text-xl font-sans font-bold tracking-tight text-zinc-900 dark:text-white mb-1">3. Hero Section</h2>
+            <p className="text-xs font-light text-zinc-500">Visual overlays and effects on the landing hero video.</p>
+          </div>
+          <div className="space-y-4">
+            {/* Golden overlay toggle */}
+            <div className="flex justify-between items-center py-3 border-b border-zinc-200/50 dark:border-white/5">
+              <div>
+                <span className="font-medium block">Golden Shimmer Overlay</span>
+                <span className="text-xs text-zinc-500 font-light">Adds a warm gold radial glow over the hero video</span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={heroGoldenOverlay}
+                  onChange={(e) => setHeroGoldenOverlay(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C99537]"></div>
+              </label>
+            </div>
+
+            {/* Preview swatch */}
+            <div className="relative h-20 rounded-xl overflow-hidden border border-zinc-200 dark:border-white/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-800 via-sky-600 to-slate-800" />
+              {heroGoldenOverlay && (
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,149,55,0.35) 0%, rgba(201,149,55,0.10) 55%, transparent 100%)" }}
+                />
+              )}
+              <div className="relative z-10 h-full flex items-center justify-center">
+                <span className="text-white/70 text-xs font-sans tracking-widest uppercase">Hero Preview</span>
               </div>
             </div>
           </div>

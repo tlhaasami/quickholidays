@@ -22,6 +22,11 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Quick Holidays Ltd | Schengen Visa Specialists",
   description: "Get your Schengen visa handled properly with clear costs, honest advice, and our full Accountability Promise.",
+  icons: {
+    icon: "/logos/logo.svg",
+    shortcut: "/logos/logo.svg",
+    apple: "/logos/logo.svg",
+  },
 };
 
 export default function RootLayout({

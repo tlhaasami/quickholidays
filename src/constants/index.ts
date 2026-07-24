@@ -1,35 +1,35 @@
 // Country details with flag paths and famous places
 export const COUNTRIES = [
-  { name: "Austria", slug: "austria", flag: "/Flags/austria/flag-austria.webp" },
-  { name: "Belgium", slug: "belgium", flag: "/Flags/belgium/flag-belgium.webp" },
-  { name: "Bulgaria", slug: "bulgaria", flag: "/Flags/bulgaria/flag-bulgaria.webp" },
-  { name: "Croatia", slug: "croatia", flag: "/Flags/croatia/flag-croatia.webp" },
-  { name: "Czech Republic", slug: "czech-republic", flag: "/Flags/czech-republic/flag-czech-republic.webp" },
-  { name: "Denmark", slug: "denmark", flag: "/Flags/denmark/flag-denmark.webp" },
-  { name: "Estonia", slug: "estonia", flag: "/Flags/estonia/flag-estonia.webp" },
-  { name: "Finland", slug: "finland", flag: "/Flags/finland/flag-finland.webp" },
-  { name: "France", slug: "france", flag: "/Flags/france/flag-france.webp" },
-  { name: "Spain", slug: "spain", flag: "/Flags/spain/flag-spain.webp" },
+  { name: "Austria", slug: "austria", flag: "/flags/austria/flag-austria.webp" },
+  { name: "Belgium", slug: "belgium", flag: "/flags/belgium/flag-belgium.webp" },
+  { name: "Bulgaria", slug: "bulgaria", flag: "/flags/bulgaria/flag-bulgaria.webp" },
+  { name: "Croatia", slug: "croatia", flag: "/flags/croatia/flag-croatia.webp" },
+  { name: "Czech Republic", slug: "czech-republic", flag: "/flags/czech-republic/flag-czech-republic.webp" },
+  { name: "Denmark", slug: "denmark", flag: "/flags/denmark/flag-denmark.webp" },
+  { name: "Estonia", slug: "estonia", flag: "/flags/estonia/flag-estonia.webp" },
+  { name: "Finland", slug: "finland", flag: "/flags/finland/flag-finland.webp" },
+  { name: "France", slug: "france", flag: "/flags/france/flag-france.webp" },
+  { name: "Spain", slug: "spain", flag: "/flags/spain/flag-spain.webp" },
 
-  { name: "Greece", slug: "greece", flag: "/Flags/greece/flag-greece.webp" },
-  { name: "Hungary", slug: "hungary", flag: "/Flags/hungary/flag-hungary.webp" },
-  { name: "Iceland", slug: "iceland", flag: "/Flags/iceland/flag-iceland.webp" },
-  { name: "Italy", slug: "italy", flag: "/Flags/italy/flag-italy.webp" },
-  { name: "Latvia", slug: "latvia", flag: "/Flags/latvia/flag-latvia.webp" },
-  { name: "Liechtenstein", slug: "liechtenstein", flag: "/Flags/liechtenstein/flag-liechtenstein.webp" },
-  { name: "Lithuania", slug: "lithuania", flag: "/Flags/lithuania/flag-lithuania.webp" },
-  { name: "Luxembourg", slug: "luxembourg", flag: "/Flags/luxembourg/flag-luxembourg.webp" },
-  { name: "Malta", slug: "malta", flag: "/Flags/malta/flag-malta.webp" },
-  { name: "Netherlands", slug: "netherlands", flag: "/Flags/netherlands/flag-netherlands.webp" },
-  { name: "Norway", slug: "norway", flag: "/Flags/norway/flag-norway.webp" },
-  { name: "Poland", slug: "poland", flag: "/Flags/poland/flag-poland.webp" },
-  { name: "Portugal", slug: "portugal", flag: "/Flags/portugal/flag-portugal.webp" },
-  { name: "Romania", slug: "romania", flag: "/Flags/romania/flag-romania.webp" },
-  { name: "Slovakia", slug: "slovakia", flag: "/Flags/slovakia/flag-slovakia.webp" },
-  { name: "Slovenia", slug: "slovenia", flag: "/Flags/slovenia/flag-slovenia.webp" },
-  { name: "Germany", slug: "germany", flag: "/Flags/germany/flag-germany.webp" },
-  { name: "Sweden", slug: "sweden", flag: "/Flags/sweden/flag-sweden.webp" },
-  { name: "Switzerland", slug: "switzerland", flag: "/Flags/switzerland/flag-switzerland.webp" },
+  { name: "Greece", slug: "greece", flag: "/flags/greece/flag-greece.webp" },
+  { name: "Hungary", slug: "hungary", flag: "/flags/hungary/flag-hungary.webp" },
+  { name: "Iceland", slug: "iceland", flag: "/flags/iceland/flag-iceland.webp" },
+  { name: "Italy", slug: "italy", flag: "/flags/italy/flag-italy.webp" },
+  { name: "Latvia", slug: "latvia", flag: "/flags/latvia/flag-latvia.webp" },
+  { name: "Liechtenstein", slug: "liechtenstein", flag: "/flags/liechtenstein/flag-liechtenstein.webp" },
+  { name: "Lithuania", slug: "lithuania", flag: "/flags/lithuania/flag-lithuania.webp" },
+  { name: "Luxembourg", slug: "luxembourg", flag: "/flags/luxembourg/flag-luxembourg.webp" },
+  { name: "Malta", slug: "malta", flag: "/flags/malta/flag-malta.webp" },
+  { name: "Netherlands", slug: "netherlands", flag: "/flags/netherlands/flag-netherlands.webp" },
+  { name: "Norway", slug: "norway", flag: "/flags/norway/flag-norway.webp" },
+  { name: "Poland", slug: "poland", flag: "/flags/poland/flag-poland.webp" },
+  { name: "Portugal", slug: "portugal", flag: "/flags/portugal/flag-portugal.webp" },
+  { name: "Romania", slug: "romania", flag: "/flags/romania/flag-romania.webp" },
+  { name: "Slovakia", slug: "slovakia", flag: "/flags/slovakia/flag-slovakia.webp" },
+  { name: "Slovenia", slug: "slovenia", flag: "/flags/slovenia/flag-slovenia.webp" },
+  { name: "Germany", slug: "germany", flag: "/flags/germany/flag-germany.webp" },
+  { name: "Sweden", slug: "sweden", flag: "/flags/sweden/flag-sweden.webp" },
+  { name: "Switzerland", slug: "switzerland", flag: "/flags/switzerland/flag-switzerland.webp" },
 ];
 
 // Array of all organized flag image paths for the marquee
@@ -49,11 +49,24 @@ export const MARQUEE_CONFIG = {
   repeats: 1,               // No flags repeated
 };
 
-// Configurations for the Hero video background overlays
+// Configurations for the Hero layout, typography, sizes, and colors
 export const HERO_CONFIG = {
-  fadeOpacity: 0.1,        // Black fade opacity overlay on the video background (e.g. 0.15 = 15% black fade overlay)
-  quickColor: "#18213bff",     // Custom hex color for the word "Quick" (Midnight Navy)
-  holidaysColor: "#C99537",  // Custom hex color for the word "Holidays" (Heritage Gold)
+  // Brand colors
+  quickColor: "#101b37",         // Hex color for "QUICK"
+  holidaysColor: "#C99537",      // Hex color for "HOLIDAYS"
+
+  // Logo dimensions
+  logoSizeMobile: "w-20 h-20",
+  logoSizeTablet: "sm:w-28 sm:h-28",
+  logoSizeDesktop: "md:w-36 md:h-36",
+
+  // Typography & Boldness configuration (e.g., font-sans, font-serif, font-playfair)
+  headingFont: "font-serif",      // Best serif typography for premium travel brand
+  headingBoldness: "font-black",  // Thickness: font-black (900), font-extrabold (800), etc.
+
+  // Paragraph width configuration
+  paragraphMaxWidth: "max-w-lg",  // Bounds: max-w-md, max-w-lg, max-w-xl, max-w-2xl
+  containerMaxWidth: "max-w-3xl",  // Overall container max-width bounds
 };
 
 // Navigation Links for site pages
@@ -73,6 +86,4 @@ export const NAVBAR_CONFIG = {
   borderColor: "#ffffff1a",  // Subtle white border (10% opacity)
   activeColor: "#C99537",    // Heritage Gold (Official Primary color)
   inactiveColor: "#a1a1aa",  // Muted grey for non-active links
-  hoverColor: "#e4e4e7",     // Light grey for link hover states
 };
-

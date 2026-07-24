@@ -8,141 +8,285 @@ import {
 } from "@/components/ui/magnetic-dock";
 import { trackContact } from "@/lib/analytics";
 
-const DockIconPassport = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+/* ─────────────────────────────────────────
+   DEFAULT ICONS  (clean stroke SVGs)
+───────────────────────────────────────── */
+const DefaultPassportIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
     <circle cx="12" cy="10" r="3" />
     <path d="M12 7v6M9 10h6" />
   </svg>
 );
-
-const DockIconRoute = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <circle cx="6" cy="19" r="3" />
-    <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
-    <circle cx="18" cy="5" r="3" />
+const DefaultPricingIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
 );
-
-const DockIconStar = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+const DefaultRouteIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="6" cy="19" r="3" /><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /><circle cx="18" cy="5" r="3" />
   </svg>
 );
-
-const DockIconCalendar = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
-  </svg>
-);
-
-const DockIconFaq = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+const DefaultFaqIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" />
   </svg>
 );
-
-const DockIconAbout = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
+const DefaultStarIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+const DefaultAboutIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
     <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
-
-const DockIconBot = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+const DefaultContactIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+const DefaultBotIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 8V4H8M12 8v4M12 12H8m4 0h4m-4 8v-4m0-4V8h.01" />
-    <rect x="5" y="8" width="14" height="10" rx="2" />
-    <circle cx="9" cy="13" r="1" />
-    <circle cx="15" cy="13" r="1" />
+    <rect x="5" y="8" width="14" height="10" rx="2" /><circle cx="9" cy="13" r="1" /><circle cx="15" cy="13" r="1" />
   </svg>
 );
-
-const DockIconPricing = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <line x1="12" y1="1" x2="12" y2="23" />
-    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-  </svg>
-);
-
-const DockIconWhatsapp = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    {...props}
-  >
+const DefaultWhatsappIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
     <path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01m-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18l-3.12.82l.83-3.04l-.2-.31a8.26 8.26 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.02 4.54-3.68 8.23-8.22 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81c-.23-.08-.39-.12-.56.12c-.17.25-.64.81-.78.97c-.14.17-.29.19-.54.06c-.25-.12-1.05-.39-1.99-1.23c-.74-.66-1.23-1.47-1.38-1.72c-.14-.25-.02-.38.11-.51c.11-.11.25-.29.37-.43s.17-.25.25-.41c.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31c-.22.25-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74c.59.26 1.05.41 1.41.52c.59.19 1.13.16 1.56.1c.48-.07 1.47-.6 1.67-1.18c.21-.58.21-1.07.14-1.18s-.22-.16-.47-.28" />
+  </svg>
+);
+
+/* ─────────────────────────────────────────
+   CREATIVE ICONS  (artistic, travel-themed, 
+   colourful — inspired by the theme toggle)
+───────────────────────────────────────── */
+
+/** Home – a golden sun rising over a horizon arc */
+const CreativeHomeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#FFD700" />
+        <stop offset="100%" stopColor="#FF8C00" />
+      </radialGradient>
+      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#0EA5E9" />
+        <stop offset="100%" stopColor="#7DD3FC" />
+      </linearGradient>
+    </defs>
+    {/* Sky arc */}
+    <path d="M4 22 Q16 4 28 22" fill="url(#skyGrad)" opacity="0.55" />
+    {/* Horizon */}
+    <line x1="3" y1="22" x2="29" y2="22" stroke="#C99537" strokeWidth="2" strokeLinecap="round" />
+    {/* Sun */}
+    <circle cx="16" cy="18" r="5" fill="url(#sunGrad)" />
+    {/* Sun rays */}
+    {[0,45,90,135,180,225,270,315].map((deg, i) => {
+      const rad = (deg * Math.PI) / 180;
+      const x1 = 16 + 7 * Math.cos(rad);
+      const y1 = 18 + 7 * Math.sin(rad);
+      const x2 = 16 + 9.5 * Math.cos(rad);
+      const y2 = 18 + 9.5 * Math.sin(rad);
+      return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" />;
+    })}
+  </svg>
+);
+
+/** Schengen Visa – passport with EU circle of stars */
+const CreativePassportIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <linearGradient id="passGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#1e3a8a" />
+        <stop offset="100%" stopColor="#3b82f6" />
+      </linearGradient>
+    </defs>
+    {/* Passport book */}
+    <rect x="6" y="3" width="20" height="26" rx="2.5" fill="url(#passGrad)" />
+    <rect x="8" y="5" width="16" height="22" rx="1.5" fill="#1e40af" opacity="0.4" />
+    {/* EU stars circle */}
+    {Array.from({length: 12}).map((_, i) => {
+      const a = (i * 30 - 90) * Math.PI / 180;
+      return <circle key={i} cx={16 + 6.5 * Math.cos(a)} cy={14 + 6.5 * Math.sin(a)} r="0.9" fill="#FFD700" />;
+    })}
+    {/* Photo box */}
+    <rect x="11" y="22" width="10" height="4" rx="1" fill="#93c5fd" opacity="0.6" />
+    {/* Spine */}
+    <rect x="6" y="3" width="2.5" height="26" rx="1.2" fill="#1e3a8a" opacity="0.6" />
+  </svg>
+);
+
+/** Pricing – stylised golden coin/tag with upward arrow */
+const CreativePricingIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="coinGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#FFF176" />
+        <stop offset="50%" stopColor="#C99537" />
+        <stop offset="100%" stopColor="#92400e" />
+      </radialGradient>
+    </defs>
+    <circle cx="16" cy="16" r="12" fill="url(#coinGrad)" />
+    <circle cx="16" cy="16" r="9" fill="none" stroke="#FFD700" strokeWidth="0.8" strokeDasharray="2 1.5" />
+    <text x="16" y="20.5" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#1c1917" fontFamily="serif">£</text>
+    {/* Arrow up */}
+    <path d="M24 8 L27 5 L30 8" stroke="#4ade80" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    <line x1="27" y1="5" x2="27" y2="11" stroke="#4ade80" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+/** How It Works – compass with colourful needle */
+const CreativeRouteIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="compassBg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#0f172a" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </radialGradient>
+    </defs>
+    <circle cx="16" cy="16" r="12" fill="url(#compassBg)" />
+    <circle cx="16" cy="16" r="11" fill="none" stroke="#C99537" strokeWidth="1" />
+    {/* Cardinal marks */}
+    {[0,90,180,270].map((d,i) => {
+      const r = d * Math.PI / 180;
+      return <line key={i} x1={16+8.5*Math.cos(r-Math.PI/2)} y1={16+8.5*Math.sin(r-Math.PI/2)} x2={16+10*Math.cos(r-Math.PI/2)} y2={16+10*Math.sin(r-Math.PI/2)} stroke="#C99537" strokeWidth="1.5" strokeLinecap="round" />;
+    })}
+    {/* N / S label */}
+    <text x="16" y="8.5" textAnchor="middle" fontSize="3.5" fill="#C99537" fontWeight="bold">N</text>
+    <text x="16" y="25.5" textAnchor="middle" fontSize="3.5" fill="#6b7280" fontWeight="bold">S</text>
+    {/* Needle – north red, south white */}
+    <polygon points="16,7 17.2,16 16,15 14.8,16" fill="#ef4444" />
+    <polygon points="16,25 17.2,16 16,17 14.8,16" fill="#f1f5f9" />
+    <circle cx="16" cy="16" r="1.5" fill="#C99537" />
+  </svg>
+);
+
+/** FAQ – speech bubble with glowing question mark */
+const CreativeFaqIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <linearGradient id="bubbleGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#a855f7" />
+        <stop offset="100%" stopColor="#7c3aed" />
+      </linearGradient>
+    </defs>
+    <path d="M4 6 Q4 3 7 3 H25 Q28 3 28 6 V19 Q28 22 25 22 H18 L12 29 L13 22 H7 Q4 22 4 19 Z" fill="url(#bubbleGrad)" />
+    {/* Glow dot */}
+    <circle cx="16" cy="6.5" r="4" fill="#e879f9" opacity="0.25" />
+    <text x="16" y="17" textAnchor="middle" fontSize="13" fontWeight="900" fill="white" fontFamily="serif">?</text>
+  </svg>
+);
+
+/** Reviews – five-pointed star with gradient glow */
+const CreativeStarIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#FFF176" stopOpacity="0.7" />
+        <stop offset="100%" stopColor="#C99537" stopOpacity="0" />
+      </radialGradient>
+      <linearGradient id="starFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#FFD700" />
+        <stop offset="100%" stopColor="#C99537" />
+      </linearGradient>
+    </defs>
+    <circle cx="16" cy="16" r="14" fill="url(#starGlow)" />
+    <polygon points="16,3 19.5,12 29,12.5 22,19 24.5,29 16,23.5 7.5,29 10,19 3,12.5 12.5,12" fill="url(#starFill)" />
+    <polygon points="16,7 18.5,13 25,13.5 20,18 21.8,25 16,21.5 10.2,25 12,18 7,13.5 13.5,13" fill="#FFF9C4" opacity="0.35" />
+  </svg>
+);
+
+/** About Us – globe with flight path arc */
+const CreativeAboutIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="globeOcean" cx="40%" cy="40%" r="55%">
+        <stop offset="0%" stopColor="#38bdf8" />
+        <stop offset="100%" stopColor="#0369a1" />
+      </radialGradient>
+    </defs>
+    <circle cx="16" cy="16" r="12" fill="url(#globeOcean)" />
+    {/* Latitude lines */}
+    <ellipse cx="16" cy="16" rx="12" ry="5" fill="none" stroke="#bae6fd" strokeWidth="0.7" opacity="0.5" />
+    <ellipse cx="16" cy="11" rx="8" ry="3" fill="none" stroke="#bae6fd" strokeWidth="0.7" opacity="0.4" />
+    {/* Meridian */}
+    <ellipse cx="16" cy="16" rx="5" ry="12" fill="none" stroke="#bae6fd" strokeWidth="0.7" opacity="0.5" />
+    {/* Continents silhouette */}
+    <path d="M10 12 Q13 9 15 12 Q17 14 20 12 Q22 10 22 14 Q21 18 18 18 Q15 19 13 17 Q10 15 10 12Z" fill="#22c55e" opacity="0.7" />
+    {/* Flight arc */}
+    <path d="M7 22 Q16 8 25 10" stroke="#FFD700" strokeWidth="1.5" strokeDasharray="2 2" fill="none" />
+    <polygon points="25,10 23,8 27,9" fill="#FFD700" />
+  </svg>
+);
+
+/** Contact Us – envelope with golden wax seal */
+const CreativeContactIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <linearGradient id="envGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#1e293b" />
+        <stop offset="100%" stopColor="#0f172a" />
+      </linearGradient>
+    </defs>
+    {/* Envelope body */}
+    <rect x="3" y="8" width="26" height="18" rx="2.5" fill="url(#envGrad)" />
+    <rect x="3" y="8" width="26" height="18" rx="2.5" stroke="#C99537" strokeWidth="1" />
+    {/* Flap */}
+    <path d="M3 8 L16 19 L29 8" stroke="#C99537" strokeWidth="1.2" fill="none" />
+    {/* Wax seal */}
+    <circle cx="23" cy="22" r="4.5" fill="#C99537" />
+    <text x="23" y="24.5" textAnchor="middle" fontSize="5" fontWeight="bold" fill="#1c1917" fontFamily="serif">Q</text>
+  </svg>
+);
+
+/** AI Assistant – geometric brain/neural nodes */
+const CreativeBotIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="brainGlow" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stopColor="#818cf8" />
+        <stop offset="100%" stopColor="#4f46e5" />
+      </radialGradient>
+    </defs>
+    {/* Neural network connections */}
+    <line x1="8" y1="10" x2="16" y2="16" stroke="#a5b4fc" strokeWidth="1" opacity="0.7" />
+    <line x1="24" y1="10" x2="16" y2="16" stroke="#a5b4fc" strokeWidth="1" opacity="0.7" />
+    <line x1="8" y1="22" x2="16" y2="16" stroke="#a5b4fc" strokeWidth="1" opacity="0.7" />
+    <line x1="24" y1="22" x2="16" y2="16" stroke="#a5b4fc" strokeWidth="1" opacity="0.7" />
+    <line x1="8" y1="10" x2="8" y2="22" stroke="#6366f1" strokeWidth="0.8" opacity="0.5" />
+    <line x1="24" y1="10" x2="24" y2="22" stroke="#6366f1" strokeWidth="0.8" opacity="0.5" />
+    <line x1="8" y1="10" x2="24" y2="10" stroke="#6366f1" strokeWidth="0.8" opacity="0.5" />
+    <line x1="8" y1="22" x2="24" y2="22" stroke="#6366f1" strokeWidth="0.8" opacity="0.5" />
+    {/* Nodes */}
+    <circle cx="8" cy="10" r="3" fill="url(#brainGlow)" />
+    <circle cx="24" cy="10" r="3" fill="url(#brainGlow)" />
+    <circle cx="8" cy="22" r="3" fill="url(#brainGlow)" />
+    <circle cx="24" cy="22" r="3" fill="url(#brainGlow)" />
+    {/* Centre hub */}
+    <circle cx="16" cy="16" r="4.5" fill="#4f46e5" />
+    <circle cx="16" cy="16" r="2.5" fill="white" opacity="0.9" />
+    <circle cx="16" cy="16" r="1" fill="#4f46e5" />
+  </svg>
+);
+
+/** WhatsApp – speech bubble with wave signal bands */
+const CreativeWhatsappIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 32 32" fill="none" {...props}>
+    <defs>
+      <radialGradient id="waGrad" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stopColor="#4ade80" />
+        <stop offset="100%" stopColor="#16a34a" />
+      </radialGradient>
+    </defs>
+    <circle cx="16" cy="16" r="13" fill="url(#waGrad)" />
+    <path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01m-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.26 8.26 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.02 4.54-3.68 8.23-8.22 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43s.17-.25.25-.41c.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18s-.22-.16-.47-.28" fill="white" transform="translate(4,4) scale(0.75)" />
   </svg>
 );
 
@@ -157,6 +301,7 @@ export function DockWrapper() {
   const [position, setPosition] = useState<"bottom" | "top" | "left" | "right">("bottom");
   const [variant, setVariant] = useState<"glass" | "solid" | "transparent">("glass");
   const [showLabels, setShowLabels] = useState(true);
+  const [iconStyle, setIconStyle] = useState<"default" | "creative">("default");
 
   // --- Theme toggle states & callbacks ---
   const [isDark, setIsDark] = useState(true);
@@ -215,6 +360,9 @@ export function DockWrapper() {
 
         const savedLabels = localStorage.getItem("dock_showLabels");
         if (savedLabels) setShowLabels(savedLabels === "true");
+
+        const savedIconStyle = localStorage.getItem("dock_iconStyle");
+        if (savedIconStyle) setIconStyle(savedIconStyle as "default" | "creative");
       } catch (e) {
         console.error(e);
       }
@@ -227,67 +375,73 @@ export function DockWrapper() {
     return () => window.removeEventListener("storage", loadSettings);
   }, []);
 
+  // Helper to pick icon based on current style
+  const ic = (creative: React.ReactNode, def: React.ReactNode) =>
+    iconStyle === "creative" ? creative : def;
+
   const items = [
     {
       id: "home",
       label: "Home",
-      icon: <DockIconHome className="w-5 h-5" />,
+      icon: iconStyle === "creative"
+        ? <CreativeHomeIcon className="w-7 h-7" />
+        : <DockIconHome className="w-5 h-5" />,
       isActive: pathname === "/",
       onClick: () => router.push("/"),
     },
     {
       id: "schengen-visa",
       label: "Schengen Visa",
-      icon: <DockIconPassport className="w-5 h-5" />,
+      icon: ic(<CreativePassportIcon className="w-7 h-7" />, <DefaultPassportIcon className="w-5 h-5" />),
       isActive: pathname.startsWith("/schengen-visa"),
       onClick: () => router.push("/schengen-visa"),
     },
     {
       id: "pricing",
       label: "Pricing",
-      icon: <DockIconPricing className="w-5 h-5" />,
+      icon: ic(<CreativePricingIcon className="w-7 h-7" />, <DefaultPricingIcon className="w-5 h-5" />),
       isActive: pathname === "/pricing",
       onClick: () => router.push("/pricing"),
     },
     {
       id: "how-it-works",
       label: "How It Works",
-      icon: <DockIconRoute className="w-5 h-5" />,
+      icon: ic(<CreativeRouteIcon className="w-7 h-7" />, <DefaultRouteIcon className="w-5 h-5" />),
       isActive: pathname === "/how-it-works",
       onClick: () => router.push("/how-it-works"),
     },
     {
       id: "faq",
       label: "FAQ",
-      icon: <DockIconFaq className="w-5 h-5" />,
+      icon: ic(<CreativeFaqIcon className="w-7 h-7" />, <DefaultFaqIcon className="w-5 h-5" />),
       isActive: pathname === "/faq",
       onClick: () => router.push("/faq"),
     },
     {
       id: "reviews",
       label: "Reviews",
-      icon: <DockIconStar className="w-5 h-5" />,
+      icon: ic(<CreativeStarIcon className="w-7 h-7" />, <DefaultStarIcon className="w-5 h-5" />),
       isActive: pathname === "/reviews",
       onClick: () => router.push("/reviews"),
     },
     {
       id: "about-us",
       label: "About Us",
-      icon: <DockIconAbout className="w-5 h-5" />,
+      icon: ic(<CreativeAboutIcon className="w-7 h-7" />, <DefaultAboutIcon className="w-5 h-5" />),
       isActive: pathname === "/about-us",
       onClick: () => router.push("/about-us"),
     },
     {
       id: "contact-us",
       label: "Contact Us",
-      icon: <DockIconCalendar className="w-5 h-5" />,
+      icon: ic(<CreativeContactIcon className="w-7 h-7" />, <DefaultContactIcon className="w-5 h-5" />),
       isActive: pathname === "/contact-us",
       onClick: () => router.push("/contact-us"),
     },
     {
       id: "whatsapp",
       label: "WhatsApp Chat",
-      icon: <DockIconWhatsapp className="w-5 h-5" />,
+      icon: ic(<CreativeWhatsappIcon className="w-7 h-7" />, <DefaultWhatsappIcon className="w-5 h-5" />),
       isActive: false,
       onClick: () => {
         trackContact("WhatsApp");
@@ -297,7 +451,7 @@ export function DockWrapper() {
     {
       id: "ai-assistant",
       label: "Ai Assistant",
-      icon: <DockIconBot className="w-5 h-5" />,
+      icon: ic(<CreativeBotIcon className="w-7 h-7" />, <DefaultBotIcon className="w-5 h-5" />),
       isActive: pathname === "/ai-assistant",
       onClick: () => router.push("/ai-assistant"),
     },

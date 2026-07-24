@@ -119,40 +119,40 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 01 / 04</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Introduce yourself</h3>
               </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Full Name</label>
+              <div className="space-y-8 mt-4">
+                <div className="brutalist-container">
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. John Doe"
-                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                    className="brutalist-input smooth-type"
                   />
+                  <label className="brutalist-label">Full Name</label>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Phone Number</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <div className="brutalist-container">
                     <input
                       type="tel"
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="e.g. +44 7700 900077"
-                      className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                      className="brutalist-input smooth-type"
                     />
+                    <label className="brutalist-label">Phone Number</label>
                   </div>
-                  <div>
-                    <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Email Address</label>
+                  <div className="brutalist-container">
                     <input
                       type="email"
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="e.g. john@example.com"
-                      className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                      className="brutalist-input smooth-type"
                     />
+                    <label className="brutalist-label">Email Address</label>
                   </div>
                 </div>
               </div>
@@ -172,10 +172,9 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 02 / 04</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Nationality & Destination</h3>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-8 mt-6">
                 {/* Searchable Nationality */}
-                <div ref={nationalityContainerRef} className="relative">
-                  <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Nationality</label>
+                <div ref={nationalityContainerRef} className="brutalist-container">
                   <input
                     type="text"
                     required
@@ -186,10 +185,11 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       setFormData({ ...formData, nationality: e.target.value });
                     }}
                     placeholder="Search nationality (e.g. Indian)"
-                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                    className="brutalist-input smooth-type"
                   />
+                  <label className="brutalist-label">Nationality</label>
                   {showNationalityDropdown && filteredNationalities.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg z-50 shadow-2xl max-h-40 overflow-y-auto no-scrollbar">
+                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border-3 border-black dark:border-white z-50 shadow-2xl max-h-40 overflow-y-auto no-scrollbar">
                       {filteredNationalities.map((nat) => (
                         <button
                           key={nat}
@@ -199,7 +199,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                             setNationalitySearch(nat);
                             setShowNationalityDropdown(false);
                           }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-900 dark:text-zinc-300 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors font-bold"
                         >
                           {nat}
                         </button>
@@ -209,19 +209,19 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                 </div>
 
                 {/* Destination Country */}
-                <div>
-                  <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Destination Country</label>
+                <div className="brutalist-container">
                   <select
                     value={formData.destination}
                     onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                    className="w-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-3 text-zinc-900 dark:text-white font-sans text-sm focus:outline-none focus:border-primary transition-colors"
+                    className="brutalist-input cursor-pointer font-bold"
                   >
                     {COUNTRIES.map((c) => (
-                      <option key={c.slug} value={c.slug} className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white">
+                      <option key={c.slug} value={c.slug} className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white font-bold">
                         {c.name}
                       </option>
                     ))}
                   </select>
+                  <label className="brutalist-label">Destination Country</label>
                 </div>
               </div>
             </motion.div>

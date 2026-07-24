@@ -151,6 +151,23 @@ export default function Hero() {
     return () => observer.disconnect();
   }, []);
 
+  // Force-play video after mount (browser autoplay policies can suppress it)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    const tryPlay = () => {
+      video.play().catch(() => {
+        // Silently ignore — video will still show poster
+      });
+    };
+    if (video.readyState >= 3) {
+      tryPlay();
+    } else {
+      video.addEventListener("canplay", tryPlay, { once: true });
+    }
+  }, []);
+
   const activeDark = mounted ? isDark : true;
 
   // --- Load Dynamic Custom FloatingLines Settings ---
@@ -213,6 +230,19 @@ export default function Hero() {
     return () => window.removeEventListener("storage", loadCustomSettings);
   }, []);
 
+  // Hero golden overlay setting
+  const [goldenOverlay, setGoldenOverlay] = useState(false);
+
+  useEffect(() => {
+    const loadOverlay = () => {
+      const saved = localStorage.getItem("hero_goldenOverlay");
+      if (saved) setGoldenOverlay(saved === "true");
+    };
+    loadOverlay();
+    window.addEventListener("storage", loadOverlay);
+    return () => window.removeEventListener("storage", loadOverlay);
+  }, []);
+
   // Multiply the flag images array to create more rows in the columns
   const repeatedFlagImages = Array(MARQUEE_CONFIG.repeats).fill(FLAG_IMAGES).flat();
 
@@ -226,40 +256,115 @@ export default function Hero() {
     { id: "schengen-visa", label: "7.6 Country Grid" },
     { id: "reviews", label: "7.7 Reviews" },
     { id: "contact-us", label: "7.8 Consultation Form" },
-    { id: "faq", label: "7.9 FAQ" }, // Inline FAQ section target
+    { id: "faq", label: "7.9 FAQ" },
   ];
 
   return (
     <div className="relative w-full min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white transition-colors duration-300">
-      {/* Premium dark gradient overlays for editorial depth (Fixed Position) */}
-      <div className="fixed inset-0 bg-linear-to-b from-black/60 via-transparent to-black/60 pointer-events-none z-10 hidden dark:block" />
+      {/* Premium dark gradient overlays removed — video plays clear */}
 
 
-      {/* 1. Hero Section (7.1) - Now 1st Section at the top */}
-      <section id="hero" className="relative w-full h-screen flex items-start justify-start overflow-hidden bg-white dark:bg-black">
-        {/* Background Video (bg-video.mp4) without any fade - completely clear */}
+      {/* 1. Hero Section (7.1) */}
+      <section id="hero" className="relative w-full h-screen overflow-hidden bg-black">
+        {/* Background Video */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <video
+            ref={videoRef}
             src="/videos/bg-video.mp4"
+            poster="/videos/bg-video-first-frame.jpg"
             autoPlay
             muted
             loop
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-100"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
 
-        {/* Company Name positioned in top left corner */}
-        <div className="absolute top-12 left-8 sm:left-16 z-20 text-left select-none pointer-events-none">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-sans font-bold tracking-tighter leading-none animate-text-shadow flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Highlighter action="highlight" color={activeDark ? "#C9953755" : "#C9953733"} isView={true}>
-              <span style={{ color: activeDark ? "#ffffff" : "#71717a" }}>Quick</span>
-            </Highlighter>
-            <Highlighter action="highlight" color={activeDark ? "#18213b88" : "#18213b33"} isView={true}>
-              <span style={{ color: HERO_CONFIG.holidaysColor }}>Holidays</span>
-            </Highlighter>
-          </h1>
-        </div>
+        {/* Optional golden shimmer overlay */}
+        {goldenOverlay && (
+          <div
+            className="absolute inset-0 z-[2] pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,149,55,0.28) 0%, rgba(201,149,55,0.08) 55%, transparent 100%)",
+            }}
+          />
+        )}
+
+        {/* Hero brand block — matches user image layout with premium staggered entry animation */}
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.15,
+                delayChildren: 0.25
+              }
+            }
+          }}
+          className={`absolute bottom-36 left-8 sm:left-16 z-10 w-[calc(100%-4rem)] sm:w-[calc(100%-8rem)] ${HERO_CONFIG.containerMaxWidth} flex flex-col gap-4`}
+        >
+
+          {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+            }}
+            className="flex items-center gap-6"
+          >
+            {/* Logo */}
+            <div className={`shrink-0 flex items-center justify-center ${HERO_CONFIG.logoSizeMobile} ${HERO_CONFIG.logoSizeTablet} ${HERO_CONFIG.logoSizeDesktop}`}>
+              <img
+                src="/logos/logo.svg"
+                alt="Quick Holidays"
+                className="w-full h-full object-contain drop-shadow-md"
+              />
+            </div>
+            {/* Stacked Heading */}
+            <div className={`flex flex-col leading-none select-none tracking-tighter ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
+              <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
+                QUICK
+              </span>
+              <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.holidaysColor }}>
+                HOLIDAYS
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Row 2: Description */}
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+            }}
+            className={HERO_CONFIG.paragraphMaxWidth}
+          >
+            <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
+               style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
+              Quick Holidays is a UK-based Schengen visa consultancy trusted by hundreds of non-UK nationals — BRP holders, spouse, work, and student visa holders — who need expert, honest help securing their European tourist visas. No hidden fees, no guesswork, just resulTS.
+            </p>
+          </motion.div>
+
+          {/* Row 3: CTA Buttons */}
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+            }}
+            className="flex flex-col sm:flex-row gap-4 items-start mt-2"
+          >
+            <ThemeButton href="/contact-us">
+              Book a Free Consultation
+            </ThemeButton>
+            <ThemeButton href="/how-it-works">
+              See how it works
+            </ThemeButton>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* 2. Stat Counters Section (7.2) - Now 2nd Section */}
@@ -395,7 +500,7 @@ export default function Hero() {
           >
             <div className="relative group max-w-md w-full rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl p-3 transition-transform duration-500 hover:scale-[1.02]">
               <img
-                src={activeDark ? "/assets/images/companyverification-dark.png" : "/assets/images/companyverification.png"}
+                src={activeDark ? "/images/companyverification-dark.png" : "/images/companyverification.png"}
                 alt="Companies House Verification Record"
                 className="w-full h-auto rounded-xl object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
               />
@@ -503,12 +608,9 @@ export default function Hero() {
           <VerticalAccordion />
 
           <div className="mt-12 text-center">
-            <Link 
-              href="/how-it-works"
-              className="text-primary hover:text-zinc-900 dark:hover:text-white transition-colors font-sans font-semibold inline-flex items-center gap-2 text-sm group"
-            >
-              See the full process <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-            </Link>
+            <ThemeButton href="/how-it-works">
+              See the full process
+            </ThemeButton>
           </div>
         </div>
       </section>
@@ -731,7 +833,7 @@ export default function Hero() {
           {/* Brand Column */}
           <div className="flex flex-col gap-6 text-left">
             <img 
-              src="/assets/logos/quick-holidays-logo-search.png"
+              src="/logos/logo-search.png"
               alt="Quick Holidays Logo"
               className="h-10 w-auto object-contain self-start filter brightness-95"
             />

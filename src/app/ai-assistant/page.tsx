@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { motion } from "motion/react";
 import { Highlighter } from "@/components/ui/highlighter";
 import { ThemeButton } from "@/components/ThemeButton";
 
@@ -11,6 +13,7 @@ interface Message {
 }
 
 export default function AiAssistant() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "bot",
@@ -60,14 +63,15 @@ export default function AiAssistant() {
   }, [messages, isTyping]);
 
   return (
-    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
-      <div className="max-w-4xl mx-auto flex flex-col items-center">
+    <div className="bg-white dark:bg-black h-[100dvh] w-full text-zinc-950 dark:text-white pt-24 pb-36 px-4 sm:px-8 transition-colors duration-300 overflow-hidden flex flex-col justify-between">
+      <div className="max-w-4xl mx-auto flex flex-col h-full w-full justify-between min-h-0">
+        
         {/* Header */}
-        <div className="text-center mb-10 w-full">
+        <div className="text-center mb-4 w-full shrink-0">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
+            className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight mb-2 text-zinc-900 dark:text-white"
           >
             Schengen Visa <br />
             <span className="text-primary">
@@ -76,14 +80,15 @@ export default function AiAssistant() {
               </Highlighter>
             </span>
           </motion.h1>
-          <p className="font-sans text-sm sm:text-base text-zinc-500 dark:text-zinc-400 font-light max-w-lg mx-auto leading-relaxed">
+          <p className="font-sans text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-light max-w-lg mx-auto leading-relaxed">
             Get instant answers to embassy rules, travel checklists, and visa processing parameters.
           </p>
         </div>
 
         {/* Chat Window */}
-        <div className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col h-[500px] mb-8 relative">
-          <div className="flex-1 overflow-y-auto space-y-6 pr-2 no-scrollbar">
+        <div className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 flex flex-col flex-1 min-h-0 mb-4 relative">
+          {/* Scrollable messages container */}
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2 no-scrollbar">
             {messages.map((msg, index) => (
               <motion.div
                 key={index}
@@ -93,7 +98,7 @@ export default function AiAssistant() {
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed ${
+                  className={`max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${
                     msg.sender === "user"
                       ? "bg-primary text-white rounded-br-none"
                       : "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 text-zinc-800 dark:text-zinc-300 rounded-bl-none shadow-sm"
@@ -116,7 +121,7 @@ export default function AiAssistant() {
           </div>
 
           {/* Quick suggestions */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-zinc-200 dark:border-white/5 mt-4">
+          <div className="flex flex-wrap gap-2 pt-3 border-t border-zinc-200 dark:border-white/5 mt-3 shrink-0">
             {suggestedQuestions.map((q) => (
               <button
                 key={q}
@@ -129,33 +134,37 @@ export default function AiAssistant() {
           </div>
         </div>
 
-        {/* Input panel */}
-        <div className="w-full flex gap-3">
-          <input
-            type="text"
-            placeholder="Type your Schengen visa question..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
-            className="flex-1 px-5 py-3.5 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-          />
-          <button
-            onClick={() => handleSend(input)}
-            className="bg-primary hover:bg-primary/95 text-white font-sans font-semibold tracking-wider text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-primary/20"
-          >
-            Send
-          </button>
-        </div>
+        {/* Sticky Input panel */}
+        <div className="w-full flex flex-col gap-3 shrink-0">
+          <div className="w-full flex gap-3 items-end">
+            <div className="brutalist-container flex-1">
+              <input
+                type="text"
+                placeholder="Type your Schengen visa question..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
+                className="brutalist-input smooth-type"
+              />
+              <label className="brutalist-label">Your Question</label>
+            </div>
+            <button
+              onClick={() => handleSend(input)}
+              className="px-6 py-3.5 bg-primary text-white font-bold border-3 border-black dark:border-white hover:bg-primary/90 transition-all cursor-pointer shadow-[3px_3px_0_#000] dark:shadow-[3px_3px_0_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
+            >
+              Send
+            </button>
+          </div>
 
-        {/* CTA */}
-        <div className="mt-8 text-center">
-          <span className="text-zinc-450 text-xs font-sans">Need human assistance?</span>
-          <div className="mt-2">
-            <ThemeButton href="/contact-us">
+          {/* Compact CTA */}
+          <div className="text-center flex items-center justify-center gap-2 text-xs">
+            <span className="text-zinc-450 font-sans">Need human assistance?</span>
+            <Link href="/contact-us" className="text-primary hover:underline font-bold">
               Connect to Visa Officer
-            </ThemeButton>
+            </Link>
           </div>
         </div>
+
       </div>
     </div>
   );
