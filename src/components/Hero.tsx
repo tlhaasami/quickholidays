@@ -9,6 +9,7 @@ import { TypeformForm } from "@/components/TypeformForm";
 import { FLAG_IMAGES, MARQUEE_CONFIG, HERO_CONFIG, COUNTRIES } from "@/constants";
 import { Pointer } from "@/components/ui/pointer";
 import { Highlighter } from "@/components/ui/highlighter";
+import { VerticalAccordion } from "@/components/VerticalAccordion";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -392,53 +393,7 @@ export default function Hero() {
             Our step-by-step commitment to secure your Schengen visa with zero guessing and complete transparency.
           </motion.p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Consultation",
-                description: "A free, honest assessment: whether you're ready to apply, what it will cost, and a realistic timeline — before you pay anything."
-              },
-              {
-                step: "02",
-                title: "Documentation",
-                description: "Your checklist, cover letter, and application forms — built for your situation. We also help find refundable flights and pay-at-property hotels, wherever possible. Everything reviewed before submission."
-              },
-              {
-                step: "03",
-                title: "Appointment Booking",
-                description: "We book and manage your biometrics appointment — London, Manchester, or Edinburgh — and hand you your appointment letter once confirmed."
-              },
-              {
-                step: "04",
-                title: "Approval Monitoring",
-                description: "We track your application wherever the system allows it. Where it doesn't, we follow up directly. Either way, you're not left wondering — and you're covered by our Accountability Promise if we get something wrong."
-              }
-            ].map((step, idx) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className="group relative overflow-hidden border border-white/5 rounded-xl p-8 bg-zinc-950/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/50 h-72 flex flex-col justify-between"
-              >
-                <div className="text-left">
-                  <span className="text-primary font-sans font-extrabold text-2xl tracking-widest block opacity-75">{step.step}</span>
-                  <h3 className="text-white font-serif text-xl sm:text-2xl mt-4 font-semibold">{step.title}</h3>
-                </div>
-
-                <div className="text-left text-zinc-400 font-sans text-xs sm:text-sm font-light mt-auto">
-                  Hover to view details <span className="text-primary">→</span>
-                </div>
-
-                <div className="absolute inset-0 bg-zinc-950 p-8 rounded-xl flex flex-col justify-center border border-primary/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 text-left">
-                  <span className="text-primary font-sans font-bold text-xs tracking-wider uppercase mb-3">Step {step.step}: {step.title}</span>
-                  <p className="text-sm font-light leading-relaxed text-zinc-100 font-sans">{step.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <VerticalAccordion />
 
           <div className="mt-12 text-center">
             <Link 
