@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { TiltedCard } from "@/components/ui/tilted-card";
 
 export const ThreeDMarquee = ({
   images,
@@ -121,20 +122,18 @@ export const ThreeDMarquee = ({
                             }}
                             className="w-full"
                           >
-                            <motion.img
-                              whileHover={{
-                                y: hoverTranslateY,
-                              }}
-                              transition={{
-                                duration: 0.3,
-                                ease: "easeInOut",
-                              }}
-                              src={fifthFlag}
-                              alt="5th Flag"
-                              className="aspect-[970/700] rounded-lg object-cover ring ring-gray-950/5 hover:shadow-2xl w-full"
-                              width={970}
-                              height={700}
-                            />
+                          <TiltedCard
+                            imageSrc={fifthFlag}
+                            altText="5th Flag"
+                            containerHeight="140px"
+                            containerWidth="100%"
+                            imageHeight="140px"
+                            imageWidth="100%"
+                            scaleOnHover={1.12}
+                            rotateAmplitude={14}
+                            showMobileWarning={false}
+                            showTooltip={false}
+                          />
                           </motion.div>
                         </div>
                       );
@@ -156,19 +155,17 @@ export const ThreeDMarquee = ({
                           }}
                           className="w-full"
                         >
-                          <motion.img
-                            whileHover={{
-                              y: hoverTranslateY,
-                            }}
-                            transition={{
-                              duration: 0.3,
-                              ease: "easeInOut",
-                            }}
-                            src={item}
-                            alt={`Flag ${itemIndex + 1}`}
-                            className="aspect-[970/700] rounded-lg object-cover ring ring-gray-950/5 hover:shadow-2xl w-full"
-                            width={970}
-                            height={700}
+                          <TiltedCard
+                            imageSrc={item}
+                            altText={`Flag ${itemIndex + 1}`}
+                            containerHeight="140px"
+                            containerWidth="100%"
+                            imageHeight="140px"
+                            imageWidth="100%"
+                            scaleOnHover={1.12}
+                            rotateAmplitude={14}
+                            showMobileWarning={false}
+                            showTooltip={false}
                           />
                         </motion.div>
                       </div>

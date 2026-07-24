@@ -51,8 +51,28 @@ export const MARQUEE_CONFIG = {
 
 // Configurations for the Hero video background overlays
 export const HERO_CONFIG = {
-  fadeOpacity: 0.35,        // Black fade opacity overlay on the video background (e.g. 0.15 = 15% black fade overlay)
+  fadeOpacity: 0.1,        // Black fade opacity overlay on the video background (e.g. 0.15 = 15% black fade overlay)
   quickColor: "#18213bff",     // Custom hex color for the word "Quick" (Midnight Navy)
   holidaysColor: "#C99537",  // Custom hex color for the word "Holidays" (Heritage Gold)
+};
+
+// Navigation Links for site pages
+export const NAV_LINKS = [
+  { name: "Home", href: "/" },
+  { name: "Schengen Visa", href: "/schengen-visa" },
+  { name: "How It Works", href: "/how-it-works" },
+  { name: "FAQ", href: "/faq" },
+  { name: "Reviews", href: "/reviews" },
+  { name: "About Us", href: "/about-us" },
+  { name: "Contact Us", href: "/contact-us" },
+];
+
+// Configurations for the floating Navbar styling (matching theme colors)
+export const NAVBAR_CONFIG = {
+  bgColor: "#0F1936e6",      // Midnight Navy with 90% opacity (Official Ink color)
+  borderColor: "#ffffff1a",  // Subtle white border (10% opacity)
+  activeColor: "#C99537",    // Heritage Gold (Official Primary color)
+  inactiveColor: "#a1a1aa",  // Muted grey for non-active links
+  hoverColor: "#e4e4e7",     // Light grey for link hover states
 };
 

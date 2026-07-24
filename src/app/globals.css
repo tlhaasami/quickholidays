@@ -35,3 +35,31 @@ html {
   scrollbar-width: none;     /* Firefox */
 }
 
+@keyframes slow-glow {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.15) translate(8px, -8px);
+    opacity: 0.28;
+  }
+}
+
+@keyframes text-shadow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 4px 24px rgba(201, 149, 55, 0.45)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.65));
+  }
+}
+
+.animate-slow-glow {
+  animation: slow-glow 10s ease-in-out infinite;
+}
+
+.animate-text-shadow {
+  animation: text-shadow-pulse 6s ease-in-out infinite;
+}
+

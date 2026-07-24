@@ -368,17 +368,35 @@ Verification: all events checked in Meta Events Manager test mode before launch 
 
 ## 13. Placeholder Checklist (Team Fills Before Launch)
 
-| Placeholder | Owner | Needed by |
-| :--- | :--- | :--- |
-| [COMPANIES HOUSE NO.] | Management | |
-| [YEARS] / [CLIENTS] / [RATE] / [START YEAR] + source lines | Management | |
-| [SERVICE FEE] / [DEPOSIT] / [BALANCE] / [BALANCE TRIGGER] | Management | |
-| [WHATSAPP NUMBER] (+447828707425) | Management | |
-| [LEADS EMAIL] for form notifications | Management | |
-| [LINKEDIN URL] / [https://www.instagram.com/quickholidaysltd.co.uk] [https://www.facebook.com/quickholidaysltd.co.uk/] — or decision to omit | Marketing | |
-| [RETENTION PERIOD] / [LIABILITY CAP] / [ICO NO.] | Solicitor(I would confirm these) | |
-| Per-country fees, documents, processing times (CMS) | Ops team | |
-| Genuine, consented reviews (min. 6, incl. one accountability story) | Sales team | |
+### 1. Management Approvals & Financials
+* Determine and supply the final [SERVICE FEE], [DEPOSIT], [BALANCE], and [BALANCE TRIGGER] amounts.
+* Decide whether to approve or reject the proposed reapplication clause and set the [REAPPLICATION FEE] if approved.
+* Supply verifiable statistics for [YEARS], [CLIENTS], [RATE], and [START YEAR].
+* Provide the official [WHATSAPP NUMBER] (listed as +447828707425) and the [LEADS EMAIL] for consultation form notifications.
+
+### 2. Solicitor / Legal Verification
+* Review the Refund & Cancellation Policy for consumer-rights compliance, specifically the Consumer Contracts Regulations.
+* Review the wording of the proposed reapplication clause, pending Management approval.
+* Confirm whether Schengen visa consultancy for UK residents falls under UK immigration-advice regulation (IAA/OISC regime).
+* Confirm whether arranging travel medical insurance triggers FCA-regulated activity.
+* Provide the legally sound [RETENTION PERIOD], [LIABILITY CAP], [ICO NO.], and physical document return [METHOD] for the Privacy and Service Terms pages.
+
+### 3. Marketing & Sales Assets
+* Write, design, and configure email delivery for the new 12-point "Refusal Checklist" PDF.
+* Supply the official Trustpilot widget code for implementation.
+* Provide the final, real URLs for LinkedIn, Instagram, and Facebook, or make a definitive decision to omit them.
+* Source a minimum of six genuine, consented client reviews.
+* Ensure at least one of the sourced reviews highlights a problem that Quick Holidays successfully fixed (an accountability story).
+
+### 4. Operations Team Tasks
+* Populate the CMS with accurate per-country fees, required documents, and processing times.
+* Confirm that the pre-appointment briefing, the visa misprint check, and the booking advice are genuinely performed for every single client before the copy goes live.
+
+### 5. Technical Handover & Setup (Week 1 Priority)
+* Secure and store Git repository access for company records.
+* Secure hosting account access (likely Vercel) and move billing to a company card.
+* Obtain a one-page deployment note detailing how to run the site locally and how to push changes live.
+
 
 ## 14. Pre-Launch QA Checklist
 * [ ] Zero [square brackets] visible anywhere on the site.

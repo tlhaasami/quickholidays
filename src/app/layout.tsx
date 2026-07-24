@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/Navbar";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -36,7 +38,9 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen">
+        <Navbar />
         <main>{children}</main>
+        <FloatingWhatsApp />
       </body>
     </html>
   );
