@@ -7,6 +7,8 @@ import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 import { TiltedCard } from "@/components/ui/tilted-card";
 import { TypeformForm } from "@/components/TypeformForm";
 import { FLAG_IMAGES, MARQUEE_CONFIG, HERO_CONFIG, COUNTRIES } from "@/constants";
+import { Pointer } from "@/components/ui/pointer";
+import { Highlighter } from "@/components/ui/highlighter";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -140,6 +142,7 @@ export default function Hero() {
 
   return (
     <div className="relative w-full min-h-screen bg-black text-white">
+      <Pointer />
       {/* Premium dark gradient overlays for editorial depth (Fixed Position) */}
       <div className="fixed inset-0 bg-linear-to-b from-black/60 via-transparent to-black/60 pointer-events-none z-10" />
 
@@ -218,7 +221,10 @@ export default function Hero() {
             className="flex flex-col text-left justify-center"
           >
             <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-white mb-6 leading-tight">
-              Your Schengen visa,<br />handled properly.
+              Your Schengen visa,<br />
+              <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
+                handled properly.
+              </Highlighter>
             </h2>
             <p className="font-sans text-base sm:text-lg text-zinc-400 font-light leading-relaxed mb-10 max-w-xl">
               Clear costs. Honest advice. A team that stands behind each application. We prepare Schengen tourist visa applications for non-UK nationals living in the UK — No surprises, No guessing.
@@ -310,7 +316,12 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium text-white mb-8 tracking-tight"
           >
-            If we make a mistake,<br />we own it.
+            If we make a mistake,<br />
+            <span className="inline-block mt-2">
+              <Highlighter action="circle" color="#CCA352" strokeWidth={2} padding={8} isView={true}>
+                we own it.
+              </Highlighter>
+            </span>
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 30 }}
@@ -667,7 +678,7 @@ export default function Hero() {
             </p>
             <div className="flex gap-4">
               <a 
-                href="https://wa.me/448000584673" 
+                href="https://wa.me/447828707425" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600/10 hover:bg-emerald-600/25 border border-emerald-500/20 text-emerald-400 font-sans text-xs font-semibold rounded-lg transition-colors"

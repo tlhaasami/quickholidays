@@ -10,7 +10,7 @@ export function FloatingWhatsApp() {
 
   return (
     <a
-      href="https://wa.me/448000584673?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa."
+      href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa."
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
