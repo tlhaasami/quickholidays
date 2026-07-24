@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "motion/react";
 import { ThreeDMarquee } from "@/components/ui/3d-marquee";
@@ -12,10 +12,11 @@ import { Highlighter } from "@/components/ui/highlighter";
 import { VerticalAccordion } from "@/components/VerticalAccordion";
 import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
-import FloatingLines from "@/components/ui/floating-lines";
 import Stack from "@/components/ui/stack";
+
 import { trackContact } from "@/lib/analytics";
 import { CoolMode } from "@/components/ui/cool-mode";
+import { WobbleCard } from "@/components/ui/wobble-card";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -112,8 +113,8 @@ function CustomSelect({
                   setIsOpen(false);
                 }}
                 className={`w-full text-left px-4 py-3 text-sm font-sans transition-colors ${isSelected
-                    ? "bg-primary text-white font-semibold"
-                    : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white"
+                  ? "bg-primary text-white font-semibold"
+                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white"
                   }`}
               >
                 {opt.label}
@@ -172,66 +173,6 @@ export default function Hero() {
 
   const activeDark = mounted ? isDark : true;
 
-  // --- Load Dynamic Custom FloatingLines Settings ---
-  const [flLineCount, setFlLineCount] = useState<number | number[]>([10, 15, 20]);
-  const [flLineDistance, setFlLineDistance] = useState<number | number[]>([8, 6, 4]);
-  const [flBendRadius, setFlBendRadius] = useState(5.0);
-  const [flBendStrength, setFlBendStrength] = useState(-0.5);
-  const [flAnimationSpeed, setFlAnimationSpeed] = useState(1);
-  const [flGradientStart, setFlGradientStart] = useState<string | undefined>(undefined);
-  const [flGradientMid, setFlGradientMid] = useState<string | undefined>(undefined);
-  const [flGradientEnd, setFlGradientEnd] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    const loadCustomSettings = () => {
-      try {
-        const savedCount = localStorage.getItem("fl_lineCount");
-        if (savedCount) {
-          setFlLineCount(parseInt(savedCount));
-        } else {
-          setFlLineCount([10, 15, 20]);
-        }
-
-        const savedDistance = localStorage.getItem("fl_lineDistance");
-        if (savedDistance) {
-          setFlLineDistance(parseInt(savedDistance));
-        } else {
-          setFlLineDistance([8, 6, 4]);
-        }
-
-        const savedRadius = localStorage.getItem("fl_bendRadius");
-        if (savedRadius) setFlBendRadius(parseFloat(savedRadius));
-        else setFlBendRadius(5.0);
-
-        const savedStrength = localStorage.getItem("fl_bendStrength");
-        if (savedStrength) setFlBendStrength(parseFloat(savedStrength));
-        else setFlBendStrength(-0.5);
-
-        const savedSpeed = localStorage.getItem("fl_animationSpeed");
-        if (savedSpeed) setFlAnimationSpeed(parseFloat(savedSpeed));
-        else setFlAnimationSpeed(1);
-
-        const savedStart = localStorage.getItem("fl_gradientStart");
-        if (savedStart) setFlGradientStart(savedStart);
-        else setFlGradientStart(undefined);
-
-        const savedMid = localStorage.getItem("fl_gradientMid");
-        if (savedMid) setFlGradientMid(savedMid);
-        else setFlGradientMid(undefined);
-
-        const savedEnd = localStorage.getItem("fl_gradientEnd");
-        if (savedEnd) setFlGradientEnd(savedEnd);
-        else setFlGradientEnd(undefined);
-      } catch (e) {
-        console.error("Failed to load settings in Hero.tsx", e);
-      }
-    };
-
-    loadCustomSettings();
-    window.addEventListener("storage", loadCustomSettings);
-    return () => window.removeEventListener("storage", loadCustomSettings);
-  }, []);
-
   // Hero golden overlay setting
   const [goldenOverlay, setGoldenOverlay] = useState(false);
 
@@ -245,11 +186,49 @@ export default function Hero() {
     return () => window.removeEventListener("storage", loadOverlay);
   }, []);
 
-  // Repeated flag images for other sections if needed
   const repeatedFlagImages = Array(MARQUEE_CONFIG.repeats).fill(FLAG_IMAGES).flat();
+
+  const menuItems = useMemo(() => COUNTRIES.map((c) => {
+    let desc = `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`;
+    if (c.name === "France") {
+      desc = "France is the most popular Schengen destination from the UK. Biometrics slots fill up quickly, and decisions are returned in 7-10 days.";
+    } else if (c.name === "Spain") {
+      desc = "Spain is a top choice for summer vacations and quick getaways. Applications are processed in London, Manchester, and Edinburgh.";
+    } else if (c.name === "Italy") {
+      desc = "Italy tourist visas require detailed proof of travel. Slots are highly competitive and require early booking.";
+    } else if (c.name === "Germany") {
+      desc = "Germany is high-demand for business and holiday travelers. Embassy guidelines are strict and require complete precision.";
+    } else if (c.name === "Switzerland") {
+      desc = "Switzerland is famed for the scenic Alps. We organize complete day-by-day flight, hotel, and travel itineraries.";
+    } else if (c.name === "Greece") {
+      desc = "Greece is heavily requested for summer travel. Appointments are processed at the GVC centers across the UK.";
+    } else if (c.name === "Netherlands") {
+      desc = "Netherlands is a major European transit and tourist hub. Appointment slots are monitored and secured 24/7 by our team.";
+    } else if (c.name === "Portugal") {
+      desc = "Portugal is highly popular for beach and cultural trips. Applications are processed via VFS centers in London and Manchester.";
+    } else if (c.name === "Austria") {
+      desc = "Austria is famous for ski resorts and Vienna tours. Accommodation proofs and financial stability are strictly verified.";
+    } else if (c.name === "Belgium") {
+      desc = "Belgium is highly accessible via Eurostar from St Pancras. The ideal destination for short weekend breaks.";
+    }
+    return {
+      image: c.flag,
+      link: `/contact-us?destination=${c.slug}`,
+      title: c.name,
+      description: desc
+    };
+  }), []);
 
   const [residency, setResidency] = useState("brp-work");
   const [destination, setDestination] = useState("france");
+  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveReviewIndex((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const sections = [
     { id: "proof-strip", label: "7.3 Proof Strip" },
@@ -281,7 +260,7 @@ export default function Hero() {
             onEnded={() => {
               if (videoRef.current) {
                 videoRef.current.currentTime = 0;
-                videoRef.current.play().catch(() => {});
+                videoRef.current.play().catch(() => { });
               }
             }}
             className="absolute inset-0 w-full h-full object-cover"
@@ -377,9 +356,9 @@ export default function Hero() {
                 </ThemeButton>
               </CoolMode>
               <CoolMode>
-                <a 
-                  href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa." 
-                  target="_blank" 
+                <a
+                  href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa."
+                  target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackContact("WhatsApp")}
                   className="inline-block w-full sm:w-auto md:hidden"
@@ -387,7 +366,7 @@ export default function Hero() {
                   <div className="relative group inline-block w-full sm:w-auto select-none">
                     {/* Bottom Shadow Background */}
                     <div className="absolute inset-0 bg-black border border-black z-0 transition-colors duration-200 group-hover:bg-[#C99537]" />
-                    
+
                     {/* Top Active Button */}
                     <div className="relative bg-[#25D366] text-white border border-black font-sans font-bold tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 px-5 py-3 text-[11px] group-hover:translate-x-2 group-hover:-translate-y-2">
                       <span className="flex items-center gap-2">
@@ -407,7 +386,7 @@ export default function Hero() {
           </motion.div>
 
           {/* Right Column: Swipable Polaroid Flag Stack */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.4 }}
@@ -426,9 +405,9 @@ export default function Hero() {
                   return (
                     <div key={i} className="w-full h-full p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl flex flex-col justify-between select-none">
                       <div className="w-full h-[84%] overflow-hidden rounded-xl border border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
-                        <img 
-                          src={src} 
-                          alt={countryName} 
+                        <img
+                          src={src}
+                          alt={countryName}
                           className="w-full h-full object-cover pointer-events-none"
                         />
                       </div>
@@ -467,7 +446,7 @@ export default function Hero() {
                 handled properly.
               </Highlighter>
             </h2>
-            <p className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light leading-relaxed mb-10 max-w-xl">
+            <div className="font-sans text-base sm:text-lg text-zinc-650 dark:text-zinc-400 font-light leading-relaxed mb-10 max-w-xl">
               Clear costs. Honest advice. A team that stands behind each application. We prepare Schengen tourist visa applications for{" "}
               <Tooltip
                 content={
@@ -482,7 +461,7 @@ export default function Hero() {
                 <span className="underline decoration-dotted decoration-primary/40 cursor-help font-semibold hover:text-primary transition-colors text-zinc-900 dark:text-zinc-100">non-UK nationals</span>
               </Tooltip>{" "}
               living in the UK — No surprises, No guessing.
-            </p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-6 items-stretch sm:items-center mt-4">
               <ThemeButton href="/contact-us">
                 Book a Free Consultation
@@ -592,7 +571,7 @@ export default function Hero() {
       </section>
 
       {/* 2.4 Accountability Promise Section (About Us) - Includes 3D Marquee at the bottom */}
-      <section id="about-us" className="relative w-full bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
+      <section id="about-us" className="relative w-full bg-white dark:bg-[#120F0A] z-20 border-t border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-8 py-24 text-center flex flex-col items-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -608,12 +587,12 @@ export default function Hero() {
               </Highlighter>
             </span>
           </motion.h2>
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light leading-relaxed mb-10 max-w-2xl"
+            className="font-sans text-base sm:text-lg text-zinc-700 dark:text-zinc-200 font-light leading-relaxed mb-10 max-w-2xl"
           >
             Most visa consultancies disappear when something goes wrong. We do the opposite. If we make a mistake, we{" "}
             <Tooltip
@@ -629,7 +608,7 @@ export default function Hero() {
               <span className="underline decoration-dotted decoration-primary/40 cursor-help font-semibold hover:text-primary transition-colors text-zinc-900 dark:text-zinc-100">refund our service fee</span>
             </Tooltip>{" "}
             — in full, excluding appointment, insurance and other charges. That promise is in writing, in our refund policy, for every client.
-          </motion.p>
+          </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -666,7 +645,7 @@ export default function Hero() {
       </section>
 
       {/* 2.5 QuickVisa Assurance Process Section */}
-      <section id="how-it-works" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="how-it-works" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-[#0A0D16] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -675,7 +654,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            QuickVisa Assurance Process
+            QuickVisa <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>Assurance Process.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -698,8 +677,8 @@ export default function Hero() {
       </section>
 
       {/* 2.6 Country Grid Section */}
-      <section id="schengen-visa" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
-        <div className="max-w-7xl mx-auto text-center">
+      <section id="schengen-visa" className="relative w-full py-24 bg-white dark:bg-[#120F0A] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+        <div className="max-w-7xl mx-auto text-center px-8 sm:px-16 mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -707,33 +686,36 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            Where do you want to go?
+            Where do you want to <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>go?</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-2xl mx-auto mb-16"
+            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-2xl mx-auto"
           >
             Fees, documents and timelines for every Schengen country — see exactly what your application needs before you talk to anyone.
           </motion.p>
-
+        </div>
+        <div className="max-w-7xl mx-auto px-8 sm:px-16 pb-12 mt-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {COUNTRIES.map((country, idx) => (
               <motion.div
                 key={country.slug}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: Math.min(idx * 0.03, 0.5) }} // Cap delay to avoid excessive staggered delay on 29 items
+                transition={{ duration: 0.5, delay: Math.min(idx * 0.03, 0.5) }}
               >
                 <Link
                   href={`/schengen-visa/${country.slug}`}
                   className="group relative flex flex-col justify-between overflow-hidden border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/60 rounded-xl p-6 hover:border-primary/50 hover:bg-zinc-100 dark:hover:bg-zinc-950/80 transition-all duration-300 h-full text-left"
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <span className="font-serif text-lg sm:text-xl font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{country.name}</span>
+                    <span className="font-serif text-lg sm:text-xl font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
+                      {country.name}
+                    </span>
                     <img
                       src={country.flag}
                       alt={`${country.name} Flag`}
@@ -741,7 +723,11 @@ export default function Hero() {
                     />
                   </div>
                   <span className="text-zinc-500 font-sans text-xs tracking-wider uppercase group-hover:text-zinc-900 dark:group-hover:text-white transition-colors inline-flex items-center gap-1 self-start mt-2">
-                    Visa Guide <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                    Visa Guide
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform">
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
                   </span>
                 </Link>
               </motion.div>
@@ -751,7 +737,7 @@ export default function Hero() {
       </section>
 
       {/* 2.7 Reviews Section */}
-      <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-[#0A0D16] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -760,7 +746,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            Real clients. Real decisions.
+            Real <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>clients.</Highlighter> Real <Highlighter action="highlight" color="#CCA35255" isView={true}>decisions.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -772,7 +758,8 @@ export default function Hero() {
             Read what our clients say about our document verification and biometrics search process.
           </motion.p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mb-12">
+          {/* Desktop view: 3-Column Wobble Card Grid */}
+          <div className="hidden md:grid grid-cols-3 gap-8 text-left mb-12">
             {[
               {
                 name: "Amara O.",
@@ -790,29 +777,97 @@ export default function Hero() {
                 text: "Very professional from start to finish. Everything handled online, and they accompanied me right until my VFS appointment day. Excellent service.",
               }
             ].map((rev, idx) => (
-              <motion.div
+              <WobbleCard
                 key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.15 }}
-                className="border border-zinc-200 dark:border-white/5 bg-white dark:bg-zinc-950/40 rounded-xl p-8 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-white/10 transition-colors"
+                containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md h-full flex flex-col"
+                className="p-8 flex flex-col justify-between h-full cursor-pointer"
               >
-                <div>
-                  <div className="flex items-center gap-1 text-primary text-sm mb-4">★ ★ ★ ★ ★</div>
-                  <p className="text-zinc-650 dark:text-zinc-400 font-sans text-sm font-light leading-relaxed mb-6">"{rev.text}"</p>
-                </div>
-                <div className="flex justify-between items-center border-t border-zinc-200 dark:border-white/5 pt-4 mt-2">
+                <div className="flex flex-col h-full justify-between text-left">
                   <div>
-                    <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white">{rev.name}</h4>
-                    <span className="font-sans text-xs text-primary">{rev.country}</span>
+                    <div className="flex items-center gap-1 text-primary text-sm mb-4">★ ★ ★ ★ ★</div>
+                    <p className="text-zinc-700 dark:text-zinc-200 font-sans text-sm font-light leading-relaxed mb-6">"{rev.text}"</p>
                   </div>
-                  <Link href="/reviews" className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors underline">
-                    Read more
-                  </Link>
+                  <div className="flex justify-between items-center border-t border-zinc-200 dark:border-white/5 pt-4 mt-2">
+                    <div>
+                      <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white">{rev.name}</h4>
+                      <span className="font-sans text-xs text-primary">{rev.country}</span>
+                    </div>
+                    <Link href="/reviews" className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors underline">
+                      Read more
+                    </Link>
+                  </div>
                 </div>
-              </motion.div>
+              </WobbleCard>
             ))}
+          </div>
+
+          {/* Mobile view: Swipe Slider / Auto-carousel Card with Dot Indicators */}
+          <div className="block md:hidden text-left mb-12">
+            <div className="min-h-[220px]">
+              {[
+                {
+                  name: "Amara O.",
+                  country: "France Visa",
+                  text: "They managed to find a France appointment in London within 4 days. Absolutely saved my summer holiday. The checklist was extremely precise.",
+                },
+                {
+                  name: "Dmitry K.",
+                  country: "Spain Visa",
+                  text: "Highly recommend the Accountability Promise. It gives you absolute peace of mind knowing they back their check. Got my 2-year multiple entry visa.",
+                },
+                {
+                  name: "Priyah S.",
+                  country: "Germany Visa",
+                  text: "Very professional from start to finish. Everything handled online, and they accompanied me right until my VFS appointment day. Excellent service.",
+                }
+              ].map((rev, idx) => {
+                if (idx !== activeReviewIndex) return null;
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <WobbleCard
+                      containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md flex flex-col"
+                      className="p-8 flex flex-col justify-between"
+                    >
+                      <div className="flex flex-col text-left">
+                        <div className="flex items-center gap-1 text-primary text-sm mb-4">★ ★ ★ ★ ★</div>
+                        <p className="text-zinc-700 dark:text-zinc-200 font-sans text-sm font-light leading-relaxed mb-6">"{rev.text}"</p>
+
+                        <div className="flex justify-between items-center border-t border-zinc-200 dark:border-white/5 pt-4 mt-2">
+                          <div>
+                            <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white">{rev.name}</h4>
+                            <span className="font-sans text-xs text-primary">{rev.country}</span>
+                          </div>
+                          <Link href="/reviews" className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors underline">
+                            Read more
+                          </Link>
+                        </div>
+                      </div>
+                    </WobbleCard>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Slider Dots indicators */}
+            <div className="flex justify-center items-center gap-2 mt-6">
+              {[0, 1, 2].map((idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveReviewIndex(idx)}
+                  className={`transition-all duration-300 h-2 cursor-pointer ${activeReviewIndex === idx
+                      ? "w-6 rounded-full bg-[#C99537]"
+                      : "w-2 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:bg-[#C99537]"
+                    }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
 
           <motion.div
@@ -829,8 +884,8 @@ export default function Hero() {
       </section>
 
       {/* 2.8 Consultation Form Section */}
-      <section id="contact-us" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
-        <div className="max-w-3xl mx-auto text-center">
+      <section id="contact-us" className="relative w-full py-24 px-6 sm:px-16 bg-white dark:bg-[#120F0A] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300 flex flex-col items-center justify-center">
+        <div className="max-w-6xl w-full text-left mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -838,25 +893,56 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            Start with a free consultation.
+            Start with a <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>free consultation.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-650 dark:text-zinc-400 font-light max-w-2xl mx-auto mb-12"
+            className="font-sans text-base sm:text-lg text-zinc-655 dark:text-zinc-400 font-light max-w-3xl"
           >
             Tell us about your trip. We'll tell you exactly what it takes — the cost, the documents, and a realistic timeline. No obligation, no pressure.
           </motion.p>
+        </div>
 
-          {/* Lead Capture Form */}
-          <TypeformForm />
+        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+
+          {/* Left Column: Form */}
+          <div className="lg:col-span-6 flex flex-col justify-start">
+            <TypeformForm />
+          </div>
+
+          {/* Right Column: Contact Image Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+            className="lg:col-span-6 hidden lg:block relative w-full rounded-2xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-white/10 group bg-zinc-900"
+          >
+            {/* Subtle gold overlay highlight on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10 transition-opacity duration-300" />
+            <img
+              src="/contact-right.png"
+              alt="Quick Visa Consultation"
+              className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
+            />
+            {/* Elegant floating caption inside the image */}
+            <div className="absolute bottom-6 left-6 z-20 text-left">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#C99537] bg-black/45 px-2.5 py-1 rounded-full backdrop-blur-md">
+                Secure Schengen Visa
+              </span>
+              <h3 className="font-serif text-lg sm:text-xl text-white font-medium mt-2 drop-shadow-md">
+                Your gateway to Europe, simplified.
+              </h3>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* 2.9 FAQ Section */}
-      <section id="faq" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="faq" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-[#0A0D16] z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -865,7 +951,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-center text-zinc-900 dark:text-white tracking-tight"
           >
-            Frequently Asked Questions
+            Frequently <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>Asked Questions.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -909,11 +995,11 @@ export default function Hero() {
       </section>
 
       {/* Sitewide Footer (1.2) */}
-      <footer className="relative w-full bg-zinc-100 dark:bg-zinc-950 border-t border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white z-20 pt-20 pb-12 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+      <footer className="relative w-full bg-zinc-100 dark:bg-[#120F0A] border-t border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white z-20 pt-20 pb-12 px-8 sm:px-16 md:px-24 transition-colors duration-300">
         <div className="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 
           {/* Brand Column */}
-          <div className="flex flex-col gap-6 text-left">
+          <div className="flex flex-col gap-6 text-left items-start">
             <img
               src="/logos/logo-search.png"
               alt="Quick Holidays Logo"
@@ -922,23 +1008,12 @@ export default function Hero() {
             <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
               Quick Holidays Ltd — Schengen visa specialists for Non-UK nationals living in the UK. Clear costs, honest advice, and full accountability, every step.
             </p>
-            <div className="flex gap-4">
-              <a
-                href="https://wa.me/447828707425"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600/10 hover:bg-emerald-600/25 border border-emerald-500/20 text-emerald-400 font-sans text-xs font-semibold rounded-lg transition-colors"
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                WhatsApp Chat
-              </a>
-            </div>
           </div>
 
           {/* Quick Links Column */}
-          <div className="flex flex-col gap-6 text-left">
+          <div className="flex flex-col gap-6 text-left items-start">
             <h4 className="font-sans text-xs font-bold uppercase tracking-widest text-primary">Quick Links</h4>
-            <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400">
+            <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400 items-start">
               <Link href="/" className="hover:text-primary dark:hover:text-white transition-colors">Home</Link>
               <Link href="/schengen-visa" className="hover:text-primary dark:hover:text-white transition-colors">Schengen Visa</Link>
               <Link href="/how-it-works" className="hover:text-primary dark:hover:text-white transition-colors">How It Works</Link>
@@ -948,9 +1023,9 @@ export default function Hero() {
           </div>
 
           {/* Policies Column */}
-          <div className="flex flex-col gap-6 text-left">
+          <div className="flex flex-col gap-6 text-left items-start">
             <h4 className="font-sans text-xs font-bold uppercase tracking-widest text-primary">Policies</h4>
-            <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400">
+            <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400 items-start">
               <Link href="/refund-policy" className="hover:text-primary dark:hover:text-white transition-colors">Refund & Cancellation Policy</Link>
               <Link href="/terms" className="hover:text-primary dark:hover:text-white transition-colors">Service Terms</Link>
               <Link href="/insurance-disclaimer" className="hover:text-primary dark:hover:text-white transition-colors">Insurance Disclaimer</Link>
@@ -960,34 +1035,34 @@ export default function Hero() {
           </div>
 
           {/* Contact Info Column */}
-          <div className="flex flex-col gap-6 text-left">
+          <div className="flex flex-col gap-6 text-left items-start">
             <h4 className="font-sans text-xs font-bold uppercase tracking-widest text-primary">Contact Info</h4>
-            <div className="flex flex-col gap-4 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400">
-              <div className="flex items-start gap-3">
+            <div className="flex flex-col gap-4 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400 items-start">
+              <div className="flex flex-row items-start text-left gap-3">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
                   <rect width="20" height="16" x="2" y="4" rx="2" />
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
-                <div>
+                <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Email</span>
                   <a href="mailto:info@quickholidays.co.uk" className="hover:text-primary dark:hover:text-white transition-colors">info@quickholidays.co.uk</a>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
+              <div className="flex flex-row items-start text-left gap-3">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
-                <div>
+                <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Phone</span>
                   <a href="tel:+448000584673" className="hover:text-primary dark:hover:text-white transition-colors">+44 800 058 4673</a>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
+              <div className="flex flex-row items-start text-left gap-3">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
                   <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                <div>
+                <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Address</span>
                   <span className="leading-relaxed">Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ</span>
                 </div>
@@ -1002,7 +1077,7 @@ export default function Hero() {
           <p className="leading-relaxed">
             <strong>Legal Disclaimer:</strong> Quick Holidays Ltd is a private visa support agency and is not affiliated with TLScontact, VFS Global, or any government embassy or consular authority. We offer document checking, appointment search assistance, and consulting services for Schengen visa applications. Official visa fees are set by EU regulation and are payable directly to the respective embassy/consulate or visa outsourcing center.
           </p>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-4 text-[11px]">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-4 pt-4 text-[11px]">
             <span>© 2026 Quick Holidays Ltd. All rights reserved. Company No. 15948457.</span>
             <span>Made with precision for Schengen visa applicants in the UK.</span>
           </div>

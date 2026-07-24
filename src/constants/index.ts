@@ -87,3 +87,12 @@ export const NAVBAR_CONFIG = {
   activeColor: "#C99537",    // Heritage Gold (Official Primary color)
   inactiveColor: "#a1a1aa",  // Muted grey for non-active links
 };
+
+// Configurations for the InfiniteMenu component (destinations area)
+export const INFINITE_MENU_CONFIG = {
+  scale: 3,             // Controls camera zoom
+  flagSizeFactor: 0.28,   // Scale factor for flags
+  borderColor: "#C99537", // Gold border matching theme
+  borderWidth: 12,        // Border thickness for flags
+};
+

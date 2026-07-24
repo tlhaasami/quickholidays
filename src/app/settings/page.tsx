@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import FloatingLines from "@/components/ui/floating-lines";
 import {
   MagneticDock,
   DockIconHome,
@@ -15,16 +14,6 @@ import {
 import { ThemeButton } from "@/components/ThemeButton";
 
 export default function SettingsPage() {
-  // --- FloatingLines Local Settings State ---
-  const [lineCount, setLineCount] = useState(1);
-  const [lineDistance, setLineDistance] = useState(8);
-  const [bendRadius, setBendRadius] = useState(8);
-  const [bendStrength, setBendStrength] = useState(-2);
-  const [animationSpeed, setAnimationSpeed] = useState(1);
-  const [gradientStart, setGradientStart] = useState("#e945f5");
-  const [gradientMid, setGradientMid] = useState("#6f6f6f");
-  const [gradientEnd, setGradientEnd] = useState("#6a6a6a");
-
   // --- MagneticDock Local Settings State ---
   const [dockIconSize, setDockIconSize] = useState(40);
   const [dockMaxScale, setDockMaxScale] = useState(1.3);
@@ -35,36 +24,18 @@ export default function SettingsPage() {
   const [dockIconStyle, setDockIconStyle] = useState<"default" | "creative">("default");
   const [dockDesign, setDockDesign] = useState<"classic" | "sketchy">("classic");
 
-  // --- Hero Section Settings ---
   const [heroGoldenOverlay, setHeroGoldenOverlay] = useState(false);
+  const [dockUnifiedGlow, setDockUnifiedGlow] = useState(false);
+
+  // Position and mobile configurations
+  const [dockMobileMode, setDockMobileMode] = useState<"hamburger" | "always">("hamburger");
+  const [dockSide, setDockSide] = useState<"bottom" | "top" | "left" | "right">("bottom");
+  const [dockVerticalAlign, setDockVerticalAlign] = useState<"bottom" | "top" | "center">("bottom");
+  const [dockCenterOffset, setDockCenterOffset] = useState<number>(0);
 
   // --- Load Saved Settings ---
   useEffect(() => {
     try {
-      const savedCount = localStorage.getItem("fl_lineCount");
-      if (savedCount) setLineCount(parseInt(savedCount));
-
-      const savedDistance = localStorage.getItem("fl_lineDistance");
-      if (savedDistance) setLineDistance(parseInt(savedDistance));
-
-      const savedRadius = localStorage.getItem("fl_bendRadius");
-      if (savedRadius) setBendRadius(parseFloat(savedRadius));
-
-      const savedStrength = localStorage.getItem("fl_bendStrength");
-      if (savedStrength) setBendStrength(parseFloat(savedStrength));
-
-      const savedSpeed = localStorage.getItem("fl_animationSpeed");
-      if (savedSpeed) setAnimationSpeed(parseFloat(savedSpeed));
-
-      const savedStart = localStorage.getItem("fl_gradientStart");
-      if (savedStart) setGradientStart(savedStart);
-
-      const savedMid = localStorage.getItem("fl_gradientMid");
-      if (savedMid) setGradientMid(savedMid);
-
-      const savedEnd = localStorage.getItem("fl_gradientEnd");
-      if (savedEnd) setGradientEnd(savedEnd);
-
       // Dock properties
       const savedDockSize = localStorage.getItem("dock_iconSize");
       if (savedDockSize) setDockIconSize(parseInt(savedDockSize));
@@ -92,6 +63,21 @@ export default function SettingsPage() {
 
       const savedGoldenOverlay = localStorage.getItem("hero_goldenOverlay");
       if (savedGoldenOverlay) setHeroGoldenOverlay(savedGoldenOverlay === "true");
+
+      const savedUnifiedGlow = localStorage.getItem("dock_unifiedGlow");
+      if (savedUnifiedGlow) setDockUnifiedGlow(savedUnifiedGlow === "true");
+
+      const savedMobileMode = localStorage.getItem("dock_mobileMode");
+      if (savedMobileMode) setDockMobileMode(savedMobileMode as any);
+
+      const savedSide = localStorage.getItem("dock_side");
+      if (savedSide) setDockSide(savedSide as any);
+
+      const savedAlign = localStorage.getItem("dock_verticalAlign");
+      if (savedAlign) setDockVerticalAlign(savedAlign as any);
+
+      const savedOffset = localStorage.getItem("dock_centerOffset");
+      if (savedOffset) setDockCenterOffset(parseInt(savedOffset));
     } catch (e) {
       console.error("Failed to load settings from localStorage", e);
     }
@@ -100,15 +86,6 @@ export default function SettingsPage() {
   // --- Save / Apply globally ---
   const handleApply = () => {
     try {
-      localStorage.setItem("fl_lineCount", lineCount.toString());
-      localStorage.setItem("fl_lineDistance", lineDistance.toString());
-      localStorage.setItem("fl_bendRadius", bendRadius.toString());
-      localStorage.setItem("fl_bendStrength", bendStrength.toString());
-      localStorage.setItem("fl_animationSpeed", animationSpeed.toString());
-      localStorage.setItem("fl_gradientStart", gradientStart);
-      localStorage.setItem("fl_gradientMid", gradientMid);
-      localStorage.setItem("fl_gradientEnd", gradientEnd);
-
       localStorage.setItem("dock_iconSize", dockIconSize.toString());
       localStorage.setItem("dock_maxScale", dockMaxScale.toString());
       localStorage.setItem("dock_magneticDistance", dockMagneticDistance.toString());
@@ -118,6 +95,12 @@ export default function SettingsPage() {
       localStorage.setItem("dock_iconStyle", dockIconStyle);
       localStorage.setItem("dock_design", dockDesign);
       localStorage.setItem("hero_goldenOverlay", heroGoldenOverlay.toString());
+      localStorage.setItem("dock_unifiedGlow", dockUnifiedGlow.toString());
+
+      localStorage.setItem("dock_mobileMode", dockMobileMode);
+      localStorage.setItem("dock_side", dockSide);
+      localStorage.setItem("dock_verticalAlign", dockVerticalAlign);
+      localStorage.setItem("dock_centerOffset", dockCenterOffset.toString());
 
       // Trigger custom storage update event to sync on active components in DOM immediately
       window.dispatchEvent(new Event("storage"));
@@ -129,15 +112,6 @@ export default function SettingsPage() {
 
   const handleReset = () => {
     if (confirm("Reset all customizations to factory defaults?")) {
-      localStorage.removeItem("fl_lineCount");
-      localStorage.removeItem("fl_lineDistance");
-      localStorage.removeItem("fl_bendRadius");
-      localStorage.removeItem("fl_bendStrength");
-      localStorage.removeItem("fl_animationSpeed");
-      localStorage.removeItem("fl_gradientStart");
-      localStorage.removeItem("fl_gradientMid");
-      localStorage.removeItem("fl_gradientEnd");
-
       localStorage.removeItem("dock_iconSize");
       localStorage.removeItem("dock_maxScale");
       localStorage.removeItem("dock_magneticDistance");
@@ -147,17 +121,14 @@ export default function SettingsPage() {
       localStorage.removeItem("dock_iconStyle");
       localStorage.removeItem("dock_design");
       localStorage.removeItem("hero_goldenOverlay");
+      localStorage.removeItem("dock_unifiedGlow");
+
+      localStorage.removeItem("dock_mobileMode");
+      localStorage.removeItem("dock_side");
+      localStorage.removeItem("dock_verticalAlign");
+      localStorage.removeItem("dock_centerOffset");
 
       // Reload state variables
-      setLineCount(8);
-      setLineDistance(8);
-      setBendRadius(8);
-      setBendStrength(-2);
-      setAnimationSpeed(1);
-      setGradientStart("#e945f5");
-      setGradientMid("#6f6f6f");
-      setGradientEnd("#6a6a6a");
-
       setDockIconSize(40);
       setDockMaxScale(1.3);
       setDockMagneticDistance(100);
@@ -167,6 +138,12 @@ export default function SettingsPage() {
       setDockIconStyle("default");
       setDockDesign("classic");
       setHeroGoldenOverlay(false);
+      setDockUnifiedGlow(false);
+
+      setDockMobileMode("hamburger");
+      setDockSide("bottom");
+      setDockVerticalAlign("bottom");
+      setDockCenterOffset(0);
 
       window.dispatchEvent(new Event("storage"));
       alert("Settings reset to default values.");
@@ -183,21 +160,6 @@ export default function SettingsPage() {
     { id: "settings", label: "Dock Config", icon: <DockIconSettings className="w-5 h-5" /> },
   ];
 
-  // Generated React Component code representation
-  const flCodeString = `<FloatingLines 
-  enabledWaves={["top", "middle", "bottom"]}
-  lineCount={${lineCount}}
-  lineDistance={${lineDistance}}
-  bendRadius={${bendRadius}}
-  bendStrength={${bendStrength}}
-  interactive={true}
-  parallax={true}
-  animationSpeed={${animationSpeed}}
-  gradientStart="${gradientStart}"
-  gradientMid="${gradientMid}"
-  gradientEnd="${gradientEnd}"
-/>`;
-
   const dockCodeString = `<MagneticDock 
   items={items}
   iconSize={${dockIconSize}}
@@ -209,24 +171,7 @@ export default function SettingsPage() {
 />`;
 
   return (
-    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300 pt-32 pb-48 px-4">
-      {/* Dynamic Background Preview block */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-20">
-        <FloatingLines
-          enabledWaves={["top", "middle", "bottom"]}
-          lineCount={lineCount}
-          lineDistance={lineDistance}
-          bendRadius={bendRadius}
-          bendStrength={bendStrength}
-          interactive={false}
-          parallax={false}
-          animationSpeed={animationSpeed}
-          gradientStart={gradientStart}
-          gradientMid={gradientMid}
-          gradientEnd={gradientEnd}
-        />
-      </div>
-
+    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-[#0A0D16] text-zinc-900 dark:text-zinc-100 transition-colors duration-300 pt-32 pb-24 px-4">
       <div className="relative z-10 max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -237,168 +182,31 @@ export default function SettingsPage() {
             Component Configurator
           </h1>
           <p className="font-sans text-sm sm:text-base text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed">
-            Customize parameters in real-time, inspect physics and visual changes instantly, and copy components' drop-in JSX markup files.
+            Customize dock and hero parameters in real-time, inspect visual changes instantly, and apply settings globally across the site.
           </p>
         </div>
 
         {/* Live Dock Interactive Preview Container */}
         <div className="bg-white/40 dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[220px] backdrop-blur-md shadow-xl gap-4">
           <span className="text-xs uppercase tracking-widest font-sans font-bold text-zinc-450 dark:text-zinc-500">Live Magnetic Dock Preview</span>
-
-          <div className="py-4 w-full flex items-center justify-center overflow-x-auto">
-            <MagneticDock
-              items={previewItems}
-              iconSize={dockIconSize}
-              maxScale={dockMaxScale}
-              magneticDistance={dockMagneticDistance}
-              showLabels={dockShowLabels}
-              position={dockPosition}
-              variant={dockVariant}
-            />
-          </div>
+          <MagneticDock
+            items={previewItems}
+            iconSize={dockIconSize}
+            maxScale={dockMaxScale}
+            magneticDistance={dockMagneticDistance}
+            showLabels={dockShowLabels}
+            position={dockPosition}
+            variant={dockVariant}
+          />
         </div>
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          {/* Column 1: FloatingLines Controller */}
+          {/* Column 1: MagneticDock Controller */}
           <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 backdrop-blur-md space-y-6">
             <h2 className="text-xl font-sans font-bold tracking-tight border-b border-zinc-200 dark:border-white/10 pb-4">
-              1. Floating Lines Parameters
-            </h2>
-
-            <div className="space-y-4 font-sans text-sm">
-              {/* Line Count Slider */}
-              <div className="space-y-2">
-                <div className="flex justify-between font-medium">
-                  <span>Line Count (Density)</span>
-                  <span className="text-primary">{lineCount}</span>
-                </div>
-                <input
-                  type="range"
-                  min="2"
-                  max="35"
-                  value={lineCount}
-                  onChange={(e) => setLineCount(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#C99537]"
-                />
-              </div>
-
-              {/* Line Distance Slider */}
-              <div className="space-y-2">
-                <div className="flex justify-between font-medium">
-                  <span>Line Distance</span>
-                  <span className="text-primary">{lineDistance}</span>
-                </div>
-                <input
-                  type="range"
-                  min="2"
-                  max="25"
-                  value={lineDistance}
-                  onChange={(e) => setLineDistance(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#C99537]"
-                />
-              </div>
-
-              {/* Bend Radius Slider */}
-              <div className="space-y-2">
-                <div className="flex justify-between font-medium">
-                  <span>Bend Radius</span>
-                  <span className="text-primary">{bendRadius}</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="25"
-                  step="0.5"
-                  value={bendRadius}
-                  onChange={(e) => setBendRadius(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#C99537]"
-                />
-              </div>
-
-              {/* Bend Strength Slider */}
-              <div className="space-y-2">
-                <div className="flex justify-between font-medium">
-                  <span>Bend Strength (Deformation)</span>
-                  <span className="text-primary">{bendStrength}</span>
-                </div>
-                <input
-                  type="range"
-                  min="-8"
-                  max="8"
-                  step="0.5"
-                  value={bendStrength}
-                  onChange={(e) => setBendStrength(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#C99537]"
-                />
-              </div>
-
-              {/* Speed Slider */}
-              <div className="space-y-2">
-                <div className="flex justify-between font-medium">
-                  <span>Animation Speed</span>
-                  <span className="text-primary">{animationSpeed}x</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="4"
-                  step="0.1"
-                  value={animationSpeed}
-                  onChange={(e) => setAnimationSpeed(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#C99537]"
-                />
-              </div>
-
-              {/* Color Gradient Pickers */}
-              <div className="grid grid-cols-3 gap-4 pt-2">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-500">Start Color</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      value={gradientStart}
-                      onChange={(e) => setGradientStart(e.target.value)}
-                      className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 outline-none"
-                    />
-                    <span className="text-xs font-mono select-all uppercase">{gradientStart}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-500">Mid Color</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      value={gradientMid}
-                      onChange={(e) => setGradientMid(e.target.value)}
-                      className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 outline-none"
-                    />
-                    <span className="text-xs font-mono select-all uppercase">{gradientMid}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-500">End Color</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      value={gradientEnd}
-                      onChange={(e) => setGradientEnd(e.target.value)}
-                      className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 outline-none"
-                    />
-                    <span className="text-xs font-mono select-all uppercase">{gradientEnd}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 2: MagneticDock Controller */}
-          <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 backdrop-blur-md space-y-6">
-            <h2 className="text-xl font-sans font-bold tracking-tight border-b border-zinc-200 dark:border-white/10 pb-4">
-              2. Magnetic Dock Parameters
+              1. Magnetic Dock Parameters
             </h2>
 
             <div className="space-y-4 font-sans text-sm">
@@ -503,6 +311,123 @@ export default function SettingsPage() {
                 </label>
               </div>
 
+              {/* Unified Background Glow Toggle */}
+              <div className="flex justify-between items-center py-2 border-b border-zinc-200/50 dark:border-white/5">
+                <div>
+                  <span className="font-medium block">Unified Background Glow</span>
+                  <span className="text-[10px] font-light text-zinc-500">Use same gold accent light glow for all options</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={dockUnifiedGlow}
+                    onChange={(e) => setDockUnifiedGlow(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C99537]"></div>
+                </label>
+              </div>
+
+              {/* Mobile Dock Options */}
+              <div className="flex justify-between items-center gap-4 py-2 border-b border-zinc-200/50 dark:border-white/5">
+                <div>
+                  <span className="font-medium block">Mobile Dock Mode</span>
+                  <span className="text-[10px] font-light text-zinc-500">Hamburger triggered overlay vs. always visible</span>
+                </div>
+                <div className="flex border border-zinc-200 dark:border-neutral-700 rounded-lg overflow-hidden shrink-0">
+                  {([
+                    { label: "Hamburger Toggle", val: "hamburger" },
+                    { label: "Always Visible", val: "always" },
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.val}
+                      onClick={() => setDockMobileMode(opt.val)}
+                      className={`px-3 py-1 text-xs font-bold transition-colors ${dockMobileMode === opt.val
+                        ? "bg-[#C99537] text-white"
+                        : "bg-transparent text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dock Side Placement */}
+              <div className="flex justify-between items-center gap-4 py-2 border-b border-zinc-200/50 dark:border-white/5">
+                <div>
+                  <span className="font-medium block">Dock Screen Side</span>
+                  <span className="text-[10px] font-light text-zinc-500">Pick screen boundary edge</span>
+                </div>
+                <div className="flex border border-zinc-200 dark:border-neutral-700 rounded-lg overflow-hidden shrink-0">
+                  {(["bottom", "top", "left", "right"] as const).map((side) => (
+                    <button
+                      key={side}
+                      onClick={() => setDockSide(side)}
+                      className={`px-3 py-1 text-xs font-bold capitalize transition-colors ${dockSide === side
+                        ? "bg-[#C99537] text-white"
+                        : "bg-transparent text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        }`}
+                    >
+                      {side}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dock Vertical Alignment (only active if left or right side) */}
+              {(dockSide === "left" || dockSide === "right") && (
+                <div className="flex justify-between items-center gap-4 py-2 border-b border-zinc-200/50 dark:border-white/5">
+                  <div>
+                    <span className="font-medium block">Dock Side Alignment</span>
+                    <span className="text-[10px] font-light text-zinc-500">Align vertically on the side edge</span>
+                  </div>
+                  <div className="flex border border-zinc-200 dark:border-neutral-700 rounded-lg overflow-hidden shrink-0">
+                    {(["bottom", "top", "center"] as const).map((align) => (
+                      <button
+                        key={align}
+                        onClick={() => setDockVerticalAlign(align)}
+                        className={`px-3 py-1 text-xs font-bold capitalize transition-colors ${dockVerticalAlign === align
+                          ? "bg-[#C99537] text-white"
+                          : "bg-transparent text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                          }`}
+                      >
+                        {align}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Center Offset Coordinate Slider */}
+              <div className="space-y-2 py-2 border-b border-zinc-200/50 dark:border-white/5">
+                <div className="flex justify-between font-medium">
+                  <div>
+                    <span className="block">Alignment Height Offset</span>
+                    <span className="text-[10px] font-light text-zinc-500">Shift up/down from screen boundary/center</span>
+                  </div>
+                  <span className="text-primary">{dockCenterOffset}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="-300"
+                  max="300"
+                  step="5"
+                  value={dockCenterOffset}
+                  onChange={(e) => setDockCenterOffset(parseInt(e.target.value))}
+                  className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#C99537]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Icon Style & Design */}
+          <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 backdrop-blur-md space-y-6">
+            <h2 className="text-xl font-sans font-bold tracking-tight border-b border-zinc-200 dark:border-white/10 pb-4">
+              2. Visual Style Options
+            </h2>
+
+            <div className="space-y-4 font-sans text-sm">
               {/* Icon Style Toggle */}
               <div className="py-3 space-y-3">
                 <div className="flex items-center justify-between">
@@ -557,7 +482,6 @@ export default function SettingsPage() {
                       <svg viewBox="0 0 32 32" className="w-6 h-6" fill="none">
                         <defs><radialGradient id="s1" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#FFD700" /><stop offset="100%" stopColor="#FF8C00" /></radialGradient></defs>
                         <circle cx="16" cy="16" r="7" fill="url(#s1)" />
-                        {/* Pre-computed ray endpoints for 0,60,120,180,240,300 degrees — avoids SSR/CSR float mismatch */}
                         <line x1="25" y1="16" x2="28" y2="16" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
                         <line x1="20.5" y1="23.8" x2="22" y2="26.4" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
                         <line x1="11.5" y1="23.8" x2="10" y2="26.4" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
@@ -570,18 +494,13 @@ export default function SettingsPage() {
                         <defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFD700" /><stop offset="100%" stopColor="#C99537" /></linearGradient></defs>
                         <polygon points="16,3 19.5,12 29,12.5 22,19 24.5,29 16,23.5 7.5,29 10,19 3,12.5 12.5,12" fill="url(#sg1)" />
                       </svg>
-                      {/* Mini globe */}
-                      <svg viewBox="0 0 32 32" className="w-6 h-6" fill="none">
-                        <defs><radialGradient id="gg1" cx="40%" cy="40%" r="55%"><stop offset="0%" stopColor="#38bdf8" /><stop offset="100%" stopColor="#0369a1" /></radialGradient></defs>
-                        <circle cx="16" cy="16" r="12" fill="url(#gg1)" />
-                        <ellipse cx="16" cy="16" rx="12" ry="5" fill="none" stroke="#bae6fd" strokeWidth="0.8" opacity="0.5" />
-                        <path d="M10 12 Q13 9 15 12 Q17 14 20 12 Q22 10 22 14 Q21 18 18 18 Q15 19 13 17 Q10 15 10 12Z" fill="#22c55e" opacity="0.7" />
-                      </svg>
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Creative</span>
                     <span className="text-[10px] text-zinc-400 text-center">Artistic travel-themed</span>
                   </button>
                 </div>
+              </div>
+
               {/* Dock Design Style Toggle */}
               <div className="py-3 border-t border-zinc-200/50 dark:border-white/5 space-y-3">
                 <div className="flex items-center justify-between">
@@ -626,7 +545,7 @@ export default function SettingsPage() {
                       <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
                     )}
                     {/* Sketchy layout preview */}
-                    <div 
+                    <div
                       className="w-16 h-8 rounded-md bg-white dark:bg-zinc-950 border border-zinc-700 flex items-center justify-center gap-1"
                       style={{
                         filter: "url(#sketchy-sm)",
@@ -642,7 +561,6 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </div>
-            </div>
             </div>
           </div>
         </div>
@@ -700,25 +618,15 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {/* Generated Code blocks */}
-        <div className="bg-zinc-900 text-zinc-200 border border-white/5 rounded-3xl p-8 space-y-6">
+        {/* Generated Code block */}
+        <div className="bg-zinc-900 text-zinc-200 border border-white/5 rounded-3xl p-8 space-y-4">
           <h3 className="text-lg font-sans font-bold text-white border-b border-white/10 pb-4">
-            3. Generated Component Code
+            Generated Dock JSX
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <span className="text-xs text-zinc-500 uppercase tracking-widest block">FloatingLines JSX Code</span>
-              <pre className="p-4 bg-black/60 rounded-xl text-xs font-mono overflow-x-auto text-emerald-400 select-all border border-white/5">
-                {flCodeString}
-              </pre>
-            </div>
-            <div className="space-y-2">
-              <span className="text-xs text-zinc-500 uppercase tracking-widest block">MagneticDock JSX Code</span>
-              <pre className="p-4 bg-black/60 rounded-xl text-xs font-mono overflow-x-auto text-emerald-400 select-all border border-white/5">
-                {dockCodeString}
-              </pre>
-            </div>
-          </div>
+          <span className="text-xs text-zinc-500 uppercase tracking-widest block">MagneticDock JSX Code</span>
+          <pre className="p-4 bg-black/60 rounded-xl text-xs font-mono overflow-x-auto text-emerald-400 select-all border border-white/5">
+            {dockCodeString}
+          </pre>
         </div>
       </div>
     </div>

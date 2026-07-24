@@ -68,6 +68,12 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
     };
   }, []);
 
+  useEffect(() => {
+    if (defaultDestination) {
+      setFormData((prev) => ({ ...prev, destination: defaultDestination }));
+    }
+  }, [defaultDestination]);
+
   // Handle outside clicks for nationality search dropdown
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -477,16 +483,16 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
             initial={{ opacity: 0, y: 50, scale: 0.9, x: 20 }}
             animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
             exit={{ opacity: 0, y: 20, scale: 0.9, transition: { duration: 0.2 } }}
-            className="fixed bottom-24 right-6 sm:bottom-6 sm:right-6 z-[99999] bg-zinc-950 border border-red-500/30 text-white px-5 py-4 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] flex items-center gap-3.5 max-w-sm pointer-events-auto"
+            className="fixed bottom-24 right-6 sm:bottom-6 sm:right-6 z-[99999] bg-zinc-950 border border-[#C99537]/45 text-white px-5 py-4 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] flex items-center gap-3.5 max-w-sm pointer-events-auto"
           >
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#C99537]/15 flex items-center justify-center text-[#E2B755]">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div className="flex-1 text-left">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-red-500">Validation Notice</h4>
-              <p className="text-[13px] text-zinc-300 font-medium leading-normal mt-0.5">{notification.message}</p>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-[#E2B755]">Validation Notice</h4>
+              <p className="text-[13px] text-zinc-100 font-medium leading-normal mt-0.5">{notification.message}</p>
             </div>
             <button 
               type="button"

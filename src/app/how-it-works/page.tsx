@@ -31,7 +31,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-[#0A0D16] min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         {/* Intro */}
         <div className="text-center mb-20">

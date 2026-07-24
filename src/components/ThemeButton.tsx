@@ -20,19 +20,19 @@ export function ThemeButton({ href, onClick, className, children, type = "button
   const content = (
     <div className="relative group inline-block w-full sm:w-auto select-none">
       {/* Bottom Shadow Background (exposes to bottom-left when button moves up-right, transitions to gold) */}
-      <div className="absolute inset-0 bg-black border border-black z-0 transition-colors duration-200 group-hover:bg-[#C99537]" />
+      <div className="absolute inset-0 bg-black dark:bg-white border border-black dark:border-white z-0 transition-colors duration-200 group-hover:bg-[#C99537] dark:group-hover:bg-[#C99537]" />
       
       {/* Top Active Button */}
       <div 
         className={cn(
-          "relative bg-white text-zinc-950 border border-black font-sans font-bold tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 group-hover:translate-x-2 group-hover:-translate-y-2",
+          "relative bg-white dark:bg-zinc-950 text-zinc-950 dark:text-white border border-black dark:border-white font-sans font-bold tracking-wider uppercase transition-transform duration-200 flex items-center justify-between gap-6 cursor-pointer z-10 group-hover:translate-x-2 group-hover:-translate-y-2",
           size === "sm" ? "px-5 py-3 text-[11px]" : "px-8 py-4 text-xs sm:text-sm",
           className
         )}
       >
         <span>{children}</span>
         {!hideArrow && (
-          <span className="text-zinc-950 group-hover:text-[#C99537] transition-colors duration-200 text-base shrink-0">
+          <span className="text-zinc-950 dark:text-white group-hover:text-[#C99537] dark:group-hover:text-[#C99537] transition-colors duration-200 text-base shrink-0">
             →
           </span>
         )}

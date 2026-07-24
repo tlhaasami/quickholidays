@@ -63,17 +63,17 @@ export default function AiAssistant() {
   }, [messages, isTyping]);
 
   return (
-    <div className="bg-white dark:bg-black min-h-screen w-full text-zinc-950 dark:text-white pt-24 pb-48 px-4 sm:px-8 transition-colors duration-300 flex flex-col justify-between">
-      <div className="max-w-4xl mx-auto flex flex-col h-full w-full justify-between">
+    <div className="bg-white dark:bg-[#120F0A] min-h-screen w-full text-zinc-950 dark:text-white pt-24 pb-32 px-4 sm:px-8 transition-colors duration-300 flex flex-col justify-start">
+      <div className="max-w-4xl mx-auto flex flex-col w-full gap-4">
         
         {/* Header */}
-        <div className="text-center mb-4 w-full shrink-0">
+        <div className="text-center mb-2 w-full shrink-0">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight mb-2 text-zinc-900 dark:text-white"
+            className="font-serif text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight mb-2 text-zinc-900 dark:text-white"
           >
-            Schengen Visa <br />
+            Schengen Visa{" "}
             <span className="text-primary">
               <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
                 AI Consult Assistant.
@@ -86,7 +86,7 @@ export default function AiAssistant() {
         </div>
 
         {/* Chat Window */}
-        <div className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 flex flex-col h-[480px] mb-4 relative">
+        <div className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 flex flex-col h-[350px] sm:h-[400px] relative">
           {/* Scrollable messages container */}
           <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800">
             {messages.map((msg, index) => (

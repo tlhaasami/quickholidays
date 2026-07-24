@@ -58,16 +58,16 @@ export default function Pricing() {
   ];
 
   return (
-    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-48 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-[#0A0D16] min-h-screen text-zinc-950 dark:text-white pt-20 pb-36 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-6xl mx-auto text-center">
-        <div className="mb-20">
+        <div className="mb-10">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6 text-zinc-900 dark:text-white"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
           >
-            Clear, upfront pricing — <br />
+            Clear, upfront pricing —{" "}
             <span className="text-primary">
               <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
                 backed by accountability.
@@ -78,7 +78,7 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-lg sm:text-xl text-zinc-650 dark:text-zinc-400 font-light leading-relaxed max-w-2xl mx-auto"
+            className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed max-w-2xl mx-auto"
           >
             No hidden fees. Check eligibility for free. Only pay deposit to open your case file.
           </motion.p>

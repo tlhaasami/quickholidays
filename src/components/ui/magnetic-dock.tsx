@@ -21,8 +21,6 @@ interface MagneticDockProps {
     variant?: "glass" | "solid" | "transparent"
     /** Custom class name */
     className?: string
-    /** Custom theme styling: 'classic' (colorful glowing glass) or 'sketchy' (sketch outline) */
-    dockDesign?: "classic" | "sketchy"
 }
 
 interface DockItemData {
@@ -50,49 +48,7 @@ interface DockItemProps {
     magneticDistance: number
     showLabels: boolean
     isVertical: boolean
-    dockDesign: "classic" | "sketchy"
 }
-
-// Color styling configs for classic creative mode
-const hoverGlowColors: Record<string, string> = {
-    home: "from-amber-400 to-orange-500",
-    "schengen-visa": "from-sky-400 to-blue-600",
-    pricing: "from-yellow-300 to-amber-500",
-    "how-it-works": "from-cyan-400 to-teal-500",
-    faq: "from-purple-400 to-indigo-600",
-    reviews: "from-rose-400 to-red-500",
-    "about-us": "from-emerald-400 to-teal-600",
-    "contact-us": "from-pink-400 to-fuchsia-600",
-    whatsapp: "from-green-400 to-emerald-600",
-    "ai-assistant": "from-indigo-400 to-violet-600",
-    "theme-toggle": "from-transparent to-transparent",
-};
-
-const hoverIconColors: Record<string, string> = {
-    home: "group-hover:text-amber-500 dark:group-hover:text-amber-400",
-    "schengen-visa": "group-hover:text-blue-500 dark:group-hover:text-blue-400",
-    pricing: "group-hover:text-amber-500 dark:group-hover:text-amber-400",
-    "how-it-works": "group-hover:text-cyan-500 dark:group-hover:text-cyan-400",
-    faq: "group-hover:text-purple-500 dark:group-hover:text-purple-400",
-    reviews: "group-hover:text-rose-500 dark:group-hover:text-rose-400",
-    "about-us": "group-hover:text-emerald-500 dark:group-hover:text-emerald-400",
-    "contact-us": "group-hover:text-pink-500 dark:group-hover:text-pink-400",
-    whatsapp: "group-hover:text-green-500 dark:group-hover:text-green-400",
-    "ai-assistant": "group-hover:text-indigo-500 dark:group-hover:text-indigo-400",
-};
-
-const activeIndicatorColors: Record<string, string> = {
-    home: "bg-amber-500 shadow-amber-500/50",
-    "schengen-visa": "bg-blue-500 shadow-blue-500/50",
-    pricing: "bg-amber-500 shadow-amber-500/50",
-    "how-it-works": "bg-cyan-500 shadow-cyan-500/50",
-    faq: "bg-purple-500 shadow-purple-500/50",
-    reviews: "bg-rose-500 shadow-rose-500/50",
-    "about-us": "bg-emerald-500 shadow-emerald-500/50",
-    "contact-us": "bg-pink-500 shadow-pink-500/50",
-    whatsapp: "bg-green-500 shadow-green-500/50",
-    "ai-assistant": "bg-indigo-500 shadow-indigo-500/50",
-};
 
 function DockItem({
     item,
@@ -102,7 +58,6 @@ function DockItem({
     magneticDistance,
     showLabels,
     isVertical,
-    dockDesign,
 }: DockItemProps) {
     const ref = React.useRef<HTMLButtonElement>(null)
     const [isHovered, setIsHovered] = React.useState(false)
@@ -131,104 +86,69 @@ function DockItem({
     const y = useTransform(smoothScale, (s) => (s - 1) * -10)
     const smoothY = useSpring(y, springConfig)
 
-    // Theme state to toggle box-shadow colors dynamically in sketchy mode
-    const [isDark, setIsDark] = React.useState(true);
-
-    React.useEffect(() => {
-        const checkTheme = () => {
-            setIsDark(document.documentElement.classList.contains("dark"));
-        };
-        checkTheme();
-        const observer = new MutationObserver(checkTheme);
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["class"]
-        });
-        return () => observer.disconnect();
-    }, []);
-
-    // Sketchy box shadows
-    const baseBoxShadow = isDark
-        ? "0 0 0 2px #fff, 2.5px 3px 0 2px rgba(255, 255, 255, 0.25)"
-        : "0 0 0 2px #1c1917, 2.5px 3px 0 2px rgba(28, 25, 23, 0.22)";
-
-    const hoverBoxShadow = isDark
-        ? "0 0 0 2px #fff, 4px 5px 0 2px rgba(255, 255, 255, 0.35)"
-        : "0 0 0 2px #1c1917, 4px 5px 0 2px rgba(28, 25, 23, 0.3)";
-
-    const activeBoxShadow = isHovered ? hoverBoxShadow : baseBoxShadow;
-
     return (
         <motion.button
             ref={ref}
             onClick={item.onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="relative flex items-center justify-center cursor-pointer bg-transparent border-0 focus:outline-none group"
+            className={cn(
+                "relative flex items-center justify-center cursor-pointer bg-transparent border-0",
+                "rounded-2xl transition-colors duration-200",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-455 dark:focus-visible:ring-white/50",
+                item.isActive && "bg-neutral-200/50 dark:bg-white/10"
+            )}
             style={{
                 width: size,
                 height: size,
                 y: isVertical ? 0 : smoothY,
                 x: isVertical ? smoothY : 0,
             }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.9 }}
         >
-            {/* Out-of-bounds Glow Drop-shadow for Classic Mode */}
-            {dockDesign === "classic" && isHovered && hoverGlowColors[item.id] && (
-                <div className={cn(
-                    "absolute -inset-1.5 rounded-3xl opacity-30 blur-lg transition-opacity duration-300 bg-gradient-to-br -z-10",
-                    hoverGlowColors[item.id]
-                )} />
-            )}
-
             {/* Icon Container */}
             <motion.div
                 className={cn(
-                    "relative w-full h-full rounded-2xl flex items-center justify-center transition-all duration-300",
+                    "relative w-full h-full rounded-2xl",
                     item.id === "theme-toggle" ? "overflow-visible" : "overflow-hidden",
-                    // SKETCHY VARIANT container
-                    dockDesign === "sketchy"
-                        ? (item.id === "theme-toggle"
-                            ? "bg-transparent border-none shadow-none"
-                            : "bg-white dark:bg-zinc-950")
-                        // CLASSIC VARIANT container (glowing glass styling)
-                        : (item.id === "theme-toggle"
-                            ? "bg-transparent border-none shadow-none"
-                            : cn(
-                                "bg-gradient-to-b from-white/95 to-white/70 dark:from-zinc-900/95 dark:to-zinc-950/70",
-                                "backdrop-blur-md border border-zinc-200/50 dark:border-white/5",
-                                "shadow-md hover:shadow-xl shadow-black/[0.05]"
-                              )),
+                    item.id === "theme-toggle"
+                        ? "bg-transparent border-none shadow-none"
+                        : cn(
+                            "bg-gradient-to-b from-neutral-100 to-neutral-50",
+                            "dark:from-neutral-800 dark:to-neutral-900",
+                            "backdrop-blur-sm",
+                            "border border-neutral-300 dark:border-neutral-700",
+                            "shadow-lg shadow-black/10 dark:shadow-black/30"
+                        ),
+                    "flex items-center justify-center",
+                    "transition-all duration-200",
                     item.className
                 )}
                 style={{
-                    // Sketchy inline parameters
-                    filter: dockDesign === "sketchy" && item.id !== "theme-toggle" ? "url(#sketchy-sm)" : "none",
-                    boxShadow: dockDesign === "sketchy" && item.id !== "theme-toggle" ? activeBoxShadow : undefined,
-                    transform: dockDesign === "sketchy" && item.id !== "theme-toggle"
-                        ? (isHovered ? "rotate(3deg) scale(1.05)" : "rotate(-1.5deg) scale(1)")
-                        : "none",
-                    transition: "transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease",
+                    boxShadow: item.id === "theme-toggle"
+                        ? "none"
+                        : (isHovered
+                            ? "0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.5)"
+                            : "0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.3)"),
                 }}
             >
-                {/* Icon wrapper with hover state matching colors */}
+                {/* Icon */}
                 <div className={cn(
-                    "flex items-center justify-center transition-colors duration-300",
-                    dockDesign === "sketchy"
-                        ? (item.id !== "theme-toggle" && "text-neutral-700 dark:text-white filter drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_1px_1px_rgba(255,255,255,0.15)]")
-                        : (item.id !== "theme-toggle" && cn("text-zinc-600 dark:text-zinc-400", hoverIconColors[item.id])),
+                    "flex items-center justify-center text-neutral-700 dark:text-white",
                     item.id === "theme-toggle" ? "w-full h-full" : "w-[60%] h-[60%]"
                 )}>
                     {item.icon}
                 </div>
 
-                {/* Reflection Sweep (Shine sweep animation on hover for classic mode) */}
-                {dockDesign === "classic" && isHovered && item.id !== "theme-toggle" && (
+                {/* Shine effect */}
+                {item.id !== "theme-toggle" && (
                     <motion.div
-                        initial={{ left: "-100%" }}
-                        animate={{ left: "100%" }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="absolute top-0 bottom-0 w-1/2 bg-white/20 skew-x-12 pointer-events-none -z-0"
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            background:
+                                "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, transparent 50%, transparent 100%)",
+                            opacity: isHovered ? 0.9 : 0.5,
+                        }}
                     />
                 )}
             </motion.div>
@@ -265,14 +185,9 @@ function DockItem({
                         exit={{ scale: 0, opacity: 0 }}
                         className={cn(
                             "absolute -bottom-2",
-                            dockDesign === "sketchy"
-                                ? "w-2.5 h-1.5 rounded-sm bg-neutral-600 dark:bg-white/80"
-                                : cn("w-3.5 h-1 rounded-full shadow-lg", activeIndicatorColors[item.id] || "bg-zinc-650 dark:bg-white/80")
+                            "w-1.5 h-1.5 rounded-full",
+                            "bg-neutral-600 dark:bg-white/80"
                         )}
-                        style={dockDesign === "sketchy" ? {
-                            filter: "url(#sketchy-sm)",
-                            transform: "rotate(-1deg)"
-                        } : undefined}
                     />
                 )}
             </AnimatePresence>
@@ -309,6 +224,17 @@ function DockItem({
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Hover glow */}
+            <motion.div
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                animate={{
+                    boxShadow: isHovered
+                        ? "0 0 30px rgba(255,255,255,0.15)"
+                        : "0 0 0px rgba(255,255,255,0)",
+                }}
+                transition={{ duration: 0.3 }}
+            />
         </motion.button>
     )
 }
@@ -322,7 +248,6 @@ function MagneticDock({
     position = "bottom",
     variant = "glass",
     className,
-    dockDesign = "classic",
 }: MagneticDockProps) {
     const mousePosition = useMotionValue(Infinity)
     const isVertical = position === "left" || position === "right"
@@ -387,7 +312,6 @@ function MagneticDock({
                     magneticDistance={magneticDistance}
                     showLabels={showLabels}
                     isVertical={isVertical}
-                    dockDesign={dockDesign}
                 />
             ))}
         </motion.div>
@@ -523,4 +447,6 @@ export {
     DockIconMusic,
     DockIconSettings,
     DockIconTrash,
+    type MagneticDockProps,
+    type DockItemData,
 }

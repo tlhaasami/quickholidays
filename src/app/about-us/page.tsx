@@ -7,16 +7,16 @@ import { WobbleCard } from "@/components/ui/wobble-card";
 
 export default function AboutUs() {
   return (
-    <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
+    <div className="bg-white dark:bg-[#0A0D16] min-h-screen text-zinc-950 dark:text-white pt-20 pb-32 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-4xl mx-auto text-left">
         
         {/* H1 Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight mb-4 text-zinc-900 dark:text-white"
           >
             Why Quick Holidays exists.
           </motion.h1>
@@ -24,19 +24,16 @@ export default function AboutUs() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-xl mx-auto"
+            className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light max-w-xl mx-auto"
           >
             Our founding mission, our team, and our commitment to premium trust.
           </motion.p>
         </div>
 
-        {/* Verbatim Vision Story (3 Paragraphs) */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 rounded-2xl p-8 sm:p-12 space-y-6 mb-16 shadow-2xl font-serif text-lg sm:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed italic"
+        {/* Verbatim Vision Story (3 Paragraphs) - Now as WobbleCard */}
+        <WobbleCard 
+          containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 mb-16 shadow-2xl" 
+          className="p-8 sm:p-12 text-zinc-700 dark:text-zinc-100 font-serif text-lg sm:text-xl leading-relaxed italic space-y-6"
         >
           <p>
             Schengen visas are confusing. Consultancies contradict each other. Forums give bad advice. Small mistakes get you rejected. Most consultancies don't fix this. They're expensive. Impersonal. Disorganised.
@@ -47,26 +44,26 @@ export default function AboutUs() {
           <p>
             We can't promise you a visa. We can promise you clarity. You'll know exactly where you stand. Every step. Start to finish.
           </p>
-        </motion.div>
+        </WobbleCard>
 
         {/* Core Beliefs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           <WobbleCard 
-            containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10" 
+            containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md" 
             className="p-8"
           >
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white mb-3">Transparency First</h3>
-            <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
+            <p className="font-sans text-sm text-zinc-700 dark:text-zinc-200 font-light leading-relaxed">
               We charge fixed, clear consultancy fees agreed in writing beforehand. We do not bundle VFS/embassy costs or mark them up. You always know exactly what your application costs and why.
             </p>
           </WobbleCard>
 
           <WobbleCard 
-            containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10" 
+            containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md" 
             className="p-8"
           >
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white mb-3">Quality Over Quantity</h3>
-            <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
+            <p className="font-sans text-sm text-zinc-700 dark:text-zinc-200 font-light leading-relaxed">
               We deliberately accept fewer clients to ensure that every single application gets checked by a trained specialist. We prepare every document, flight layout, and checklist manually.
             </p>
           </WobbleCard>
@@ -74,11 +71,11 @@ export default function AboutUs() {
 
         {/* Team Story */}
         <WobbleCard 
-          containerClassName="bg-[#101b37] border border-[#C99537]/20" 
+          containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 mb-16 shadow-2xl" 
           className="p-8 sm:p-12 text-left"
         >
-          <h3 className="font-serif text-2xl sm:text-3xl text-[#C99537] mb-4">Our Team</h3>
-          <div className="font-sans text-sm sm:text-base text-zinc-300 font-light leading-relaxed space-y-4">
+          <h3 className="font-serif text-2xl sm:text-3xl text-zinc-900 dark:text-white mb-4">Our Team</h3>
+          <div className="font-sans text-sm sm:text-base text-zinc-700 dark:text-zinc-200 font-light leading-relaxed space-y-4">
             <p>
               Behind every application is a dedicated, professional team — trained specifically in Schengen visa requirements, and focused on one thing: getting your application right, the first time.
             </p>
