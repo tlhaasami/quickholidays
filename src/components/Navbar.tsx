@@ -220,6 +220,8 @@ export function Navbar() {
         </defs>
       </svg>
 
+
+
       {/* Hamburger Menu Button (Mobile Only) - Only rendered if dockMobileMode is set to "hamburger" */}
       {mobileMode === "hamburger" && (
         <button

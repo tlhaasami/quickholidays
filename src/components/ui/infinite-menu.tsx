@@ -3,6 +3,7 @@
 import { FC, useRef, useState, useEffect, MutableRefObject } from 'react';
 import { useRouter } from 'next/navigation';
 import { mat4, quat, vec2, vec3 } from 'gl-matrix';
+import { ThemeButton } from '@/components/ThemeButton';
 
 const discVertShaderSource = `#version 300 es
 
@@ -16,10 +17,11 @@ in vec3 aModelPosition;
 in vec3 aModelNormal;
 in vec2 aModelUvs;
 in mat4 aInstanceMatrix;
+in float aItemIndex;
 
 out vec2 vUvs;
 out float vAlpha;
-flat out int vInstanceId;
+flat out int vItemIndex;
 
 #define PI 3.141593
 
@@ -44,9 +46,9 @@ void main() {
 
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 
-    vAlpha = smoothstep(0.5, 1., normalize(worldPosition.xyz).z) * .9 + .1;
+    vAlpha = 1.0;
     vUvs = aModelUvs;
-    vInstanceId = gl_InstanceID;
+    vItemIndex = int(aItemIndex);
 }
 `;
 
@@ -61,10 +63,10 @@ out vec4 outColor;
 
 in vec2 vUvs;
 in float vAlpha;
-flat in int vInstanceId;
+flat in int vItemIndex;
 
 void main() {
-    int itemIndex = vInstanceId % uItemCount;
+    int itemIndex = vItemIndex;
     int cellsPerRow = uAtlasSize;
     int cellX = itemIndex % cellsPerRow;
     int cellY = itemIndex / cellsPerRow;
@@ -85,6 +87,7 @@ void main() {
     st = st * cellSize + cellOffset;
     
     outColor = texture(uTex, st);
+    outColor.rgb *= vAlpha;
     outColor.a *= vAlpha;
 }
 `;
@@ -677,11 +680,13 @@ class InfiniteGridMenu {
   private worldMatrix = mat4.create();
   private tex: WebGLTexture | null = null;
   private control!: ArcballControl;
+  private vertexItemIndices!: Float32Array;
 
   private discLocations!: {
     aModelPosition: number;
     aModelUvs: number;
     aInstanceMatrix: number;
+    aItemIndex: number;
     uWorldMatrix: WebGLUniformLocation | null;
     uViewMatrix: WebGLUniformLocation | null;
     uProjectionMatrix: WebGLUniformLocation | null;
@@ -820,13 +825,15 @@ class InfiniteGridMenu {
       aModelPosition: 0,
       aModelNormal: 1,
       aModelUvs: 2,
-      aInstanceMatrix: 3
+      aInstanceMatrix: 3,
+      aItemIndex: 7
     });
 
     this.discLocations = {
       aModelPosition: gl.getAttribLocation(this.discProgram!, 'aModelPosition'),
       aModelUvs: gl.getAttribLocation(this.discProgram!, 'aModelUvs'),
       aInstanceMatrix: gl.getAttribLocation(this.discProgram!, 'aInstanceMatrix'),
+      aItemIndex: gl.getAttribLocation(this.discProgram!, 'aItemIndex'),
       uWorldMatrix: gl.getUniformLocation(this.discProgram!, 'uWorldMatrix'),
       uViewMatrix: gl.getUniformLocation(this.discProgram!, 'uViewMatrix'),
       uProjectionMatrix: gl.getUniformLocation(this.discProgram!, 'uProjectionMatrix'),
@@ -854,6 +861,56 @@ class InfiniteGridMenu {
     this.icoGeo.subdivide(1).spherize(this.SPHERE_RADIUS);
     this.instancePositions = this.icoGeo.vertices.map(v => v.position);
     this.DISC_INSTANCE_COUNT = this.icoGeo.vertices.length;
+
+    // Calculate vertex pairs and country assignments
+    const pairs: [number, number][] = [];
+    const visited = new Set<number>();
+    for (let i = 0; i < this.instancePositions.length; i++) {
+      if (visited.has(i)) continue;
+      let bestAntipode = -1;
+      let minDistance = Infinity;
+      const target = vec3.negate(vec3.create(), this.instancePositions[i]);
+      for (let j = 0; j < this.instancePositions.length; j++) {
+        if (i === j || visited.has(j)) continue;
+        const d = vec3.distance(this.instancePositions[j], target);
+        if (d < minDistance) {
+          minDistance = d;
+          bestAntipode = j;
+        }
+      }
+      if (bestAntipode !== -1 && minDistance < 0.1) {
+        pairs.push([i, bestAntipode]);
+        visited.add(i);
+        visited.add(bestAntipode);
+      }
+    }
+
+    const N = Math.max(1, this.items.length);
+    const itemIndices = new Float32Array(this.DISC_INSTANCE_COUNT);
+    let itemOffset = 0;
+    pairs.forEach(([idxA, idxB], pairIdx) => {
+      if (N >= 21) {
+        const numSinglePairs = N - 21;
+        if (pairIdx < numSinglePairs) {
+          const itemA = itemOffset % N;
+          const itemB = (itemOffset + 1) % N;
+          itemIndices[idxA] = itemA;
+          itemIndices[idxB] = itemB;
+          itemOffset += 2;
+        } else {
+          const item = itemOffset % N;
+          itemIndices[idxA] = item;
+          itemIndices[idxB] = item;
+          itemOffset += 1;
+        }
+      } else {
+        itemIndices[idxA] = pairIdx % N;
+        itemIndices[idxB] = (pairIdx + 1) % N;
+      }
+    });
+
+    this.vertexItemIndices = itemIndices;
+
     this.initDiscInstances(this.DISC_INSTANCE_COUNT);
     this.initTexture();
     this.control = new ArcballControl(this.canvas, deltaTime => this.onControlUpdate(deltaTime));
@@ -955,6 +1012,15 @@ class InfiniteGridMenu {
       gl.vertexAttribPointer(loc, 4, gl.FLOAT, false, bytesPerMatrix, j * 4 * 4);
       gl.vertexAttribDivisor(loc, 1);
     }
+
+    // Bind aItemIndex as an instanced attribute
+    const itemIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, itemIndexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, this.vertexItemIndices, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(this.discLocations.aItemIndex);
+    gl.vertexAttribPointer(this.discLocations.aItemIndex, 1, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribDivisor(this.discLocations.aItemIndex, 1);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.bindVertexArray(null);
   }
@@ -1076,7 +1142,7 @@ class InfiniteGridMenu {
 
     if (!this.control.isPointerDown) {
       const nearestVertexIndex = this.findNearestVertexIndex();
-      const itemIndex = nearestVertexIndex % Math.max(1, this.items.length);
+      const itemIndex = Math.round(this.vertexItemIndices[nearestVertexIndex]);
       this.onActiveItemChange(itemIndex);
       const snapDirection = vec3.normalize(vec3.create(), this.getVertexWorldPosition(nearestVertexIndex));
       this.control.snapTargetDirection = snapDirection;
@@ -1251,33 +1317,24 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
           </p>
 
           <div
-            onClick={handleButtonClick}
             className={`
               absolute
               left-1/2
               z-10
-              w-[54px]
-              h-[54px]
-              grid
-              place-items-center
-              bg-[#C99537] hover:bg-[#b07e2a]
-              dark:bg-[#E2B755] dark:hover:bg-[#d09e3e]
-              text-white dark:text-zinc-950
-              border-[4px]
-              border-white dark:border-zinc-900
-              shadow-lg
-              rounded-full
-              cursor-pointer
               transition-all
               ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
               ${isMoving
-                ? 'bottom-[-40px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2'
-                : 'bottom-8 sm:bottom-12 opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2'
+                ? 'bottom-[-60px] opacity-0 pointer-events-none duration-[100ms] -translate-x-1/2'
+                : 'bottom-8 sm:bottom-12 opacity-100 pointer-events-auto duration-[500ms] -translate-x-1/2'
               }
             `}
           >
-            <p className="select-none relative top-[1px] text-[20px]">&#x2197;</p>
+            <ThemeButton onClick={handleButtonClick}>
+              Book Consultation
+            </ThemeButton>
           </div>
+
+
         </>
       )}
     </div>

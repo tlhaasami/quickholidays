@@ -32,7 +32,7 @@ export default function FAQ() {
         },
         {
           q: "Where is your physical office located?",
-          a: "Our registered physical office is located at Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ. While we handle all consulting services digitally, you can consult with our team online, by email, phone, or WhatsApp."
+          a: "Our registered physical office is located at Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN. While we handle all consulting services digitally, you can consult with our team online, by email, phone, or WhatsApp."
         }
       ]
     },

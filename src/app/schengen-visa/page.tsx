@@ -3,41 +3,20 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { COUNTRIES, INFINITE_MENU_CONFIG } from "@/constants";
+import { COUNTRIES, INFINITE_MENU_CONFIG, COUNTRY_NICHES } from "@/constants";
 import { Highlighter } from "@/components/ui/highlighter";
 import { VerticalAccordion } from "@/components/VerticalAccordion";
 import InfiniteMenu from "@/components/ui/infinite-menu";
+import { ThemeButton } from "@/components/ThemeButton";
 
 export default function SchengenVisaHub() {
   const menuItems = useMemo(() => {
     return COUNTRIES.map((c) => {
-      let desc = `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`;
-      if (c.name === "France") {
-        desc = "France is the most popular Schengen destination from the UK. Biometrics slots fill up quickly, and decisions are returned in 7-10 days.";
-      } else if (c.name === "Spain") {
-        desc = "Spain is a top choice for summer vacations and quick getaways. Applications are processed in London, Manchester, and Edinburgh.";
-      } else if (c.name === "Italy") {
-        desc = "Italy tourist visas require detailed proof of travel. Slots are highly competitive and require early booking.";
-      } else if (c.name === "Germany") {
-        desc = "Germany is high-demand for business and holiday travelers. Embassy guidelines are strict and require complete precision.";
-      } else if (c.name === "Switzerland") {
-        desc = "Switzerland is famed for the scenic Alps. We organize complete day-by-day flight, hotel, and travel itineraries.";
-      } else if (c.name === "Greece") {
-        desc = "Greece is heavily requested for summer travel. Appointments are processed at the GVC centers across the UK.";
-      } else if (c.name === "Netherlands") {
-        desc = "Netherlands is a major European transit and tourist hub. Appointment slots are monitored and secured 24/7 by our team.";
-      } else if (c.name === "Portugal") {
-        desc = "Portugal is highly popular for beach and cultural trips. Applications are processed via VFS centers in London and Manchester.";
-      } else if (c.name === "Austria") {
-        desc = "Austria is famous for ski resorts and Vienna tours. Accommodation proofs and financial stability are strictly verified.";
-      } else if (c.name === "Belgium") {
-        desc = "Belgium is highly accessible via Eurostar from St Pancras. The ideal destination for short weekend breaks.";
-      }
       return {
         image: c.flag,
-        link: `/schengen-visa/${c.slug}`,
+        link: `/contact-us?destination=${c.slug}`,
         title: c.name,
-        description: desc,
+        description: COUNTRY_NICHES[c.name] || `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`,
       };
     });
   }, []);
@@ -131,13 +110,11 @@ export default function SchengenVisaHub() {
 
 
           <div className="mt-12 flex justify-center pb-12">
-            <Link 
-              href="/contact-us"
-              className="px-8 py-4 bg-primary text-white font-bold border-3 border-black dark:border-white hover:bg-[#B58532] hover:scale-105 active:scale-98 transition-all cursor-pointer shadow-[4px_4px_0_#000] dark:shadow-[4px_4px_0_#fff] shrink-0"
-            >
+            <ThemeButton href="/contact-us">
               Book Visa Consultation
-            </Link>
+            </ThemeButton>
           </div>
+
         </div>
       </div>
     </div>

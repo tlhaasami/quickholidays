@@ -6,13 +6,14 @@ import { motion, useInView, useMotionValue, useSpring, useTransform } from "moti
 import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 import { TiltedCard } from "@/components/ui/tilted-card";
 import { TypeformForm } from "@/components/TypeformForm";
-import { FLAG_IMAGES, MARQUEE_CONFIG, HERO_CONFIG, COUNTRIES } from "@/constants";
+import { FLAG_IMAGES, MARQUEE_CONFIG, HERO_CONFIG, COUNTRIES, INFINITE_MENU_CONFIG, COUNTRY_NICHES } from "@/constants";
 import { Pointer } from "@/components/ui/pointer";
 import { Highlighter } from "@/components/ui/highlighter";
 import { VerticalAccordion } from "@/components/VerticalAccordion";
 import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
 import Stack from "@/components/ui/stack";
+import InfiniteMenu from "@/components/ui/infinite-menu";
 
 import { trackContact } from "@/lib/analytics";
 import { CoolMode } from "@/components/ui/cool-mode";
@@ -189,33 +190,20 @@ export default function Hero() {
   const repeatedFlagImages = Array(MARQUEE_CONFIG.repeats).fill(FLAG_IMAGES).flat();
 
   const menuItems = useMemo(() => COUNTRIES.map((c) => {
-    let desc = `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`;
-    if (c.name === "France") {
-      desc = "France is the most popular Schengen destination from the UK. Biometrics slots fill up quickly, and decisions are returned in 7-10 days.";
-    } else if (c.name === "Spain") {
-      desc = "Spain is a top choice for summer vacations and quick getaways. Applications are processed in London, Manchester, and Edinburgh.";
-    } else if (c.name === "Italy") {
-      desc = "Italy tourist visas require detailed proof of travel. Slots are highly competitive and require early booking.";
-    } else if (c.name === "Germany") {
-      desc = "Germany is high-demand for business and holiday travelers. Embassy guidelines are strict and require complete precision.";
-    } else if (c.name === "Switzerland") {
-      desc = "Switzerland is famed for the scenic Alps. We organize complete day-by-day flight, hotel, and travel itineraries.";
-    } else if (c.name === "Greece") {
-      desc = "Greece is heavily requested for summer travel. Appointments are processed at the GVC centers across the UK.";
-    } else if (c.name === "Netherlands") {
-      desc = "Netherlands is a major European transit and tourist hub. Appointment slots are monitored and secured 24/7 by our team.";
-    } else if (c.name === "Portugal") {
-      desc = "Portugal is highly popular for beach and cultural trips. Applications are processed via VFS centers in London and Manchester.";
-    } else if (c.name === "Austria") {
-      desc = "Austria is famous for ski resorts and Vienna tours. Accommodation proofs and financial stability are strictly verified.";
-    } else if (c.name === "Belgium") {
-      desc = "Belgium is highly accessible via Eurostar from St Pancras. The ideal destination for short weekend breaks.";
-    }
     return {
       image: c.flag,
       link: `/contact-us?destination=${c.slug}`,
       title: c.name,
-      description: desc
+      description: COUNTRY_NICHES[c.name] || `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`
+    };
+  }), []);
+
+  const selectorMenuItems = useMemo(() => COUNTRIES.map((c) => {
+    return {
+      image: c.flag,
+      link: `/contact-us?destination=${c.slug}`,
+      title: c.name,
+      description: COUNTRY_NICHES[c.name] || `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`
     };
   }), []);
 
@@ -699,41 +687,17 @@ export default function Hero() {
           </motion.p>
         </div>
         <div className="max-w-7xl mx-auto px-8 sm:px-16 pb-12 mt-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {COUNTRIES.map((country, idx) => (
-              <motion.div
-                key={country.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: Math.min(idx * 0.03, 0.5) }}
-              >
-                <Link
-                  href={`/schengen-visa/${country.slug}`}
-                  className="group relative flex flex-col justify-between overflow-hidden border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/60 rounded-xl p-6 hover:border-primary/50 hover:bg-zinc-100 dark:hover:bg-zinc-950/80 transition-all duration-300 h-full text-left"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <span className="font-serif text-lg sm:text-xl font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
-                      {country.name}
-                    </span>
-                    <img
-                      src={country.flag}
-                      alt={`${country.name} Flag`}
-                      className="w-12 h-8 object-cover rounded-sm border border-zinc-200/50 dark:border-white/10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
-                    />
-                  </div>
-                  <span className="text-zinc-500 font-sans text-xs tracking-wider uppercase group-hover:text-zinc-900 dark:group-hover:text-white transition-colors inline-flex items-center gap-1 self-start mt-2">
-                    Visa Guide
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform">
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
-                  </span>
-                </Link>
-              </motion.div>
-            ))}
+          <div className="w-full h-[550px] md:h-[680px] relative overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-200 dark:border-zinc-800/50 rounded-2xl shadow-inner">
+            <InfiniteMenu
+              items={selectorMenuItems}
+              scale={INFINITE_MENU_CONFIG.scale}
+              flagSizeFactor={INFINITE_MENU_CONFIG.flagSizeFactor}
+              borderColor={INFINITE_MENU_CONFIG.borderColor}
+              borderWidth={INFINITE_MENU_CONFIG.borderWidth}
+            />
           </div>
         </div>
+
       </section>
 
       {/* 2.7 Reviews Section */}
@@ -1064,13 +1028,15 @@ export default function Hero() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Address</span>
-                  <span className="leading-relaxed">Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ</span>
+                  <span className="leading-relaxed">Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN</span>
                 </div>
               </div>
             </div>
           </div>
 
         </div>
+
+
 
         {/* Legal Disclosures & Copyright */}
         <div className="max-w-7xl w-full mx-auto border-t border-zinc-200 dark:border-white/5 pt-8 text-xs font-sans font-light text-zinc-500 text-left space-y-4">

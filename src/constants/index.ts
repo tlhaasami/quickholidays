@@ -96,3 +96,35 @@ export const INFINITE_MENU_CONFIG = {
   borderWidth: 12,        // Border thickness for flags
 };
 
+export const COUNTRY_NICHES: Record<string, string> = {
+  "Austria": "Austria is famous for Alpine resorts and Vienna tours. Accommodation proof and financial stability checks are strictly verified.",
+  "Belgium": "Belgium is easily accessible via Eurostar. Perfect for short weekend breaks; applications are processed with high efficiency.",
+  "Bulgaria": "Bulgaria offers rich history and beautiful Black Sea resorts. We verify all travel itineraries and accommodation details.",
+  "Croatia": "Croatia is popular for historic coastal towns and islands. We check your flight layouts and hotel bookings for precision.",
+  "Czech Republic": "Czech Republic is a top choice for Prague city breaks. Applications require precise travel insurance and funds check.",
+  "Denmark": "Denmark is a premium Nordic destination. Applications are processed via London visa centers with swift processing timelines.",
+  "Estonia": "Estonia is perfect for quiet Baltic medieval escapes. We prepare all documents to ensure hassle-free embassy checks.",
+  "Finland": "Finland is the ultimate winter wonderland. Financial statements and detailed travel itineraries are strictly verified.",
+  "France": "France is the most popular Schengen destination from the UK. Biometrics slots fill up quickly, and decisions are returned in 7-10 days.",
+  "Spain": "Spain is a top choice for summer vacations and quick getaways. Applications are processed in London, Manchester, and Edinburgh.",
+  "Greece": "Greece is heavily requested for summer travel. Appointments are processed at the GVC centers across the UK.",
+  "Hungary": "Hungary is a top thermal bath and cultural destination. We audit your application files to match embassy guidelines.",
+  "Iceland": "Iceland is famous for the Northern Lights and glaciers. Requires comprehensive travel insurance and flight layouts.",
+  "Italy": "Italy tourist visas require detailed proof of travel. Slots are highly competitive and require early booking.",
+  "Latvia": "Latvia offers beautiful nature and historic Riga. We coordinate your checklist to ensure quick and positive processing.",
+  "Liechtenstein": "Liechtenstein is nestled in the Alps. Applications are processed under Swiss embassy guidelines with full precision.",
+  "Lithuania": "Lithuania is famed for historic Vilnius and Baltic castles. We check your documentation and resident permit status for a smooth application.",
+  "Luxembourg": "Luxembourg is a compact, premium destination. High requirements for financial proof apply for tourist visas.",
+  "Malta": "Malta is a sunny Mediterranean island destination. Biometrics appointments are highly sought after; we monitor slots 24/7.",
+  "Netherlands": "Netherlands is a major European transit and tourist hub. Appointment slots are monitored and secured 24/7 by our team.",
+  "Norway": "Norway is famous for fjords and polar nights. Checklists require highly detailed proof of internal travel bookings.",
+  "Poland": "Poland is popular for historic cities like Krakow and Warsaw. We compile and verify all employment and banking documents.",
+  "Portugal": "Portugal is highly popular for beach and cultural trips. Applications are processed via VFS centers in London and Manchester.",
+  "Romania": "Romania is famous for Transylvanian castles and mountains. We ensure all flights and accommodation bookings align with rules.",
+  "Slovakia": "Slovakia is ideal for hiking and exploring medieval castles. Financial requirements and insurance coverage must be precisely audited.",
+  "Slovenia": "Slovenia is a scenic green destination featuring Lake Bled. We draft custom cover letters and verify checklists.",
+  "Germany": "Germany is high-demand for business and holiday travelers. Embassy guidelines are strict and require complete precision.",
+  "Sweden": "Sweden is a major Scandinavian business and holiday hub. Embassy processing is strict and requires error-free applications.",
+  "Switzerland": "Switzerland is famed for the scenic Alps. We organize complete day-by-day flight, hotel, and travel itineraries."
+};
+
