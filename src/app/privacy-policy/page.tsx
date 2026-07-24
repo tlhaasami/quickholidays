@@ -75,7 +75,7 @@ export default function PrivacyPolicyPage() {
                 Quick Holidays Ltd<br />
                 Email: info@quickholidays.co.uk<br />
                 Phone: +448000584673<br />
-                Address: 39 Stanley Street, Fairfield, Liverpool, L7 0JN
+                Address: Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ
               </p>
             </section>
           </div>

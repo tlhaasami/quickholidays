@@ -623,7 +623,7 @@ export default function ClientVisaFormPage({ params }: PageProps) {
             </div>
             <div className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Direct WhatsApp</span>
-              <a href="https://wa.me/447428878936" target="_blank" rel="noopener noreferrer" className="font-bold text-brand-gold hover:underline mt-auto">+44 7428 878936</a>
+              <a href="https://wa.me/447828707425" target="_blank" rel="noopener noreferrer" className="font-bold text-brand-gold hover:underline mt-auto">+44 7828 707425</a>
             </div>
             <div className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">General Email</span>

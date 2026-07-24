@@ -3,11 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
-  
+
   // Ignore files with extensions (images, fonts, stylesheets) and Next.js internal calls (HMR, static scripts)
-  const isStaticFileOrInternal = 
-    url.pathname.includes(".") || 
-    url.pathname.startsWith("/_next") || 
+  const isStaticFileOrInternal =
+    url.pathname.includes(".") ||
+    url.pathname.startsWith("/_next") ||
     url.pathname.includes("webpack-hmr");
 
   if (isStaticFileOrInternal) {
@@ -42,39 +42,39 @@ export async function proxy(request: NextRequest) {
   // Define response (either rewrite for subdomain or next for standard)
   let response = isSubdomainAdmin && !url.pathname.startsWith("/admin")
     ? NextResponse.rewrite(new URL(targetPathname, request.url), {
-        request: {
-          headers: requestHeaders,
-        },
-      })
+      request: {
+        headers: requestHeaders,
+      },
+    })
     : NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
+      request: {
+        headers: requestHeaders,
+      },
+    });
 
-function getCookieDomain(host?: string | null) {
-  if (!host) return undefined;
-  const cleanHost = host.split(":")[0].toLowerCase();
-  if (cleanHost === "localhost" || cleanHost.endsWith(".localhost")) {
-    return "localhost";
-  }
-  if (cleanHost.endsWith(".netlify.app") || cleanHost.endsWith(".vercel.app")) {
+  function getCookieDomain(host?: string | null) {
+    if (!host) return undefined;
+    const cleanHost = host.split(":")[0].toLowerCase();
+    if (cleanHost === "localhost" || cleanHost.endsWith(".localhost")) {
+      return "localhost";
+    }
+    if (cleanHost.endsWith(".netlify.app") || cleanHost.endsWith(".vercel.app")) {
+      return undefined;
+    }
+    const parts = cleanHost.split(".");
+    const isDoubleTld = parts.length >= 3 && [
+      "co", "com", "org", "net", "ltd", "me", "plc", "sch", "ac", "gov"
+    ].includes(parts[parts.length - 2]);
+
+    if (isDoubleTld) {
+      return "." + parts.slice(-3).join(".");
+    } else {
+      if (parts.length >= 2) {
+        return "." + parts.slice(-2).join(".");
+      }
+    }
     return undefined;
   }
-  const parts = cleanHost.split(".");
-  const isDoubleTld = parts.length >= 3 && [
-    "co", "com", "org", "net", "ltd", "me", "plc", "sch", "ac", "gov"
-  ].includes(parts[parts.length - 2]);
-
-  if (isDoubleTld) {
-    return "." + parts.slice(-3).join(".");
-  } else {
-    if (parts.length >= 2) {
-      return "." + parts.slice(-2).join(".");
-    }
-  }
-  return undefined;
-}
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -91,15 +91,15 @@ function getCookieDomain(host?: string | null) {
           );
           response = isSubdomainAdmin && !url.pathname.startsWith("/admin")
             ? NextResponse.rewrite(new URL(targetPathname, request.url), {
-                request: {
-                  headers: requestHeaders,
-                },
-              })
+              request: {
+                headers: requestHeaders,
+              },
+            })
             : NextResponse.next({
-                request: {
-                  headers: requestHeaders,
-                },
-              });
+              request: {
+                headers: requestHeaders,
+              },
+            });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, {
               ...options,

@@ -15,9 +15,9 @@ export default function Footer() {
   const [footerInfo, setFooterInfo] = useState({
     email: "info@quickholidays.co.uk",
     phone: "+448000584673",
-    address: "39 Stanley Street, Fairfield,\nLiverpool, L7 0JN",
+    address: "Office 25 Innovation Park, Edge Lane,\nLiverpool, England, L7 9NJ",
     copyright: "Quick Holidays. All rights reserved.",
-    whatsapp: "",
+    whatsapp: "+447828707425",
     linkedin: "",
     instagram: "",
     facebook: "",

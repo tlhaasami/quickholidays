@@ -731,7 +731,7 @@ export default function AgentDashboard() {
             <strong>☎ Contact Us</strong>
             <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px; list-style-type: disc;">
               <li>Phone: +44 800 058 4673</li>
-              <li>WhatsApp: +44 7428 878936</li>
+              <li>WhatsApp: +44 7828 707425</li>
               <li>Email: info@quickholidays.co.uk</li>
             </ul>
           </div>
