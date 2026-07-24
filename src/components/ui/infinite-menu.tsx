@@ -1280,16 +1280,21 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
               absolute
               font-bold
               text-3xl sm:text-5xl md:text-6xl
-              left-6 sm:left-12 md:left-[10%] lg:left-[14%]
-              top-1/2
-              transform
-              -translate-y-1/2
+              text-center sm:text-left
+              
+              /* Mobile positioning */
+              top-10 left-1/2 -translate-x-1/2
+              
+              /* Desktop positioning */
+              sm:top-1/2 sm:left-12 sm:translate-x-0 sm:-translate-y-1/2
+              md:left-[10%] lg:left-[14%]
+              
               transition-all
               ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
               text-zinc-800 dark:text-zinc-100
               ${isMoving
-                ? 'opacity-0 pointer-events-none duration-[100ms] translate-x-4'
-                : 'opacity-100 pointer-events-auto duration-[500ms] translate-x-0'
+                ? 'opacity-0 pointer-events-none duration-[100ms] translate-y-2 sm:translate-x-4 sm:translate-y-0'
+                : 'opacity-100 pointer-events-auto duration-[500ms] translate-y-0 sm:translate-x-0 sm:-translate-y-1/2'
               }
             `}
           >
@@ -1299,6 +1304,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
           <p
             className={`
               select-none
+              hidden sm:block /* Hidden on mobile */
               absolute
               max-w-[200px]
               text-sm sm:text-lg
@@ -1329,8 +1335,8 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
               }
             `}
           >
-            <ThemeButton onClick={handleButtonClick}>
-              Book Consultation
+            <ThemeButton fullWidth={false} onClick={handleButtonClick}>
+              Book Visa Consultation
             </ThemeButton>
           </div>
 

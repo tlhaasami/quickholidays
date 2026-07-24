@@ -7,12 +7,12 @@ export function FloatingAssistant() {
   return (
     <Link
       href="/ai-assistant"
-      className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-indigo-500 to-violet-600 text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-indigo-400/20 md:hidden pointer-events-auto"
+      className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-[#C99537]/20 md:hidden pointer-events-auto"
       aria-label="AI Consultation Assistant"
     >
       {/* Sparkles / Bot line outline icon */}
       <svg
-        className="w-5.5 h-5.5 text-white"
+        className="w-5.5 h-5.5 text-zinc-950"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

@@ -67,6 +67,7 @@ export default function RootLayout({
         <Pointer />
         <Navbar />
         <main>{children}</main>
+        <FloatingWhatsApp />
         <FloatingAssistant />
         <DockWrapper />
       </body>

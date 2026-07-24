@@ -141,17 +141,7 @@ export default function Reviews() {
             Read what UK resident permit holders say about our service and our Accountability Promise.
           </motion.p>
 
-          {/* Add a Review Button CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="flex justify-center"
-          >
-            <ThemeButton href="/contact-us" size="sm">
-              Add a Review
-            </ThemeButton>
-          </motion.div>
+
         </div>
 
         {/* Reviews Grid - Desktop (hidden md:grid) */}

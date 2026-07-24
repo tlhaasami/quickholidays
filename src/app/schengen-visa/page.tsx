@@ -109,11 +109,7 @@ export default function SchengenVisaHub() {
           </div>
 
 
-          <div className="mt-12 flex justify-center pb-12">
-            <ThemeButton href="/contact-us">
-              Book Visa Consultation
-            </ThemeButton>
-          </div>
+
 
         </div>
       </div>

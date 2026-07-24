@@ -97,8 +97,20 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const [mobileMode, setMobileMode] = useState<"hamburger" | "always">("hamburger");
+
+  // Track window scroll
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Initialize theme status on mount
   useEffect(() => {
@@ -177,6 +189,9 @@ export function Navbar() {
 
   if (!mounted) return null;
 
+  const isHomepage = pathname === "/";
+  const showTransparent = isHomepage && !isScrolled;
+
   return (
     <>
       {/* SVG sketchy turbulence filter definitions required for the theme switch */}
@@ -222,6 +237,30 @@ export function Navbar() {
 
 
 
+      {/* Sticky Mobile Navbar (Mobile Only) */}
+      <header className={cn(
+        "fixed top-0 left-0 right-0 h-16 z-[998] md:hidden transition-all duration-300",
+        showTransparent 
+          ? "bg-transparent border-transparent" 
+          : "bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-white/10"
+      )}>
+        <div className={cn(
+          "h-full flex items-center justify-between px-6 transition-opacity duration-300",
+          showTransparent ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
+        )}>
+          <Link href="/" className="flex items-center gap-2.5 select-none">
+            <img
+              src="/logos/logo-search.png"
+              alt="Quick Holidays Logo"
+              className="h-8 w-auto object-contain filter brightness-95"
+            />
+            <span className="font-serif text-base font-bold tracking-tight text-zinc-900 dark:text-white">
+              Quick Holidays
+            </span>
+          </Link>
+        </div>
+      </header>
+
       {/* Hamburger Menu Button (Mobile Only) - Only rendered if dockMobileMode is set to "hamburger" */}
       {mobileMode === "hamburger" && (
         <button
@@ -231,11 +270,14 @@ export function Navbar() {
             window.dispatchEvent(new CustomEvent('mobile-menu-toggle', { detail: { open: newOpen } }));
           }}
           aria-label="Toggle Navigation Menu"
-          className="fixed top-6 right-6 z-[1000] p-2.5 rounded-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-white/10 shadow-lg cursor-pointer md:hidden flex flex-col justify-center items-center gap-1.5 w-11 h-11 pointer-events-auto transition-transform hover:scale-105 active:scale-95"
+          className={cn(
+            "fixed top-2.5 right-6 z-[1000] p-2.5 rounded-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-white/10 shadow-lg cursor-pointer md:hidden flex flex-col justify-center items-center gap-1.5 w-11 h-11 pointer-events-auto transition-all duration-300 hover:scale-105 active:scale-95",
+            isOpen ? "rotate-90" : "rotate-0"
+          )}
         >
-          <span className={cn("w-5 h-0.5 bg-zinc-900 dark:bg-white rounded-full transition-all duration-300 origin-center", isOpen ? "rotate-45 translate-y-1" : "")} />
-          <span className={cn("w-5 h-0.5 bg-zinc-900 dark:bg-white rounded-full transition-all duration-300", isOpen ? "opacity-0" : "")} />
-          <span className={cn("w-5 h-0.5 bg-zinc-900 dark:bg-white rounded-full transition-all duration-300 origin-center", isOpen ? "-rotate-45 -translate-y-1" : "")} />
+          <span className="w-5 h-0.5 bg-zinc-900 dark:bg-white rounded-full transition-all duration-300" />
+          <span className="w-5 h-0.5 bg-zinc-900 dark:bg-white rounded-full transition-all duration-300" />
+          <span className="w-5 h-0.5 bg-zinc-900 dark:bg-white rounded-full transition-all duration-300" />
         </button>
       )}
   
