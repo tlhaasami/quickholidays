@@ -3,6 +3,7 @@
 import React from "react";
 import { TypeformForm } from "@/components/TypeformForm";
 import { motion } from "motion/react";
+import { Highlighter } from "@/components/ui/highlighter";
 
 export default function ContactUs() {
   return (
@@ -14,7 +15,7 @@ export default function ContactUs() {
           transition={{ duration: 0.8 }}
           className="font-serif text-4xl sm:text-5xl font-medium tracking-tight mb-3 text-white"
         >
-          Book your consultation.
+          Book your <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>consultation.</Highlighter>
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}

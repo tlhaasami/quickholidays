@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "motion/react";
+import { Highlighter } from "@/components/ui/highlighter";
 
 export default function AboutUs() {
   return (
@@ -40,7 +41,7 @@ export default function AboutUs() {
             Schengen visas are confusing. Consultancies contradict each other. Forums give bad advice. Small mistakes get you rejected. Most consultancies don't fix this. They're expensive. Impersonal. Disorganised.
           </p>
           <p>
-            We built Quick Holidays to fix it.
+            We built <Highlighter action="highlight" color="#CCA35255" isView={true}>Quick Holidays</Highlighter> to fix it.
           </p>
           <p>
             We can't promise you a visa. We can promise you clarity. You'll know exactly where you stand. Every step. Start to finish.

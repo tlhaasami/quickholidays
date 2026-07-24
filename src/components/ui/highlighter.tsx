@@ -1,6 +1,6 @@
 "use client"
 
-import { useLayoutEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import type React from "react"
 import { useInView } from "motion/react"
 import { annotate } from "rough-notation"
@@ -39,6 +39,7 @@ export function Highlighter({
   isView = false,
 }: HighlighterProps) {
   const elementRef = useRef<HTMLSpanElement>(null)
+  const [isReady, setIsReady] = useState(false)
 
   const isInView = useInView(elementRef, {
     once: true,
@@ -48,12 +49,21 @@ export function Highlighter({
   // If isView is false, always show. If isView is true, wait for inView
   const shouldShow = !isView || isInView
 
+  useEffect(() => {
+    if (shouldShow) {
+      const timer = setTimeout(() => {
+        setIsReady(true)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [shouldShow])
+
   useLayoutEffect(() => {
     const element = elementRef.current
     let annotation: RoughAnnotation | null = null
     let resizeObserver: ResizeObserver | null = null
 
-    if (shouldShow && element) {
+    if (shouldShow && isReady && element) {
       const annotationConfig = {
         type: action,
         color,
@@ -85,6 +95,7 @@ export function Highlighter({
     }
   }, [
     shouldShow,
+    isReady,
     action,
     color,
     strokeWidth,

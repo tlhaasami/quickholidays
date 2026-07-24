@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { COUNTRIES } from "@/constants";
+import { Highlighter } from "@/components/ui/highlighter";
 
 export default function SchengenVisaHub() {
   const processSteps = [
@@ -42,7 +43,11 @@ export default function SchengenVisaHub() {
             className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6"
           >
             Schengen tourist visas,<br />
-            <span className="text-primary">country by country.</span>
+            <span className="text-primary">
+              <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
+                country by country.
+              </Highlighter>
+            </span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 30 }}

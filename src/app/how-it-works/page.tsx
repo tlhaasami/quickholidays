@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { Highlighter } from "@/components/ui/highlighter";
 
 export default function HowItWorks() {
   const steps = [
@@ -40,7 +41,11 @@ export default function HowItWorks() {
             className="font-serif text-5xl sm:text-6xl md:text-7xl font-medium tracking-tight mb-6"
           >
             How it works — <br className="hidden sm:inline" />
-            <span className="text-primary">from first call to decision day.</span>
+            <span className="text-primary">
+              <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
+                from first call to decision day.
+              </Highlighter>
+            </span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 30 }}

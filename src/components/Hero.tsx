@@ -142,7 +142,6 @@ export default function Hero() {
 
   return (
     <div className="relative w-full min-h-screen bg-black text-white">
-      <Pointer />
       {/* Premium dark gradient overlays for editorial depth (Fixed Position) */}
       <div className="fixed inset-0 bg-linear-to-b from-black/60 via-transparent to-black/60 pointer-events-none z-10" />
 
@@ -201,9 +200,13 @@ export default function Hero() {
             className="absolute -inset-10 rounded-full blur-[80px] opacity-15 pointer-events-none mix-blend-screen animate-slow-glow" 
           />
           <h1 className="text-6xl sm:text-8xl md:text-[9rem] font-sans font-bold tracking-tighter leading-[0.95] animate-text-shadow">
-            <span style={{ color: HERO_CONFIG.quickColor }}>Quick</span>
+            <Highlighter action="highlight" color="#C9953755" isView={true}>
+              <span style={{ color: HERO_CONFIG.quickColor }}>Quick</span>
+            </Highlighter>
             <br />
-            <span style={{ color: HERO_CONFIG.holidaysColor }}>Holidays</span>
+            <Highlighter action="highlight" color="#18213b66" isView={true}>
+              <span style={{ color: HERO_CONFIG.holidaysColor }}>Holidays</span>
+            </Highlighter>
           </h1>
         </div>
       </section>
