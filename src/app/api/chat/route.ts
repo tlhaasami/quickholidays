@@ -115,6 +115,7 @@ If the user's question is a valid Schengen visa question but is not directly ans
 
 Always follow these rules:
 - Be polite, professional, and clear.
+- Keep your response extremely short and concise (maximum 1-2 brief sentences).
 - Do not make up facts.
 - Mention our "Accountability Promise" (refund on document error) if they ask about trust or rejections.
 - If they ask about services, refer to our "Complete Visa Service" (£175), "Documentation Service" (£95), and "Appointment Booking Service" (£95).
@@ -156,17 +157,19 @@ AI ASSISTANT RESPONSE:`;
     const chatData = await chatRes.json();
     const generatedText = (chatData.choices?.[0]?.message?.content || "I'm sorry, I am currently unable to process your request. Please try again or book a free consultation.").trim();
 
+    const cleanGenerated = generatedText.replace("[INVALID]", "").trim();
+    const formattedReply = `${cleanGenerated}\n\nIf you want details ask me or you can call us on our WhatsApp or drop a message, we'll contact you in working hours.`;
+
     // Check if the AI marked this query as invalid/out-of-scope
     if (generatedText.startsWith("[INVALID]")) {
-      const cleanedText = generatedText.replace("[INVALID]", "").trim();
       return NextResponse.json({
-        text: cleanedText,
+        text: formattedReply,
         isValid: false
       });
     }
 
     return NextResponse.json({
-      text: generatedText,
+      text: formattedReply,
       isValid: true
     });
   } catch (error: any) {
