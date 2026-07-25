@@ -19,6 +19,7 @@ import { trackContact } from "@/lib/analytics";
 import { CoolMode } from "@/components/ui/cool-mode";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -130,6 +131,10 @@ function CustomSelect({
 }
 
 export default function Hero() {
+  const siteConfig = useSiteConfig();
+  const titleWords = (siteConfig.heroTitle || "Quick Holidays").split(" ");
+  const word1 = titleWords[0]?.toUpperCase() || "QUICK";
+  const word2 = titleWords.slice(1).join(" ")?.toUpperCase() || "HOLIDAYS";
   const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -305,10 +310,10 @@ export default function Hero() {
               {/* Stacked Heading */}
               <div className={`flex flex-col leading-none select-none tracking-tighter ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
                 <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
-                  QUICK
+                  {word1}
                 </span>
                 <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.holidaysColor }}>
-                  HOLIDAYS
+                  {word2}
                 </span>
               </div>
             </motion.div>
@@ -323,7 +328,7 @@ export default function Hero() {
             >
               <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
                 style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
-                Quick Holidays is a UK-based Schengen visa consultancy trusted by hundreds of non-UK nationals — BRP holders, spouse, work, and student visa holders — who need expert, honest help securing their European tourist visas. No hidden fees, no guesswork, just resulTS.
+                {siteConfig.heroDescription}
               </p>
             </motion.div>
 
@@ -336,7 +341,7 @@ export default function Hero() {
             >
               <CoolMode>
                 <ThemeButton href="/contact-us" size="sm">
-                  Book a Free Consultation
+                  Book a Consultation
                 </ThemeButton>
               </CoolMode>
               <CoolMode>
@@ -427,7 +432,7 @@ export default function Hero() {
             </div>
             <div className="flex flex-col sm:flex-row gap-6 items-stretch sm:items-center mt-4">
               <ThemeButton href="/contact-us">
-                Book a Free Consultation
+                Book a Consultation
               </ThemeButton>
               <ThemeButton href="/how-it-works">
                 See how it works
@@ -493,11 +498,11 @@ export default function Hero() {
               Registered & verified at Companies House.
             </h2>
             <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
-              We operate with complete corporate transparency. Quick Holidays Ltd is officially registered in England and Wales under Company Number <strong>15948457</strong>. You can verify our active business registration details, filing history, and company records directly on the UK government registry.
+              We operate with complete corporate transparency. Quick Holidays Ltd is officially registered in England and Wales under Company Number <strong>{siteConfig.companyNumber}</strong>. You can verify our active business registration details, filing history, and company records directly on the UK government registry.
             </p>
             <div className="pt-2">
               <ThemeButton
-                href="https://find-and-update.company-information.service.gov.uk/company/15948457"
+                href={`https://find-and-update.company-information.service.gov.uk/company/${siteConfig.companyNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -832,7 +837,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            Start with a <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>free consultation.</Highlighter>
+            Start with a <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>consultation.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -994,7 +999,7 @@ export default function Hero() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Phone</span>
-                  <a href="tel:+448000584673" className="hover:text-primary dark:hover:text-white transition-colors">+44 800 058 4673</a>
+                  <a href={`tel:${siteConfig.phone.replace(/\s+/g, "")}`} className="hover:text-primary dark:hover:text-white transition-colors">{siteConfig.phone}</a>
                 </div>
               </div>
               <div className="flex flex-row items-start text-left gap-3">
@@ -1004,7 +1009,7 @@ export default function Hero() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Address</span>
-                  <span className="leading-relaxed">Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN</span>
+                  <span className="leading-relaxed">{siteConfig.address}</span>
                 </div>
               </div>
             </div>
@@ -1020,7 +1025,7 @@ export default function Hero() {
             <strong>Legal Disclaimer:</strong> Quick Holidays Ltd is a private visa support agency and is not affiliated with TLScontact, VFS Global, or any government embassy or consular authority. We offer document checking, appointment search assistance, and consulting services for Schengen visa applications. Official visa fees are set by EU regulation and are payable directly to the respective embassy/consulate or visa outsourcing center.
           </p>
           <div className="flex flex-col md:flex-row justify-between items-start gap-4 pt-4 text-[11px]">
-            <span>© 2026 Quick Holidays Ltd. All rights reserved. Company No. 15948457.</span>
+            <span>© 2026 Quick Holidays Ltd. All rights reserved. Company No. {siteConfig.companyNumber}.</span>
             <span>Made with precision for Schengen visa applicants in the UK.</span>
           </div>
         </div>

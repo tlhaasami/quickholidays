@@ -4,8 +4,10 @@ import React from "react";
 import { motion } from "motion/react";
 import { Highlighter } from "@/components/ui/highlighter";
 import { WobbleCard } from "@/components/ui/wobble-card";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 export default function AboutUs() {
+  const siteConfig = useSiteConfig();
   return (
     <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-20 pb-32 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-4xl mx-auto text-left">
@@ -96,9 +98,9 @@ export default function AboutUs() {
           transition={{ duration: 0.6 }}
           className="border-t border-zinc-200 dark:border-white/10 pt-8 text-center text-zinc-500 font-sans text-sm font-light"
         >
-          Quick Holidays Ltd is registered in England and Wales, Company No. 15948457. You can check our official business status by viewing our record at{" "}
+          Quick Holidays Ltd is registered in England and Wales, Company No. {siteConfig.companyNumber}. You can check our official business status by viewing our record at{" "}
           <a
-            href="https://find-and-update.company-information.service.gov.uk/company/15948457"
+            href={`https://find-and-update.company-information.service.gov.uk/company/${siteConfig.companyNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:text-zinc-900 dark:hover:text-white underline transition-colors font-semibold"

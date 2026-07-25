@@ -14,7 +14,7 @@ export default function Pricing() {
       period: "per applicant",
       description: "Everything handled. Start to finish. Nothing left for you to figure out. This is our premium, end-to-end service designed for maximum peace of mind. We take over the entire process so you can focus on planning your trip, knowing every detail is managed by professionals.",
       features: [
-        "Free Consultation: Cost, checklist, and timeline assessment provided before you pay.",
+        "Consultation: Cost, checklist, and timeline assessment provided before you pay.",
         "Custom Document Checklist: Built perfectly for your exact situation and profile.",
         "Professional Cover Letter: Written for you to present a compelling and accurate itinerary to the embassy.",
         "Visa Application Forms: Completed for you to ensure zero errors.",

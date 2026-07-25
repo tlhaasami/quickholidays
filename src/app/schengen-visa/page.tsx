@@ -46,7 +46,7 @@ export default function SchengenVisaHub() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed"
           >
-            The embassy fee is set by EU regulation and is the same for every Schengen country. What can vary is your document checklist and processing time — we confirm both for your exact destination, free, before you pay anything.
+            No hidden costs. Check eligibility. Only pay deposit to open your case file. The embassy fee is set by EU regulation and is the same for every Schengen country. What can vary is your document checklist and processing time — we confirm both for your exact destination, before you pay anything.
           </motion.p>
         </div>
 

@@ -17,65 +17,23 @@ interface ReviewItem {
   date: string;
 }
 
+import reviewsDataRaw from "@/data/reviews.json";
+
 export default function Reviews() {
   const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(12);
 
-  const reviewsData: ReviewItem[] = [
-    {
-      name: "Omar M.",
-      city: "London",
-      country: "Italy Visa",
-      outcome: "Approved (2-Year Multi-Entry)",
-      rating: 5,
-      date: "2026-07-15",
-      text: "My initial biometrics appointment was rejected at the desk because of a missing stamped copy of my BRP bank statements. It was a detail that was easily overlooked in my self-compiled file, but Quick Holidays took full responsibility since they had reviewed it. They immediately refunded my service fee in full under their Accountability Promise, within 48 hours, and assisted me with compiling the new documents and booking a free replacement slot. That level of honesty is incredibly rare today."
-    },
-    {
-      name: "Amara O.",
-      city: "London",
-      country: "France Visa",
-      outcome: "Approved (6-Month Multi-Entry)",
-      rating: 5,
-      date: "2026-07-12",
-      text: "They managed to search and secure a France appointment in London within 4 days of booking. Absolutely saved my summer holiday. The checklist was extremely precise and the form auto-fill saved hours."
-    },
-    {
-      name: "Dmitry K.",
-      city: "Manchester",
-      country: "Spain Visa",
-      outcome: "Approved (2-Year Multi-Entry)",
-      rating: 5,
-      date: "2026-07-09",
-      text: "Highly recommend the Accountability Promise. It gives you absolute peace of mind knowing they stand behind their checklist check. The consultancy fee is clear and there are no surprise extra bills."
-    },
-    {
-      name: "Priyah S.",
-      city: "Edinburgh",
-      country: "Germany Visa",
-      outcome: "Approved (1-Year Multi-Entry)",
-      rating: 5,
-      date: "2026-07-05",
-      text: "Very professional from start to finish. Everything handled online. They accompanied me right until my VFS appointment day. Excellent service and responsive communication on WhatsApp."
-    },
-    {
-      name: "Chloe T.",
-      city: "Bristol",
-      country: "Netherlands Visa",
-      outcome: "Approved (3-Month Single)",
-      rating: 5,
-      date: "2026-06-28",
-      text: "Simple, easy, transparent. No hidden charges. The document upload portal made it easy to get everything audited from home."
-    },
-    {
-      name: "Ali R.",
-      city: "Leeds",
-      country: "Spain Visa",
-      outcome: "Approved (1-Year Multi-Entry)",
-      rating: 5,
-      date: "2026-06-22",
-      text: "Fast appointment booking and helpful cover letter drafts. Recommending to all my BRP holders living in the UK."
-    }
-  ];
+  const reviewsData: ReviewItem[] = (reviewsDataRaw as any[]).map(rev => ({
+    name: rev.name,
+    city: "UK Resident",
+    country: rev.country || "Schengen Visa",
+    outcome: "Visa Granted",
+    rating: rev.rating || 5,
+    date: rev.date,
+    text: rev.text
+  }));
+
+  const displayedReviews = reviewsData.slice(0, visibleCount);
 
   // Injects Google Review schemas for SEO optimization
   const jsonLdSchema = reviewsData.map((rev) => ({
@@ -145,8 +103,8 @@ export default function Reviews() {
         </div>
 
         {/* Reviews Grid - Desktop (hidden md:grid) */}
-        <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-8 text-left mb-16">
-          {reviewsData.map((rev, idx) => (
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-16">
+          {displayedReviews.map((rev, idx) => (
             <WobbleCard
               key={idx}
               containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md h-full flex flex-col"
@@ -185,7 +143,7 @@ export default function Reviews() {
         {/* Reviews Carousel - Mobile (block md:hidden) */}
         <div className="block md:hidden text-left mb-16">
           <div className="min-h-[260px]">
-            {reviewsData.map((rev, idx) => {
+            {displayedReviews.map((rev, idx) => {
               if (idx !== activeReviewIndex) return null;
               return (
                 <motion.div
@@ -231,7 +189,7 @@ export default function Reviews() {
 
           {/* Slider Dots indicators */}
           <div className="flex justify-center items-center gap-2 mt-6">
-            {reviewsData.map((_, idx) => (
+            {displayedReviews.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveReviewIndex(idx)}
@@ -245,6 +203,18 @@ export default function Reviews() {
             ))}
           </div>
         </div>
+
+        {/* Load More Button */}
+        {visibleCount < reviewsData.length && (
+          <div className="text-center mb-16">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 12)}
+              className="px-6 py-3 font-sans font-bold text-xs uppercase tracking-wider rounded-lg border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-150 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+            >
+              Load More Reviews ({reviewsData.length - visibleCount} remaining)
+            </button>
+          </div>
+        )}
 
         {/* Closing CTA */}
         <div className="text-center">

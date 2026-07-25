@@ -108,7 +108,7 @@ export default async function CountryPage({
         {/* Embassy Variations Note */}
         <div className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 p-6 rounded-xl mb-16">
           <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
-            <strong>Embassy Variations:</strong> Documents and processing times can vary slightly by embassy. We'll confirm your exact checklist and a realistic timeline at your free consultation — before you pay anything.
+            <strong>Embassy Variations:</strong> Documents and processing times can vary slightly by embassy. We'll confirm your exact checklist and a realistic timeline at your consultation — before you pay anything.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export default async function CountryPage({
           <div className="text-center max-w-xl mx-auto mb-10">
             <h2 className="font-serif text-3xl font-semibold mb-3 text-zinc-900 dark:text-white">Ready to start your {match.name} application?</h2>
             <p className="font-sans text-sm text-zinc-500 dark:text-zinc-400 font-light">
-              Book a free consultation and we'll confirm your exact checklist, your costs, and a realistic timeline — before you pay anything.
+              Book a consultation and we'll confirm your exact checklist, your costs, and a realistic timeline — before you pay anything.
             </p>
           </div>
           <TypeformForm defaultDestination={match.slug} />

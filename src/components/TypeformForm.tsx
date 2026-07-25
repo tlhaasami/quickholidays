@@ -459,7 +459,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   <ThemeButton
                     type="submit"
                   >
-                    Book My Free Consultation
+                    Book My Consultation
                   </ThemeButton>
                 </CoolMode>
               )}

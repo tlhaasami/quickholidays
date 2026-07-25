@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 interface FAQItem {
   q: string;
@@ -15,13 +16,14 @@ interface FAQCategory {
 }
 
 export default function FAQ() {
+  const siteConfig = useSiteConfig();
   const faqData: FAQCategory[] = [
     {
       category: "Trust & Company Verification",
       items: [
         {
           q: "Is Quick Holidays Ltd a registered company in the UK?",
-          a: "Yes, Quick Holidays Ltd is registered in England & Wales, Company House Number 15948457. You can search our registration record directly on the official UK government registry. We recommend always verifying company credentials before making any payments online."
+          a: `Yes, Quick Holidays Ltd is registered in England & Wales, Company House Number ${siteConfig.companyNumber}. You can search our registration record directly on the official UK government registry. We recommend always verifying company credentials before making any payments online.`
         },
         {
           q: "Do you guarantee that my visa will be approved?",
@@ -33,7 +35,7 @@ export default function FAQ() {
         },
         {
           q: "Where is your physical office located?",
-          a: "Our registered physical office is located at Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN. While we handle all consulting services digitally, you can consult with our team online, by email, phone, or WhatsApp."
+          a: `Our registered physical office is located at ${siteConfig.address}. While we handle all consulting services digitally, you can consult with our team online, by email, phone, or WhatsApp.`
         }
       ]
     },

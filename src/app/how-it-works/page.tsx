@@ -10,7 +10,7 @@ export default function HowItWorks() {
   const steps = [
     {
       num: "01",
-      title: "Free Consultation",
+      title: "Consultation",
       description: "We assess your Schengen destination, travel dates, visa history, and financial standing. If eligible, we provide your service fee quote and initial document requirements before you pay a penny."
     },
     {
@@ -94,10 +94,10 @@ export default function HowItWorks() {
             Know exactly where you stand — from day one.
           </h2>
           <p className="font-sans text-zinc-600 dark:text-zinc-400 text-sm sm:text-base font-light max-w-lg mx-auto mb-8 leading-relaxed">
-            Ready to secure your appointment and start compiling your Schengen checklist? Book a free qualification assessment now.
+            Ready to secure your appointment and start compiling your Schengen checklist? Book a qualification assessment now.
           </p>
           <ThemeButton href="/contact-us">
-            Book a Free Consultation
+            Book a Consultation
           </ThemeButton>
         </motion.div>
       </div>

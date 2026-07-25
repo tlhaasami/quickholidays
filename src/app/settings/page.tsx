@@ -12,8 +12,18 @@ import {
   DockIconSettings,
 } from "@/components/ui/magnetic-dock";
 import { ThemeButton } from "@/components/ThemeButton";
+import { getSiteConfig, saveSiteConfig, defaultSiteConfig } from "@/utils/siteConfig";
 
 export default function SettingsPage() {
+  // --- Dynamic Site Content States ---
+  const [heroTitle, setHeroTitle] = useState(defaultSiteConfig.heroTitle);
+  const [heroSubtitle, setHeroSubtitle] = useState(defaultSiteConfig.heroSubtitle);
+  const [heroDescription, setHeroDescription] = useState(defaultSiteConfig.heroDescription);
+  const [phone, setPhone] = useState(defaultSiteConfig.phone);
+  const [whatsappUrl, setWhatsappUrl] = useState(defaultSiteConfig.whatsappUrl);
+  const [address, setAddress] = useState(defaultSiteConfig.address);
+  const [companyNumber, setCompanyNumber] = useState(defaultSiteConfig.companyNumber);
+
   // --- MagneticDock Local Settings State ---
   const [dockIconSize, setDockIconSize] = useState(40);
   const [dockMaxScale, setDockMaxScale] = useState(1.3);
@@ -36,6 +46,16 @@ export default function SettingsPage() {
   // --- Load Saved Settings ---
   useEffect(() => {
     try {
+      // Load Dynamic Site Content
+      const config = getSiteConfig();
+      setHeroTitle(config.heroTitle);
+      setHeroSubtitle(config.heroSubtitle);
+      setHeroDescription(config.heroDescription);
+      setPhone(config.phone);
+      setWhatsappUrl(config.whatsappUrl);
+      setAddress(config.address);
+      setCompanyNumber(config.companyNumber);
+
       // Dock properties
       const savedDockSize = localStorage.getItem("dock_iconSize");
       if (savedDockSize) setDockIconSize(parseInt(savedDockSize));
@@ -86,6 +106,17 @@ export default function SettingsPage() {
   // --- Save / Apply globally ---
   const handleApply = () => {
     try {
+      // Save Dynamic Site Content
+      saveSiteConfig({
+        heroTitle,
+        heroSubtitle,
+        heroDescription,
+        phone,
+        whatsappUrl,
+        address,
+        companyNumber
+      });
+
       localStorage.setItem("dock_iconSize", dockIconSize.toString());
       localStorage.setItem("dock_maxScale", dockMaxScale.toString());
       localStorage.setItem("dock_magneticDistance", dockMagneticDistance.toString());
@@ -112,6 +143,23 @@ export default function SettingsPage() {
 
   const handleReset = () => {
     if (confirm("Reset all customizations to factory defaults?")) {
+      // Clear Dynamic Site Content
+      localStorage.removeItem("site_heroTitle");
+      localStorage.removeItem("site_heroSubtitle");
+      localStorage.removeItem("site_heroDescription");
+      localStorage.removeItem("site_phone");
+      localStorage.removeItem("site_whatsappUrl");
+      localStorage.removeItem("site_address");
+      localStorage.removeItem("site_companyNumber");
+
+      setHeroTitle(defaultSiteConfig.heroTitle);
+      setHeroSubtitle(defaultSiteConfig.heroSubtitle);
+      setHeroDescription(defaultSiteConfig.heroDescription);
+      setPhone(defaultSiteConfig.phone);
+      setWhatsappUrl(defaultSiteConfig.whatsappUrl);
+      setAddress(defaultSiteConfig.address);
+      setCompanyNumber(defaultSiteConfig.companyNumber);
+
       localStorage.removeItem("dock_iconSize");
       localStorage.removeItem("dock_maxScale");
       localStorage.removeItem("dock_magneticDistance");
@@ -601,6 +649,93 @@ export default function SettingsPage() {
               <div className="relative z-10 h-full flex items-center justify-center">
                 <span className="text-white/70 text-xs font-sans tracking-widest uppercase">Hero Preview</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: Website Content Configuration */}
+        <div className="bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm border border-zinc-200/80 dark:border-white/8 rounded-3xl p-8 space-y-6">
+          <div>
+            <h2 className="text-xl font-sans font-bold tracking-tight text-zinc-900 dark:text-white mb-1">4. Website Content Configuration</h2>
+            <p className="text-xs font-light text-zinc-500">Edit core website copywriting, headings, links, and contact coordinates. Apply settings globally to persist the changes.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans text-sm">
+            {/* Hero Title */}
+            <div className="space-y-2">
+              <label className="font-semibold block">Hero Brand Heading</label>
+              <input
+                type="text"
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            {/* Hero Subtitle */}
+            <div className="space-y-2">
+              <label className="font-semibold block">Hero Subtitle</label>
+              <input
+                type="text"
+                value={heroSubtitle}
+                onChange={(e) => setHeroSubtitle(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            {/* Hero Description */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="font-semibold block">Hero Description Text</label>
+              <textarea
+                value={heroDescription}
+                onChange={(e) => setHeroDescription(e.target.value)}
+                rows={3}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary font-sans leading-relaxed resize-y"
+              />
+            </div>
+
+            {/* Phone Number */}
+            <div className="space-y-2">
+              <label className="font-semibold block">Phone Number</label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            {/* Companies House Number */}
+            <div className="space-y-2">
+              <label className="font-semibold block">Companies House Number (UK)</label>
+              <input
+                type="text"
+                value={companyNumber}
+                onChange={(e) => setCompanyNumber(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            {/* WhatsApp API Link */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="font-semibold block">WhatsApp API Integration URL</label>
+              <input
+                type="text"
+                value={whatsappUrl}
+                onChange={(e) => setWhatsappUrl(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary font-mono text-xs"
+              />
+            </div>
+
+            {/* Office Physical Address */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="font-semibold block">Office Physical Address</label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+              />
             </div>
           </div>
         </div>

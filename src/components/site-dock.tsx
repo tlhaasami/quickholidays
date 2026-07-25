@@ -43,7 +43,7 @@ const links = [
     href: "/about-us",
   },
   {
-    title: "Book a Free Consultation",
+    title: "Book a Consultation",
     icon: <IconCalendarEvent className="h-full w-full text-primary" />,
     href: "/contact-us",
   },
