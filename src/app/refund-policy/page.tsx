@@ -40,7 +40,7 @@ export default function RefundPolicy() {
           <section className="space-y-3">
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">2. The deposit</h3>
             <p>
-              Your deposit of <strong>£150</strong> starts your case. If you cancel before we have begun work on your file, we refund it in full. Once work has begun, the deposit covers the work already done and is non-refundable. The balance of <strong>£140</strong> is due as soon as your biometrics appointment is secured.
+              Your deposit of <strong>£100</strong> starts your case. If you cancel before we have begun work on your file, we refund it in full. Once work has begun, the deposit covers the work already done and is non-refundable. The balance of <strong>£75</strong> is due as soon as your biometrics appointment is secured.
             </p>
           </section>
 
@@ -54,7 +54,7 @@ export default function RefundPolicy() {
           <section className="space-y-3">
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">4. Our Accountability Promise</h3>
             <p>
-              If your application is refused because of a documented error on our side — a mistake in your application, a missed document we were responsible for checking, a deadline we caused you to miss — we refund our full service fee (£290). We will tell you plainly whether the error was ours; you will not have to fight us for it.
+              If your application is refused because of a documented error on our side — a mistake in your application, a missed document we were responsible for checking, a deadline we caused you to miss — we refund our full service fee in full (up to £175 depending on your service tier). We will tell you plainly whether the error was ours; you will not have to fight us for it.
             </p>
             <div className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 p-4 rounded-lg mt-2 space-y-2 text-xs sm:text-sm">
               <strong className="text-primary block">What the promise doesn't cover:</strong>

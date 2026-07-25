@@ -8,50 +8,55 @@ import { ThemeButton } from "@/components/ThemeButton";
 export default function Pricing() {
   const tiers = [
     {
-      name: "Schengen Eligibility Check",
-      price: "£0",
-      period: "Free Assessment",
-      description: "Complete qualification check before you pay a single penny.",
-      features: [
-        "Embassy destination validation",
-        "Document check (BRP status & history)",
-        "Appointment slot availability check",
-        "No obligation consultation review"
-      ],
-      buttonText: "Start Free Assessment",
-      buttonHref: "/contact-us",
-      popular: false
-    },
-    {
-      name: "Premium Visa Pack Assured",
-      price: "£199",
+      name: "Complete Visa Service",
+      originalPrice: "£270",
+      price: "£175",
       period: "per applicant",
-      description: "Full service visa compilation, checklist drafting, and booking.",
+      description: "Everything handled. Start to finish. Nothing left for you to figure out.",
       features: [
-        "Custom document checklists & templates",
-        "Official application form compilation",
-        "Embassy-ready travel cover letters",
-        "Flight & hotel reservation drafts",
-        "24/7 priority slot tracking & booking",
-        "Accountability Promise refund cover"
+        "Free consultation — cost, checklist, timeline, before you pay",
+        "Document checklist, built for your situation",
+        "Cover letter, written for you",
+        "Visa application forms, completed for you",
+        "Travel insurance, sorted",
+        "Appointment booked and confirmed — your letter, ready",
+        "Flights & hotels — refundable options, booked in your name. No markup. No lock-in.",
+        "Tracked to decision day"
       ],
-      buttonText: "Book Premium Visa Pack",
+      footerNote: "One price. Every step covered.",
+      buttonText: "Book Complete Service",
       buttonHref: "/contact-us",
       popular: true
     },
     {
-      name: "Priority VIP Fast-Track",
-      price: "£349",
+      name: "Documentation Service",
+      originalPrice: "£145",
+      price: "£95",
       period: "per applicant",
-      description: "Urgent visa scheduling and direct case manager monitoring.",
+      description: "Your paperwork, done right — you handle the appointment yourself.",
       features: [
-        "Everything in Premium Visa Pack",
-        "Same-day documentation reviews",
-        "Dedicated case manager WhatsApp line",
-        "Priority slot booking tracking",
-        "Pre-appointment briefing review"
+        "Document checklist, built for your situation",
+        "Cover letter, written for you",
+        "Travel insurance, sorted",
+        "Flights & hotels — refundable options, booked in your name"
       ],
-      buttonText: "Book VIP Fast-Track",
+      footerNote: "Not included: appointment booking, visa application form.",
+      buttonText: "Book Documentation Service",
+      buttonHref: "/contact-us",
+      popular: false
+    },
+    {
+      name: "Appointment Booking Service",
+      originalPrice: "£145",
+      price: "£95",
+      period: "per applicant",
+      description: "Already have your documents ready? This is for you.",
+      features: [
+        "Appointment booked and confirmed at your preferred centre",
+        "Visa application form, completed for you"
+      ],
+      footerNote: "Fast, simple, done.",
+      buttonText: "Book Appointment Booking",
       buttonHref: "/contact-us",
       popular: false
     }
@@ -110,14 +115,19 @@ export default function Pricing() {
                   {tier.description}
                 </p>
                 <div className="flex items-baseline gap-1.5 mb-6">
+                  {tier.originalPrice && (
+                    <span className="line-through text-zinc-400 dark:text-zinc-500 text-lg sm:text-xl font-normal mr-1">
+                      {tier.originalPrice}
+                    </span>
+                  )}
                   <span className="font-serif text-4xl sm:text-5xl font-bold text-zinc-900 dark:text-white">
                     {tier.price}
                   </span>
-                  <span className="font-sans text-zinc-500 dark:text-zinc-400 text-xs font-light">
+                  <span className="font-sans text-zinc-500 dark:text-zinc-400 text-xs font-light ml-1">
                     / {tier.period}
                   </span>
                 </div>
-                <ul className="space-y-3.5 mb-8">
+                <ul className="space-y-3.5 mb-6">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm font-light text-zinc-700 dark:text-zinc-300">
                       <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-primary shrink-0 mt-0.5">
@@ -127,6 +137,11 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
+                {tier.footerNote && (
+                  <p className="font-sans text-xs italic text-zinc-500 dark:text-zinc-400 mb-6 font-light">
+                    {tier.footerNote}
+                  </p>
+                )}
               </div>
               <ThemeButton href={tier.buttonHref}>
                 {tier.buttonText}

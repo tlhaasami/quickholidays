@@ -88,13 +88,16 @@ export default async function CountryPage({
                   <td className="px-6 py-4 font-light text-zinc-500 dark:text-zinc-400">Set by EU regulation. Children 6-12: €45; under 6: free. Same across all Schengen countries.</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-white">Our Service Fee</td>
-                  <td className="px-6 py-4 text-primary font-bold">£290</td>
-                  <td className="px-6 py-4 font-light text-zinc-500 dark:text-zinc-400">Fixed, agreed in writing before we start. Covers the full QuickVisa Assurance Process.</td>
+                  <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-white">Complete Visa Service</td>
+                  <td className="px-6 py-4 text-primary font-bold">
+                    <span className="line-through text-zinc-400 dark:text-zinc-550 mr-2 text-sm font-normal">£270</span>
+                    <span>£175</span>
+                  </td>
+                  <td className="px-6 py-4 font-light text-zinc-500 dark:text-zinc-400">Everything handled start to finish. Backed by our Accountability Promise.</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-white">Deposit to Begin</td>
-                  <td className="px-6 py-4 text-primary font-bold">£150</td>
+                  <td className="px-6 py-4 text-primary font-bold">£100</td>
                   <td className="px-6 py-4 font-light text-zinc-500 dark:text-zinc-400">Starts your case: assessment, checklist, appointment search. Balance due once biometrics slot confirmed.</td>
                 </tr>
               </tbody>
