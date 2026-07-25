@@ -131,8 +131,10 @@ const DockIconPricing = (props: React.SVGProps<SVGSVGElement>) => (
     strokeLinejoin="round"
     {...props}
   >
-    <line x1="12" y1="1" x2="12" y2="23" />
-    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    <path d="M18 7c0-5.333-8-5.333-8 0" />
+    <path d="M10 7v14" />
+    <path d="M6 21h12" />
+    <path d="M6 13h10" />
   </svg>
 );
 

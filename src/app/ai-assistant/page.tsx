@@ -22,6 +22,7 @@ export default function AiAssistant() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [invalidCount, setInvalidCount] = useState(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedQuestions = [
@@ -31,31 +32,58 @@ export default function AiAssistant() {
     "How does the Accountability Promise work?"
   ];
 
-  const handleSend = (text: string) => {
-    if (!text.trim()) return;
+  const handleSend = async (text: string) => {
+    if (!text.trim() || invalidCount >= 3) return;
 
     setMessages((prev) => [...prev, { sender: "user", text }]);
     setInput("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      let reply = "I'm sorry, I don't have that information. Let me connect you with our visa experts for a direct answer. You can book a free consultation using the button below.";
-      
-      const query = text.toLowerCase();
-      if (query.includes("brp") || query.includes("uk spouse") || query.includes("do i need")) {
-        reply = "Yes! If you are a non-UK national residing in the UK on a BRP (Work Visa, Spouse Visa, or Student Visa), you will generally need to apply for a Schengen visa to travel to Europe. Quick Holidays specializes in preparing applications specifically for BRP holders.";
-      } else if (query.includes("fastest") || query.includes("embassy") || query.includes("slot")) {
-        reply = "Currently, France, Spain, and Italy are receiving the highest volumes. France is generally the fastest for processing once you complete your biometrics, with decisions back in 7 to 10 days. However, slots can be difficult to find. Our automated slot tracking handles that scheduling process for you.";
-      } else if (query.includes("document") || query.includes("require") || query.includes("checklist")) {
-        reply = "For most applications, you need: 1) A passport valid for 3+ months beyond travel. 2) Valid UK BRP. 3) Fully compiled Schengen form. 4) Travel insurance covering €30k+. 5) Flight & hotel reservations. 6) 3 months of bank statements showing sufficient funds. When you book our Premium Pack, we compile all forms and checklists for you.";
-      } else if (query.includes("promise") || query.includes("refund") || query.includes("accountability")) {
-        reply = "Our Accountability Promise ensures that if your visa is rejected due to a documentation compilation error on our end, we refund our service fee in full. We back our compilation quality completely.";
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Chat request failed");
       }
 
-      setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
+      const data = await response.json();
+      setMessages((prev) => [...prev, { sender: "bot", text: data.text }]);
+
+      if (data.isValid === false) {
+        setInvalidCount((c) => {
+          const newCount = c + 1;
+          if (newCount >= 3) {
+            setTimeout(() => {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  sender: "bot",
+                  text: "You have reached the maximum number of inquiries outside our Schengen visa consultancy scope. To guide you properly, please consult directly with our live agents."
+                }
+              ]);
+            }, 500);
+          }
+          return newCount;
+        });
+      }
+    } catch (err) {
+      console.error("AI assistant fetch error:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "I'm sorry, I'm having trouble connecting. Let me connect you with our visa experts for a direct answer. You can book a free consultation using the link below."
+        }
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   useEffect(() => {
@@ -125,8 +153,9 @@ export default function AiAssistant() {
             {suggestedQuestions.map((q) => (
               <button
                 key={q}
-                onClick={() => handleSend(q)}
-                className="text-[11px] sm:text-xs font-sans tracking-wide py-1.5 px-3 rounded-full border border-zinc-200 dark:border-white/10 hover:border-primary hover:text-primary transition-colors text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900/40 cursor-pointer"
+                onClick={() => invalidCount < 3 && handleSend(q)}
+                disabled={invalidCount >= 3}
+                className="text-[11px] sm:text-xs font-sans tracking-wide py-1.5 px-3 rounded-full border border-zinc-200 dark:border-white/10 hover:border-primary hover:text-primary transition-colors text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900/40 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {q}
               </button>
@@ -134,36 +163,64 @@ export default function AiAssistant() {
           </div>
         </div>
 
-        {/* Sticky Input panel */}
-        <div className="w-full flex flex-col gap-3 shrink-0">
-          <div className="w-full flex gap-3 items-end">
-            <div className="brutalist-container flex-1">
-              <input
-                type="text"
-                placeholder="Type your Schengen visa question..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
-                className="brutalist-input smooth-type"
-              />
-              <label className="brutalist-label">Your Question</label>
+        {/* Sticky Input panel / WhatsApp card */}
+        {invalidCount >= 3 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/30 rounded-2xl p-6 text-center shadow-lg flex flex-col items-center gap-4 shrink-0"
+          >
+            <div className="w-12 h-12 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-md animate-pulse">
+              <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24">
+                <path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01m-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18l-3.12.82l.83-3.04l-.2-.31a8.26 8.26 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.02 4.54-3.68 8.23-8.22 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81c-.23-.08-.39-.12-.56.12c-.17.25-.64.81-.78.97c-.14.17-.29.19-.54.06c-.25-.12-1.05-.39-1.99-1.23c-.74-.66-1.23-1.47-1.38-1.72c-.14-.25-.02-.38.11-.51c.11-.11.25-.29.37-.43s.17-.25.25-.41c.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31c-.22.25-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74c.59.26 1.05.41 1.41.52c.59.19 1.13.16 1.56.1c.48-.07 1.47-.6 1.67-1.18c.21-.58.21-1.07.14-1.18s-.22-.16-.47-.28" />
+              </svg>
             </div>
-            <button
-              onClick={() => handleSend(input)}
-              className="px-6 py-3.5 bg-primary text-white font-bold border-3 border-black dark:border-white hover:bg-primary/90 transition-all cursor-pointer shadow-[3px_3px_0_#000] dark:shadow-[3px_3px_0_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
+            <div>
+              <h4 className="font-serif text-lg font-bold text-zinc-900 dark:text-white mb-1">Connect with our Agents</h4>
+              <p className="font-sans text-xs text-zinc-650 dark:text-zinc-400 font-light max-w-md mx-auto leading-relaxed">
+                You can contact our agents directly on WhatsApp at **+44 7828 707425**. They will guide you through the process step-by-step.
+              </p>
+            </div>
+            <a
+              href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-650 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-md active:scale-98 text-xs cursor-pointer"
             >
-              Send
-            </button>
-          </div>
+              Contact our Agents
+            </a>
+          </motion.div>
+        ) : (
+          <div className="w-full flex flex-col gap-3 shrink-0">
+            <div className="w-full flex gap-3 items-end">
+              <div className="brutalist-container flex-1">
+                <input
+                  type="text"
+                  placeholder="Type your Schengen visa question..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
+                  className="brutalist-input smooth-type"
+                />
+                <label className="brutalist-label">Your Question</label>
+              </div>
+              <button
+                onClick={() => handleSend(input)}
+                className="px-6 py-3.5 bg-primary text-white font-bold border-3 border-black dark:border-white hover:bg-primary/90 transition-all cursor-pointer shadow-[3px_3px_0_#000] dark:shadow-[3px_3px_0_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
+              >
+                Send
+              </button>
+            </div>
 
-          {/* Compact CTA */}
-          <div className="text-center flex items-center justify-center gap-2 text-xs">
-            <span className="text-zinc-450 font-sans">Need human assistance?</span>
-            <Link href="/contact-us" className="text-primary hover:underline font-bold">
-              Connect to Visa Officer
-            </Link>
+            {/* Compact CTA */}
+            <div className="text-center flex items-center justify-center gap-2 text-xs">
+              <span className="text-zinc-450 font-sans">Need human assistance?</span>
+              <Link href="/contact-us" className="text-primary hover:underline font-bold">
+                Connect to Visa Officer
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </div>

@@ -6,6 +6,7 @@ import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { FloatingAssistant } from "@/components/FloatingAssistant";
 import { Pointer } from "@/components/ui/pointer";
 import { DockWrapper } from "@/components/DockWrapper";
+import { GlobalCoolMode } from "@/components/GlobalCoolMode";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ export default function RootLayout({
       </head>
       <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen">
         <Pointer />
+        <GlobalCoolMode />
         <Navbar />
         <main>{children}</main>
         <FloatingWhatsApp />

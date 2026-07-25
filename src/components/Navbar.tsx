@@ -28,7 +28,10 @@ const StrokePassportIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const StrokePricingIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    <path d="M18 7c0-5.333-8-5.333-8 0" />
+    <path d="M10 7v14" />
+    <path d="M6 21h12" />
+    <path d="M6 13h10" />
   </svg>
 );
 

@@ -12,16 +12,16 @@ export default function Pricing() {
       originalPrice: "£270",
       price: "£175",
       period: "per applicant",
-      description: "Everything handled. Start to finish. Nothing left for you to figure out.",
+      description: "Everything handled. Start to finish. Nothing left for you to figure out. This is our premium, end-to-end service designed for maximum peace of mind. We take over the entire process so you can focus on planning your trip, knowing every detail is managed by professionals.",
       features: [
-        "Free consultation — cost, checklist, timeline, before you pay",
-        "Document checklist, built for your situation",
-        "Cover letter, written for you",
-        "Visa application forms, completed for you",
-        "Travel insurance, sorted",
-        "Appointment booked and confirmed — your letter, ready",
-        "Flights & hotels — refundable options, booked in your name. No markup. No lock-in.",
-        "Tracked to decision day"
+        "Free Consultation: Cost, checklist, and timeline assessment provided before you pay.",
+        "Custom Document Checklist: Built perfectly for your exact situation and profile.",
+        "Professional Cover Letter: Written for you to present a compelling and accurate itinerary to the embassy.",
+        "Visa Application Forms: Completed for you to ensure zero errors.",
+        "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
+        "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
+        "Flights & Hotels: Refundable options booked in your name. No markup. No lock-in.",
+        "Tracked to Decision Day: Continuous monitoring of your application status."
       ],
       footerNote: "One price. Every step covered.",
       buttonText: "Book Complete Service",
@@ -33,14 +33,17 @@ export default function Pricing() {
       originalPrice: "£145",
       price: "£95",
       period: "per applicant",
-      description: "Your paperwork, done right — you handle the appointment yourself.",
+      description: "Your paperwork, done right — you handle the appointment yourself. This package is ideal if you already have an appointment booked or prefer to manage the portal yourself, but want the assurance that your file is flawless.",
       features: [
-        "Document checklist, built for your situation",
-        "Cover letter, written for you",
-        "Travel insurance, sorted",
-        "Flights & hotels — refundable options, booked in your name"
+        "Document Checklist: Built precisely for your personal and financial profile.",
+        "Professional Cover Letter: Expertly written for you.",
+        "Travel Insurance: Sorted for your exact travel dates.",
+        "Flights & Hotels: Refundable options booked in your name without financial risk."
       ],
-      footerNote: "Not included: appointment booking, visa application form.",
+      notIncluded: [
+        "Appointment booking",
+        "Visa application form completion"
+      ],
       buttonText: "Book Documentation Service",
       buttonHref: "/contact-us",
       popular: false
@@ -50,10 +53,10 @@ export default function Pricing() {
       originalPrice: "£145",
       price: "£95",
       period: "per applicant",
-      description: "Already have your documents ready? This is for you.",
+      description: "Already have your documents ready? This is for you. Appointment slots disappear in seconds. With this service, our processing team uses their continuous monitoring systems to secure your spot without the headache.",
       features: [
-        "Appointment booked and confirmed at your preferred centre",
-        "Visa application form, completed for you"
+        "Appointment Booking: Secured and confirmed at your preferred centre.",
+        "Visa Application Form: Completed for you accurately."
       ],
       footerNote: "Fast, simple, done.",
       buttonText: "Book Appointment Booking",
@@ -137,6 +140,23 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
+                
+                {tier.notIncluded && (
+                  <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-white/5 mb-6">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-2">What is NOT Included:</span>
+                    <ul className="space-y-2">
+                      {tier.notIncluded.map((item) => (
+                        <li key={item} className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 line-through">
+                          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-red-500 shrink-0">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                          </svg>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {tier.footerNote && (
                   <p className="font-sans text-xs italic text-zinc-500 dark:text-zinc-400 mb-6 font-light">
                     {tier.footerNote}
