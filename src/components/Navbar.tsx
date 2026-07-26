@@ -189,10 +189,9 @@ export function Navbar() {
         return null;
     }
   };
-
   if (!mounted) return null;
 
-  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal";
+  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal" || pathname === "/create-document";
   if (isExcludedPath) return null;
 
   const isHomepage = pathname === "/";
