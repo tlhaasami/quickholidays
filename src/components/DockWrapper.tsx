@@ -158,6 +158,8 @@ export function DockWrapper() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal";
+
   // --- Dynamic settings from localStorage ---
   const [iconSize, setIconSize] = useState(48);
   const [maxScale, setMaxScale] = useState(1.3);
@@ -485,6 +487,10 @@ export function DockWrapper() {
   };
 
   const showMobileDock = dockMobileMode === "always" || (dockMobileMode === "hamburger" && isMobileMenuOpen);
+
+  if (isExcludedPath) {
+    return null;
+  }
 
   return (
     <>
