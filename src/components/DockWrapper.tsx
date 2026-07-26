@@ -159,6 +159,9 @@ export function DockWrapper() {
   const [position, setPosition] = useState<"bottom" | "top" | "left" | "right">("bottom");
   const [variant, setVariant] = useState<"glass" | "solid" | "transparent">("glass");
   const [showLabels, setShowLabels] = useState(true);
+  const [design, setDesign] = useState<"classic" | "sketchy" | "brutalist" | "neon" | "minimal">("classic");
+  const [iconStyle, setIconStyle] = useState<"default" | "creative">("default");
+  const [showDock, setShowDock] = useState(true);
 
   // Position settings
   const [dockMobileMode, setDockMobileMode] = useState<"hamburger" | "always">("hamburger");
@@ -208,6 +211,24 @@ export function DockWrapper() {
     return () => observer.disconnect();
   }, []);
 
+  // homepage scroll monitor
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window !== "undefined") {
+        const isHomePage = window.location.pathname === "/";
+        if (isHomePage) {
+          setShowDock(window.scrollY > 80);
+        } else {
+          setShowDock(true);
+        }
+      }
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
+
   const toggleTheme = () => {
     const nextDark = !isDark;
     setIsDark(nextDark);
@@ -243,6 +264,12 @@ export function DockWrapper() {
 
         const savedLabels = localStorage.getItem("dock_showLabels");
         if (savedLabels) setShowLabels(savedLabels === "true");
+
+        const savedDesign = localStorage.getItem("dock_design");
+        if (savedDesign) setDesign(savedDesign as any);
+
+        const savedIconStyle = localStorage.getItem("dock_iconStyle");
+        if (savedIconStyle) setIconStyle(savedIconStyle as any);
 
         // Custom positioning and mobile keys
         const savedMobileMode = localStorage.getItem("dock_mobileMode");
@@ -332,13 +359,7 @@ export function DockWrapper() {
       isActive: false,
       onClick: () => window.open("https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa.", "_blank"),
     },
-    {
-      id: "ai-assistant",
-      label: "Ai Assistant",
-      icon: <DockIconBot className="w-[24px] h-[24px]" />,
-      isActive: pathname === "/ai-assistant",
-      onClick: () => router.push("/ai-assistant"),
-    },
+
     {
       id: "theme-toggle",
       label: isDark ? "Light Mode" : "Dark Mode",
@@ -452,6 +473,7 @@ export function DockWrapper() {
     if (dockSide !== "top" && dockSide !== "bottom" && dockVerticalAlign === "center") {
       yTrans = `calc(-50% + ${dockCenterOffset}px)`;
     }
+
     styles.transform = `translate(${xTrans}, ${yTrans})`;
     return styles;
   };
@@ -503,15 +525,37 @@ export function DockWrapper() {
           </defs>
         </svg>
 
-        <MagneticDock 
-          items={items} 
-          iconSize={iconSize}
-          maxScale={maxScale}
-          magneticDistance={magneticDistance}
-          showLabels={showLabels}
-          position={position} 
-          variant={variant} 
-        />
+        <AnimatePresence>
+          {showDock && (
+            <motion.div
+              initial={{ 
+                opacity: 0, 
+                y: position === "bottom" ? 30 : position === "top" ? -30 : 0,
+                x: position === "left" ? -30 : position === "right" ? 30 : 0
+              }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              exit={{ 
+                opacity: 0, 
+                y: position === "bottom" ? 30 : position === "top" ? -30 : 0,
+                x: position === "left" ? -30 : position === "right" ? 30 : 0
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex items-center justify-center"
+            >
+              <MagneticDock 
+                items={items} 
+                iconSize={iconSize}
+                maxScale={maxScale}
+                magneticDistance={magneticDistance}
+                showLabels={showLabels}
+                position={position} 
+                variant={variant} 
+                design={design}
+                iconStyle={iconStyle}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Mobile Sidebar — appears from behind hamburger, desktop hidden */}

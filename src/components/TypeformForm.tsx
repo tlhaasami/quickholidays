@@ -7,6 +7,7 @@ import { trackLead, trackFormAbandon } from "@/lib/analytics";
 import Link from "next/link";
 import { ThemeButton } from "@/components/ThemeButton";
 import { CoolMode } from "@/components/ui/cool-mode";
+import { usePathname } from "next/navigation";
 
 const COMMON_NATIONALITIES = [
   "Indian", "Pakistani", "Nigerian", "Chinese", "Filipino", 
@@ -20,6 +21,7 @@ interface TypeformFormProps {
 }
 
 export function TypeformForm({ defaultDestination = "france" }: TypeformFormProps) {
+  const pathname = usePathname();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
@@ -29,7 +31,8 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
     destination: defaultDestination,
     priorVisas: "None",
     channel: "WhatsApp",
-    comment: ""
+    comment: "",
+    plan: ""
   });
 
   const [nationalitySearch, setNationalitySearch] = useState("");
@@ -43,6 +46,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
   const hasSubmitted = useRef(false);
 
   const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
+  const [showPlanPopup, setShowPlanPopup] = useState(false);
 
   const showWarning = (msg: string) => {
     setNotification({ message: msg, type: "error" });
@@ -73,6 +77,39 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
       setFormData((prev) => ({ ...prev, destination: defaultDestination }));
     }
   }, [defaultDestination]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlName = params.get("name");
+      const urlPhone = params.get("phone");
+      const urlEmail = params.get("email");
+      const urlNotes = params.get("notes");
+      const urlPlan = params.get("plan");
+
+      let planName = "";
+      if (urlPlan) {
+        if (urlPlan === "complete") planName = "Complete Visa Service (£175)";
+        else if (urlPlan === "documentation") planName = "Documentation Service (£95)";
+        else if (urlPlan === "appointment") planName = "Appointment Booking Service (£95)";
+        else if (urlPlan === "priority") planName = "Immediate Priority Option (+£15)";
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        name: urlName || prev.name,
+        phone: urlPhone || prev.phone,
+        email: urlEmail || prev.email,
+        comment: urlNotes || prev.comment,
+        plan: planName || prev.plan
+      }));
+
+      // Only prompt for plan selection if booking via the dedicated /contact-us page and no plan parameter is in URL
+      if (window.location.pathname === "/contact-us" && !planName) {
+        setShowPlanPopup(true);
+      }
+    }
+  }, []);
 
   // Handle outside clicks for nationality search dropdown
   useEffect(() => {
@@ -138,7 +175,8 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
       destination: formData.destination,
       priorVisas: formData.priorVisas,
       channel: formData.channel,
-      comment: formData.comment
+      comment: formData.comment,
+      plan: formData.plan
     });
     setStep(5); // Success Screen
   };
@@ -173,6 +211,20 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 01 / 04</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Introduce yourself</h3>
+                {formData.plan && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px] font-sans font-bold uppercase tracking-wider rounded-none">
+                      Booking: {formData.plan}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPlanPopup(true)}
+                      className="text-[9px] font-sans font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors underline cursor-pointer"
+                    >
+                      Change
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="space-y-8 mt-4">
                 <div className="brutalist-container">
@@ -226,6 +278,20 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 02 / 04</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Nationality & Destination</h3>
+                {formData.plan && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px] font-sans font-bold uppercase tracking-wider rounded-none">
+                      Booking: {formData.plan}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPlanPopup(true)}
+                      className="text-[9px] font-sans font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors underline cursor-pointer"
+                    >
+                      Change
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="space-y-8 mt-6">
                 {/* Searchable Nationality */}
@@ -239,7 +305,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       setNationalitySearch(e.target.value);
                       setFormData({ ...formData, nationality: e.target.value });
                     }}
-                    placeholder="Search nationality (e.g. Indian)"
+                    placeholder="Search nationality (e.g. Portuguese)"
                     className="brutalist-input smooth-type"
                   />
                   <label className="brutalist-label">Nationality</label>
@@ -322,6 +388,20 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 03 / 04</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Your Travel History</h3>
+                {formData.plan && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px] font-sans font-bold uppercase tracking-wider rounded-none">
+                      Booking: {formData.plan}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPlanPopup(true)}
+                      className="text-[9px] font-sans font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors underline cursor-pointer"
+                    >
+                      Change
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-3">
@@ -362,6 +442,20 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 04 / 04</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Preferred Response Channel</h3>
+                {formData.plan && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px] font-sans font-bold uppercase tracking-wider rounded-none">
+                      Booking: {formData.plan}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPlanPopup(true)}
+                      className="text-[9px] font-sans font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors underline cursor-pointer"
+                    >
+                      Change
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-3">
@@ -504,6 +598,66 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               </svg>
             </button>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Plan Selection Modal Popup */}
+      <AnimatePresence>
+        {showPlanPopup && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-xs pointer-events-auto">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              className="bg-white dark:bg-zinc-950 border-3 border-zinc-950 dark:border-white p-6 sm:p-8 max-w-lg w-full shadow-[6px_6px_0_#000] dark:shadow-[6px_6px_0_#fff] text-left relative rounded-none"
+            >
+              <h3 className="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-2">Select Your Visa Service Plan</h3>
+              <p className="font-sans text-xs text-zinc-500 dark:text-zinc-400 mb-6 font-light">
+                Please select the service plan you would like to book. If you're unsure, select "Help Me Choose" and we'll help you during your consultation.
+              </p>
+
+              <div className="space-y-2.5">
+                {[
+                  { name: "Complete Visa Service", price: "£175", desc: "End-to-end guidance, slot tracking, insurance, and flight/hotel bookings." },
+                  { name: "Documentation Service", price: "£95", desc: "Flawless paperwork audit, checklist, insurance, and hotel/flight files." },
+                  { name: "Appointment Booking Service", price: "£95", desc: "Secures biometrics slots and completes Schengen application forms." },
+                  { name: "Immediate Priority Option", price: "+£15", desc: "Adds priority fast-tracking to the head of our processing queue." },
+                  { name: "Help Me Choose / Consultation", price: "Free", desc: "Speak to a visa officer first to assess your eligibility." }
+                ].map((plan) => {
+                  const fullPlanName = `${plan.name} (${plan.price})`;
+                  const isSelected = formData.plan === fullPlanName || formData.plan.startsWith(plan.name);
+                  return (
+                    <button
+                      key={plan.name}
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({ ...prev, plan: fullPlanName }));
+                        setShowPlanPopup(false);
+                      }}
+                      className={`w-full p-3 text-left border-2 transition-all flex justify-between items-center cursor-pointer group rounded-none ${
+                        isSelected
+                          ? "border-[#C99537] bg-amber-500/10 dark:bg-amber-500/20 shadow-[2px_2px_0_#C99537] dark:shadow-[2px_2px_0_#C99537]"
+                          : "border-zinc-900 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 hover:border-primary hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      }`}
+                    >
+                      <div>
+                        <h4 className="font-sans font-bold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-primary transition-colors flex items-center gap-1.5">
+                          {plan.name}
+                          {isSelected && (
+                            <span className="text-[9px] bg-primary text-zinc-950 px-1 py-0.2 font-sans font-extrabold uppercase rounded-none tracking-wider">
+                              Selected
+                            </span>
+                          )}
+                        </h4>
+                        <p className="font-sans text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 font-light mt-0.5 leading-tight">{plan.desc}</p>
+                      </div>
+                      <span className="font-serif font-bold text-xs sm:text-sm text-primary shrink-0 ml-4">{plan.price}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

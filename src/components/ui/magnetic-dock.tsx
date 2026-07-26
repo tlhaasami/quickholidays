@@ -21,6 +21,10 @@ interface MagneticDockProps {
     variant?: "glass" | "solid" | "transparent"
     /** Custom class name */
     className?: string
+    /** Dynamic container styles */
+    design?: "classic" | "sketchy" | "brutalist" | "neon" | "minimal"
+    /** Dynamic icon style accents */
+    iconStyle?: "default" | "creative"
 }
 
 interface DockItemData {
@@ -48,6 +52,9 @@ interface DockItemProps {
     magneticDistance: number
     showLabels: boolean
     isVertical: boolean
+    position: "bottom" | "top" | "left" | "right"
+    design: "classic" | "sketchy" | "brutalist" | "neon" | "minimal"
+    iconStyle: "default" | "creative"
 }
 
 function DockItem({
@@ -58,6 +65,9 @@ function DockItem({
     magneticDistance,
     showLabels,
     isVertical,
+    position,
+    design,
+    iconStyle,
 }: DockItemProps) {
     const ref = React.useRef<HTMLButtonElement>(null)
     const [isHovered, setIsHovered] = React.useState(false)
@@ -82,9 +92,39 @@ function DockItem({
     // Calculate the size based on scale
     const size = useTransform(smoothScale, (s) => s * iconSize)
 
-    // Floating effect
+    // Floating effect for horizontal; sliding offset for vertical
     const y = useTransform(smoothScale, (s) => (s - 1) * -10)
     const smoothY = useSpring(y, springConfig)
+
+    const slideX = isVertical
+        ? (position === "left"
+            ? (isHovered ? 8 : 0)
+            : position === "right"
+                ? (isHovered ? -8 : 0)
+                : 0)
+        : 0;
+
+    // Tooltip and indicator positions based on dock layout orientation
+    const tooltipPositionStyles = {
+        bottom: "absolute -top-10 left-1/2 -translate-x-1/2",
+        top: "absolute -bottom-10 left-1/2 -translate-x-1/2",
+        left: "absolute left-full top-1/2 -translate-y-1/2 ml-3.5",
+        right: "absolute right-full top-1/2 -translate-y-1/2 mr-3.5",
+    };
+
+    const tooltipArrowStyles = {
+        bottom: "absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45 border-r border-b",
+        top: "absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 rotate-45 border-l border-t",
+        left: "absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 rotate-45 border-l border-b",
+        right: "absolute top-1/2 -translate-y-1/2 -right-1 w-2 h-2 rotate-45 border-r border-t",
+    };
+
+    const activeIndicatorStyles = {
+        bottom: "absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-white/80",
+        top: "absolute -top-2 w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-white/80",
+        left: "absolute -left-2 w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-white/80",
+        right: "absolute -right-2 w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-white/80",
+    };
 
     return (
         <motion.button
@@ -92,40 +132,35 @@ function DockItem({
             onClick={item.onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className={cn(
-                "relative flex items-center justify-center cursor-pointer bg-transparent border-0",
-                "rounded-2xl transition-colors duration-200",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-455 dark:focus-visible:ring-white/50",
-                item.isActive && "bg-neutral-200/50 dark:bg-white/10"
-            )}
             style={{
                 width: size,
                 height: size,
                 y: isVertical ? 0 : smoothY,
-                x: isVertical ? smoothY : 0,
+                x: slideX,
             }}
-            whileTap={{ scale: 0.9 }}
+            className="relative flex items-center justify-center pointer-events-auto cursor-pointer"
         >
             {/* Icon Container */}
             <motion.div
                 className={cn(
-                    "relative w-full h-full rounded-2xl",
+                    "relative w-full h-full",
+                    design === "brutalist" ? "rounded-none" : "rounded-2xl",
                     item.id === "theme-toggle" ? "overflow-visible" : "overflow-hidden",
                     item.id === "theme-toggle"
                         ? "bg-transparent border-none shadow-none"
                         : cn(
-                            "bg-gradient-to-b from-neutral-100 to-neutral-50",
-                            "dark:from-neutral-800 dark:to-neutral-900",
-                            "backdrop-blur-sm",
-                            "border border-neutral-300 dark:border-neutral-700",
-                            "shadow-lg shadow-black/10 dark:shadow-black/30"
+                            design === "brutalist" 
+                                ? "bg-white dark:bg-zinc-950 border-2 border-zinc-950 dark:border-white"
+                                : design === "neon"
+                                    ? "bg-zinc-950 border-2 border-[#C99537] shadow-[0_0_10px_rgba(201,149,55,0.2)]"
+                                    : "bg-gradient-to-b from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-lg shadow-black/10 dark:shadow-black/30"
                         ),
                     "flex items-center justify-center",
                     "transition-all duration-200",
                     item.className
                 )}
                 style={{
-                    boxShadow: item.id === "theme-toggle"
+                    boxShadow: item.id === "theme-toggle" || design === "brutalist" || design === "neon"
                         ? "none"
                         : (isHovered
                             ? "0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.5)"
@@ -140,8 +175,24 @@ function DockItem({
                     {item.icon}
                 </div>
 
+                {/* Creative Accent: Top-Right flag triangle */}
+                {iconStyle === "creative" && item.id !== "theme-toggle" && (
+                    <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-amber-500 border-l border-b border-zinc-950 dark:border-white transform rotate-45 translate-x-1.5 translate-y-[-1.5px] z-20 pointer-events-none" />
+                )}
+
+                {/* Creative Accent: Mini yellow airplane floating next to item on hover when on left dock */}
+                {iconStyle === "creative" && isHovered && position === "left" && (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0, x: -10 }}
+                        animate={{ scale: 1, opacity: 1, x: 0 }}
+                        className="absolute -left-6 top-1/2 -translate-y-1/2 text-[#C99537] z-20 text-[11px]"
+                    >
+                        ✈️
+                    </motion.div>
+                )}
+
                 {/* Shine effect */}
-                {item.id !== "theme-toggle" && (
+                {item.id !== "theme-toggle" && design !== "brutalist" && (
                     <motion.div
                         className="absolute inset-0 pointer-events-none"
                         style={{
@@ -183,11 +234,7 @@ function DockItem({
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        className={cn(
-                            "absolute -bottom-2",
-                            "w-1.5 h-1.5 rounded-full",
-                            "bg-neutral-600 dark:bg-white/80"
-                        )}
+                        className={cn(activeIndicatorStyles[position])}
                     />
                 )}
             </AnimatePresence>
@@ -196,29 +243,30 @@ function DockItem({
             <AnimatePresence>
                 {showLabels && isHovered && (
                     <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
                         className={cn(
-                            "absolute -top-10 left-1/2 -translate-x-1/2",
-                            "px-3 py-1.5 rounded-lg",
-                            "bg-white dark:bg-neutral-900/95",
+                            tooltipPositionStyles[position],
+                            "px-3 py-1.5",
+                            design === "brutalist" ? "rounded-none border-2 border-zinc-950 bg-white dark:bg-zinc-900" : "rounded-lg bg-white dark:bg-neutral-900/95 border border-neutral-200 dark:border-white/10",
                             "backdrop-blur-sm",
                             "text-neutral-800 dark:text-white text-sm font-medium whitespace-nowrap",
-                            "border border-neutral-200 dark:border-white/10",
-                            "shadow-xl shadow-black/10 dark:shadow-black/20",
-                            "pointer-events-none z-50"
+                            design === "brutalist" 
+                                ? "shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff]"
+                                : "shadow-xl shadow-black/10 dark:shadow-black/20",
+                            "pointer-events-none z-50 font-sans"
                         )}
                     >
                         {item.label}
                         {/* Tooltip arrow */}
                         <div
                             className={cn(
-                                "absolute left-1/2 -translate-x-1/2 -bottom-1",
-                                "w-2 h-2 rotate-45",
-                                "bg-white dark:bg-neutral-900/95",
-                                "border-r border-b border-neutral-200 dark:border-white/10"
+                                tooltipArrowStyles[position],
+                                design === "brutalist" 
+                                    ? "bg-white dark:bg-zinc-900 border-r border-b border-zinc-950 dark:border-white" 
+                                    : "bg-white dark:bg-neutral-900/95 border-neutral-200 dark:border-white/10"
                             )}
                         />
                     </motion.div>
@@ -226,15 +274,17 @@ function DockItem({
             </AnimatePresence>
 
             {/* Hover glow */}
-            <motion.div
-                className="absolute inset-0 rounded-2xl pointer-events-none"
-                animate={{
-                    boxShadow: isHovered
-                        ? "0 0 30px rgba(255,255,255,0.15)"
-                        : "0 0 0px rgba(255,255,255,0)",
-                }}
-                transition={{ duration: 0.3 }}
-            />
+            {design !== "brutalist" && (
+                <motion.div
+                    className="absolute inset-0 rounded-2xl pointer-events-none"
+                    animate={{
+                        boxShadow: isHovered
+                            ? "0 0 30px rgba(255,255,255,0.15)"
+                            : "0 0 0px rgba(255,255,255,0)",
+                    }}
+                    transition={{ duration: 0.3 }}
+                />
+            )}
         </motion.button>
     )
 }
@@ -248,6 +298,8 @@ function MagneticDock({
     position = "bottom",
     variant = "glass",
     className,
+    design = "classic",
+    iconStyle = "default",
 }: MagneticDockProps) {
     const mousePosition = useMotionValue(Infinity)
     const isVertical = position === "left" || position === "right"
@@ -271,13 +323,49 @@ function MagneticDock({
         glass: cn(
             "bg-white/80 dark:bg-neutral-900/80",
             "backdrop-blur-xl backdrop-saturate-150",
-            "border border-neutral-200 dark:border-neutral-700"
+            "border border-neutral-200 dark:border-neutral-700",
+            "shadow-xl shadow-black/10 dark:shadow-black/30",
+            "rounded-3xl"
         ),
         solid: cn(
             "bg-neutral-100 dark:bg-neutral-900",
-            "border border-neutral-300 dark:border-neutral-700"
+            "border border-neutral-300 dark:border-neutral-700",
+            "shadow-xl shadow-black/10 dark:shadow-black/30",
+            "rounded-3xl"
         ),
-        transparent: "bg-transparent border-0",
+        transparent: "bg-transparent border-0 shadow-none",
+    }
+
+    const designStyles = {
+        classic: cn(
+            "bg-white/80 dark:bg-neutral-900/80",
+            "backdrop-blur-xl backdrop-saturate-150",
+            "border border-neutral-200 dark:border-neutral-700",
+            "shadow-xl shadow-black/10 dark:shadow-black/30",
+            "rounded-3xl"
+        ),
+        sketchy: cn(
+            "bg-[#faf6eb] dark:bg-zinc-900",
+            "border-3 border-zinc-950 dark:border-white",
+            "shadow-[5px_5px_0px_rgba(0,0,0,0.85)] dark:shadow-[5px_5px_0px_rgba(255,255,255,0.85)]",
+            "rotate-[-0.5deg]",
+            "rounded-2xl"
+        ),
+        brutalist: cn(
+            "bg-white dark:bg-zinc-950",
+            "border-3 border-zinc-950 dark:border-white",
+            "shadow-[6px_6px_0_#000] dark:shadow-[6px_6px_0_#fff]",
+            "rounded-none"
+        ),
+        neon: cn(
+            "bg-black/95",
+            "border-2 border-[#C99537]",
+            "shadow-[0_0_20px_rgba(201,149,55,0.55)]",
+            "rounded-3xl"
+        ),
+        minimal: cn(
+            "bg-transparent border-0 shadow-none p-0 gap-3"
+        )
     }
 
     const positionStyles = {
@@ -292,10 +380,9 @@ function MagneticDock({
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             className={cn(
-                "magnetic-dock-container inline-flex items-end gap-2 p-3 rounded-3xl",
-                variantStyles[variant],
+                "magnetic-dock-container inline-flex items-center gap-2 p-3",
+                design ? designStyles[design] : variantStyles[variant],
                 positionStyles[position],
-                "shadow-xl shadow-black/10 dark:shadow-black/30",
                 className
             )}
             initial={{ opacity: 0, y: 20 }}
@@ -312,6 +399,9 @@ function MagneticDock({
                     magneticDistance={magneticDistance}
                     showLabels={showLabels}
                     isVertical={isVertical}
+                    position={position}
+                    design={design}
+                    iconStyle={iconStyle}
                 />
             ))}
         </motion.div>

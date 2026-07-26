@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "motion/react";
 import {
   MagneticDock,
   DockIconHome,
@@ -32,7 +33,7 @@ export default function SettingsPage() {
   const [dockVariant, setDockVariant] = useState<"glass" | "solid" | "transparent">("glass");
   const [dockShowLabels, setDockShowLabels] = useState(true);
   const [dockIconStyle, setDockIconStyle] = useState<"default" | "creative">("default");
-  const [dockDesign, setDockDesign] = useState<"classic" | "sketchy">("classic");
+  const [dockDesign, setDockDesign] = useState<"classic" | "sketchy" | "brutalist" | "neon" | "minimal">("classic");
 
   const [heroGoldenOverlay, setHeroGoldenOverlay] = useState(false);
   const [dockUnifiedGlow, setDockUnifiedGlow] = useState(false);
@@ -42,6 +43,21 @@ export default function SettingsPage() {
   const [dockSide, setDockSide] = useState<"bottom" | "top" | "left" | "right">("bottom");
   const [dockVerticalAlign, setDockVerticalAlign] = useState<"bottom" | "top" | "center">("bottom");
   const [dockCenterOffset, setDockCenterOffset] = useState<number>(0);
+
+  // --- Toast alert notifications state ---
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const triggerToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   // --- Load Saved Settings ---
   useEffect(() => {
@@ -103,10 +119,86 @@ export default function SettingsPage() {
     }
   }, []);
 
+  // --- Save Individual Sections ---
+  const handleSaveDockParameters = () => {
+    try {
+      localStorage.setItem("dock_iconSize", dockIconSize.toString());
+      localStorage.setItem("dock_maxScale", dockMaxScale.toString());
+      localStorage.setItem("dock_magneticDistance", dockMagneticDistance.toString());
+      localStorage.setItem("dock_position", dockPosition);
+      localStorage.setItem("dock_variant", dockVariant);
+      localStorage.setItem("dock_showLabels", dockShowLabels.toString());
+      localStorage.setItem("dock_mobileMode", dockMobileMode);
+      localStorage.setItem("dock_side", dockSide);
+      localStorage.setItem("dock_verticalAlign", dockVerticalAlign);
+      localStorage.setItem("dock_centerOffset", dockCenterOffset.toString());
+      
+      window.dispatchEvent(new Event("storage"));
+      triggerToast("Dock parameters saved successfully!", "success");
+    } catch (e) {
+      console.error(e);
+      triggerToast("Failed to save dock parameters.", "error");
+    }
+  };
+
+  const handleSaveVisualOptions = () => {
+    try {
+      localStorage.setItem("dock_iconStyle", dockIconStyle);
+      localStorage.setItem("dock_design", dockDesign);
+      localStorage.setItem("dock_unifiedGlow", dockUnifiedGlow.toString());
+      
+      window.dispatchEvent(new Event("storage"));
+      triggerToast("Visual style options saved successfully!", "success");
+    } catch (e) {
+      console.error(e);
+      triggerToast("Failed to save visual styles.", "error");
+    }
+  };
+
+  const handleSaveHeroSection = () => {
+    try {
+      saveSiteConfig({
+        heroTitle,
+        heroSubtitle,
+        heroDescription,
+        phone,
+        whatsappUrl,
+        address,
+        companyNumber
+      });
+      localStorage.setItem("hero_goldenOverlay", heroGoldenOverlay.toString());
+      
+      window.dispatchEvent(new Event("storage"));
+      triggerToast("Hero section configuration saved successfully!", "success");
+    } catch (e) {
+      console.error(e);
+      triggerToast("Failed to save hero section.", "error");
+    }
+  };
+
+  const handleSaveWebsiteContent = () => {
+    try {
+      saveSiteConfig({
+        heroTitle,
+        heroSubtitle,
+        heroDescription,
+        phone,
+        whatsappUrl,
+        address,
+        companyNumber
+      });
+      
+      window.dispatchEvent(new Event("storage"));
+      triggerToast("Website content configuration saved successfully!", "success");
+    } catch (e) {
+      console.error(e);
+      triggerToast("Failed to save website coordinates.", "error");
+    }
+  };
+
   // --- Save / Apply globally ---
   const handleApply = () => {
     try {
-      // Save Dynamic Site Content
       saveSiteConfig({
         heroTitle,
         heroSubtitle,
@@ -133,11 +225,11 @@ export default function SettingsPage() {
       localStorage.setItem("dock_verticalAlign", dockVerticalAlign);
       localStorage.setItem("dock_centerOffset", dockCenterOffset.toString());
 
-      // Trigger custom storage update event to sync on active components in DOM immediately
       window.dispatchEvent(new Event("storage"));
-      alert("Settings applied globally successfully!");
+      triggerToast("All customizations applied globally!", "success");
     } catch (e) {
       console.error(e);
+      triggerToast("Failed to apply settings globally.", "error");
     }
   };
 
@@ -194,7 +286,7 @@ export default function SettingsPage() {
       setDockCenterOffset(0);
 
       window.dispatchEvent(new Event("storage"));
-      alert("Settings reset to default values.");
+      triggerToast("All customizations reset to defaults.", "success");
     }
   };
 
@@ -245,6 +337,8 @@ export default function SettingsPage() {
             showLabels={dockShowLabels}
             position={dockPosition}
             variant={dockVariant}
+            design={dockDesign}
+            iconStyle={dockIconStyle}
           />
         </div>
 
@@ -253,9 +347,17 @@ export default function SettingsPage() {
 
           {/* Column 1: MagneticDock Controller */}
           <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 backdrop-blur-md space-y-6">
-            <h2 className="text-xl font-sans font-bold tracking-tight border-b border-zinc-200 dark:border-white/10 pb-4">
-              1. Magnetic Dock Parameters
-            </h2>
+            <div className="flex justify-between items-center border-b border-zinc-200 dark:border-white/10 pb-4">
+              <h2 className="text-xl font-sans font-bold tracking-tight">
+                1. Magnetic Dock Parameters
+              </h2>
+              <button 
+                onClick={handleSaveDockParameters}
+                className="px-3 py-1.5 bg-[#C99537] text-zinc-950 font-sans font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_#000] transition-all cursor-pointer shrink-0"
+              >
+                Save Section
+              </button>
+            </div>
 
             <div className="space-y-4 font-sans text-sm">
               {/* Icon Size Slider */}
@@ -468,12 +570,19 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
-
           {/* Column 2: Icon Style & Design */}
           <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 backdrop-blur-md space-y-6">
-            <h2 className="text-xl font-sans font-bold tracking-tight border-b border-zinc-200 dark:border-white/10 pb-4">
-              2. Visual Style Options
-            </h2>
+            <div className="flex justify-between items-center border-b border-zinc-200 dark:border-white/10 pb-4">
+              <h2 className="text-xl font-sans font-bold tracking-tight">
+                2. Visual Style Options
+              </h2>
+              <button 
+                onClick={handleSaveVisualOptions}
+                className="px-3 py-1.5 bg-[#C99537] text-zinc-950 font-sans font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_#000] transition-all cursor-pointer shrink-0"
+              >
+                Save Section
+              </button>
+            </div>
 
             <div className="space-y-4 font-sans text-sm">
               {/* Icon Style Toggle */}
@@ -508,8 +617,8 @@ export default function SettingsPage() {
                         <circle cx="6" cy="19" r="3" /><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /><circle cx="18" cy="5" r="3" />
                       </svg>
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Default</span>
-                    <span className="text-[10px] text-zinc-400 text-center">Clean minimal strokes</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550">Default</span>
+                    <span className="text-[10px] text-zinc-400 text-center leading-tight">Clean minimal strokes</span>
                   </button>
 
                   {/* Creative Option */}
@@ -543,8 +652,8 @@ export default function SettingsPage() {
                         <polygon points="16,3 19.5,12 29,12.5 22,19 24.5,29 16,23.5 7.5,29 10,19 3,12.5 12.5,12" fill="url(#sg1)" />
                       </svg>
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Creative</span>
-                    <span className="text-[10px] text-zinc-400 text-center">Artistic travel-themed</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550">Creative</span>
+                    <span className="text-[10px] text-zinc-400 text-center leading-tight">Artistic travel-themed</span>
                   </button>
                 </div>
               </div>
@@ -554,58 +663,124 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium block">Dock Container Design</span>
-                    <span className="text-[10px] font-light text-zinc-500">Pick the container rendering aesthetic</span>
+                    <span className="text-[10px] font-light text-zinc-500">Pick from 5 unique styles</span>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {/* Classic Option */}
                   <button
                     onClick={() => setDockDesign("classic")}
-                    className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${
+                    className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
                       dockDesign === "classic"
                         ? "border-[#C99537] bg-[#C99537]/10"
                         : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
                     }`}
                   >
                     {dockDesign === "classic" && (
-                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
+                      <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#C99537]" />
                     )}
                     {/* Classic layout preview */}
                     <div className="w-16 h-8 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 border border-zinc-300 dark:border-white/10 flex items-center justify-center gap-1 shadow-sm">
-                      <div className="w-4 h-4 rounded-full bg-[#C99537] opacity-80" />
-                      <div className="w-4 h-4 rounded-full bg-blue-500 opacity-85" />
-                      <div className="w-4 h-4 rounded-full bg-green-500 opacity-85" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-[#C99537] opacity-80" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-blue-500 opacity-85" />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 mt-1">Classic</span>
-                    <span className="text-[10px] text-zinc-400 text-center">Glowing glass & vibrant feedback</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550 mt-1">Classic</span>
+                    <span className="text-[9px] text-zinc-400 text-center leading-tight">Glass & glow</span>
                   </button>
 
                   {/* Sketchy Option */}
                   <button
                     onClick={() => setDockDesign("sketchy")}
-                    className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${
+                    className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
                       dockDesign === "sketchy"
                         ? "border-[#C99537] bg-[#C99537]/10"
                         : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
                     }`}
                   >
                     {dockDesign === "sketchy" && (
-                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C99537]" />
+                      <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#C99537]" />
                     )}
                     {/* Sketchy layout preview */}
                     <div
-                      className="w-16 h-8 rounded-md bg-white dark:bg-zinc-950 border border-zinc-700 flex items-center justify-center gap-1"
+                      className="w-16 h-8 rounded-md bg-[#faf6eb] dark:bg-zinc-900 border border-zinc-700 flex items-center justify-center gap-1"
                       style={{
                         filter: "url(#sketchy-sm)",
-                        boxShadow: "1.5px 2px 0 1px rgba(0, 0, 0, 0.25)",
-                        transform: "rotate(-1.5deg)"
+                        boxShadow: "1px 1.5px 0 0.5px rgba(0, 0, 0, 0.25)",
+                        transform: "rotate(-1deg)"
                       }}
                     >
-                      <div className="w-3 h-3 border border-zinc-600 rounded-xs bg-[#C99537]/80" />
-                      <div className="w-3 h-3 border border-zinc-600 rounded-xs bg-blue-500/80" />
+                      <div className="w-2.5 h-2.5 border border-zinc-600 rounded-xs bg-[#C99537]/80" />
+                      <div className="w-2.5 h-2.5 border border-zinc-600 rounded-xs bg-blue-500/80" />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 mt-1">Sketchy</span>
-                    <span className="text-[10px] text-zinc-400 text-center">Hand-drawn offset lines & rotation</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550 mt-1">Sketchy</span>
+                    <span className="text-[9px] text-zinc-400 text-center leading-tight">Hand-drawn</span>
+                  </button>
+
+                  {/* Brutalist Option */}
+                  <button
+                    onClick={() => setDockDesign("brutalist")}
+                    className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
+                      dockDesign === "brutalist"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockDesign === "brutalist" && (
+                      <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Brutalist layout preview */}
+                    <div className="w-16 h-8 bg-white dark:bg-zinc-950 border-2 border-zinc-950 dark:border-white flex items-center justify-center gap-1 shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff]">
+                      <div className="w-3 h-3 bg-[#C99537] border border-zinc-950 dark:border-white" />
+                      <div className="w-3 h-3 bg-blue-500 border border-zinc-950 dark:border-white" />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550 mt-1">Brutalist</span>
+                    <span className="text-[9px] text-zinc-400 text-center leading-tight">Flat offset</span>
+                  </button>
+
+                  {/* Neon Option */}
+                  <button
+                    onClick={() => setDockDesign("neon")}
+                    className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
+                      dockDesign === "neon"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockDesign === "neon" && (
+                      <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Neon layout preview */}
+                    <div className="w-16 h-8 rounded-lg bg-zinc-950 border border-[#C99537] flex items-center justify-center gap-1 shadow-[0_0_6px_rgba(201,149,55,0.4)]">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#C99537] shadow-[0_0_3px_rgba(201,149,55,0.8)]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_3px_rgba(59,130,246,0.8)]" />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550 mt-1">Neon</span>
+                    <span className="text-[9px] text-zinc-400 text-center leading-tight">Cyber glow</span>
+                  </button>
+
+                  {/* Minimal Option */}
+                  <button
+                    onClick={() => setDockDesign("minimal")}
+                    className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
+                      dockDesign === "minimal"
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                    }`}
+                  >
+                    {dockDesign === "minimal" && (
+                      <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#C99537]" />
+                    )}
+                    {/* Minimal layout preview */}
+                    <div className="w-16 h-8 bg-transparent flex items-center justify-center gap-1">
+                      <div className="w-3.5 h-3.5 rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-350 dark:border-zinc-700 flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#C99537]" />
+                      </div>
+                      <div className="w-3.5 h-3.5 rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-350 dark:border-zinc-700 flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-550 mt-1">Minimal</span>
+                    <span className="text-[9px] text-zinc-400 text-center leading-tight">Borderless</span>
                   </button>
                 </div>
               </div>
@@ -615,9 +790,17 @@ export default function SettingsPage() {
 
         {/* Hero Section Settings Card */}
         <div className="bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm border border-zinc-200/80 dark:border-white/8 rounded-3xl p-8 space-y-6">
-          <div>
-            <h2 className="text-xl font-sans font-bold tracking-tight text-zinc-900 dark:text-white mb-1">3. Hero Section</h2>
-            <p className="text-xs font-light text-zinc-500">Visual overlays and effects on the landing hero video.</p>
+          <div className="flex justify-between items-center border-b border-zinc-200/50 dark:border-white/5 pb-4">
+            <div>
+              <h2 className="text-xl font-sans font-bold tracking-tight text-zinc-900 dark:text-white">3. Hero Section</h2>
+              <p className="text-xs font-light text-zinc-500">Visual overlays and effects on the landing hero video.</p>
+            </div>
+            <button 
+              onClick={handleSaveHeroSection}
+              className="px-3 py-1.5 bg-[#C99537] text-zinc-950 font-sans font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_#000] transition-all cursor-pointer shrink-0"
+            >
+              Save Section
+            </button>
           </div>
           <div className="space-y-4">
             {/* Golden overlay toggle */}
@@ -655,9 +838,17 @@ export default function SettingsPage() {
 
         {/* Section 4: Website Content Configuration */}
         <div className="bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm border border-zinc-200/80 dark:border-white/8 rounded-3xl p-8 space-y-6">
-          <div>
-            <h2 className="text-xl font-sans font-bold tracking-tight text-zinc-900 dark:text-white mb-1">4. Website Content Configuration</h2>
-            <p className="text-xs font-light text-zinc-500">Edit core website copywriting, headings, links, and contact coordinates. Apply settings globally to persist the changes.</p>
+          <div className="flex justify-between items-center border-b border-zinc-200/50 dark:border-white/5 pb-4">
+            <div>
+              <h2 className="text-xl font-sans font-bold tracking-tight text-zinc-900 dark:text-white">4. Website Content Configuration</h2>
+              <p className="text-xs font-light text-zinc-500">Edit core website copywriting, headings, links, and contact coordinates. Apply settings globally to persist the changes.</p>
+            </div>
+            <button 
+              onClick={handleSaveWebsiteContent}
+              className="px-3 py-1.5 bg-[#C99537] text-zinc-950 font-sans font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_#000] transition-all cursor-pointer shrink-0"
+            >
+              Save Section
+            </button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans text-sm">
@@ -763,6 +954,25 @@ export default function SettingsPage() {
             {dockCodeString}
           </pre>
         </div>
+
+        {/* Brutalist Custom Toast */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.9 }}
+              className={`fixed bottom-6 left-6 z-[9999] px-6 py-4 border-3 border-zinc-950 dark:border-white font-sans font-bold text-xs uppercase tracking-widest flex items-center gap-3 shadow-[4px_4px_0_#000] dark:shadow-[4px_4px_0_#fff] ${
+                toast.type === "success" 
+                  ? "bg-[#C99537] text-zinc-950" 
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              <span>{toast.type === "success" ? "✓" : "✗"}</span>
+              <span>{toast.message}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
