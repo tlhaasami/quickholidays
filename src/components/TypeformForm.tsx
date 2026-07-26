@@ -47,6 +47,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
   const hasSubmitted = useRef(false);
 
   const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const showWarning = (msg: string) => {
     setNotification({ message: msg, type: "error" });
@@ -171,24 +172,63 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    hasSubmitted.current = true;
-    const finalPlan = formData.priorityUpgrade 
-      ? `${formData.plan} + Immediate Priority Option (+£15)` 
-      : formData.plan;
+    if (isSubmitting) return;
 
-    trackLead(formData.email, {
-      name: formData.name,
-      phone: formData.phone,
-      nationality: formData.nationality,
-      destination: formData.destination,
-      priorVisas: formData.priorVisas,
-      channel: formData.channel,
-      comment: formData.comment,
-      plan: finalPlan
-    });
-    setStep(6); // Success Screen
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/submit-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          name: formData.name,
+          phone: formData.phone,
+          nationality: formData.nationality,
+          destination: formData.destination,
+          priorVisas: formData.priorVisas,
+          channel: formData.channel,
+          comment: formData.comment,
+          plan: formData.plan || "Help Me Choose / Consultation (Free)",
+          priorityUpgrade: formData.priorityUpgrade,
+          priorityUpgradeText: formData.priorityUpgrade ? "Yes" : "No"
+        })
+      });
+
+      if (res.status === 429) {
+        const data = await res.json();
+        showWarning(data.error || "The daily consultation booking limit has been reached. Please try again after 12:00 PM.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to submit lead");
+      }
+
+      hasSubmitted.current = true;
+      trackLead(formData.email, {
+        name: formData.name,
+        phone: formData.phone,
+        nationality: formData.nationality,
+        destination: formData.destination,
+        priorVisas: formData.priorVisas,
+        channel: formData.channel,
+        comment: formData.comment,
+        plan: formData.plan || "Help Me Choose / Consultation (Free)",
+        priorityUpgrade: formData.priorityUpgrade,
+        priorityUpgradeText: formData.priorityUpgrade ? "Yes" : "No"
+      });
+      setStep(6); // Success Screen
+    } catch (err) {
+      console.error("Submission failed:", err);
+      showWarning("Failed to submit your request. Please check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const filteredNationalities = COMMON_NATIONALITIES.filter((n) =>
@@ -387,24 +427,24 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       key={plan.id}
                       type="button"
                       onClick={() => setFormData({ ...formData, plan: fullPlanName })}
-                      className={`w-full p-3 text-left border-2 transition-all flex justify-between items-center cursor-pointer group rounded-xl ${
+                      className={`w-full p-3 text-left border-2 transition-all flex justify-between items-center cursor-pointer group rounded-xl no-custom-cursor ${
                         isSelected
                           ? "border-[#C99537] bg-amber-500/10 dark:bg-amber-500/20 shadow-[2px_2px_0_#C99537] dark:shadow-[2px_2px_0_#C99537]"
                           : "border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/30 hover:border-[#C99537] hover:bg-[#C99537]/5"
                       }`}
                     >
-                      <div className="text-left">
-                        <h4 className="font-sans font-bold text-xs sm:text-sm text-zinc-900 dark:text-white flex items-center gap-1.5">
+                      <div className="text-left pointer-events-none">
+                        <h4 className="font-sans font-bold text-xs sm:text-sm text-zinc-900 dark:text-white flex items-center gap-1.5 pointer-events-none">
                           {plan.name}
                           {isSelected && (
-                            <span className="text-[9px] bg-primary text-zinc-950 px-1 py-0.2 font-sans font-extrabold uppercase rounded-none tracking-wider">
+                            <span className="text-[9px] bg-primary text-zinc-950 px-1 py-0.2 font-sans font-extrabold uppercase rounded-none tracking-wider pointer-events-none">
                               Selected
                             </span>
                           )}
                         </h4>
-                        <p className="font-sans text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 font-light mt-0.5 leading-tight">{plan.desc}</p>
+                        <p className="font-sans text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 font-light mt-0.5 leading-tight pointer-events-none">{plan.desc}</p>
                       </div>
-                      <span className="font-serif font-bold text-xs sm:text-sm text-primary shrink-0 ml-4">{plan.price}</span>
+                      <span className="font-serif font-bold text-xs sm:text-sm text-primary shrink-0 ml-4 pointer-events-none">{plan.price}</span>
                     </button>
                   );
                 })}
@@ -460,7 +500,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                         key={num}
                         type="button"
                         onClick={() => setFormData({ ...formData, priorVisas: num })}
-                        className={`py-4 rounded-xl border text-sm font-sans font-medium cursor-pointer transition-all ${
+                        className={`py-4 rounded-xl border text-sm font-sans font-medium cursor-pointer no-custom-cursor transition-all ${
                           isSelected
                             ? "bg-primary border-primary text-white font-semibold"
                             : "bg-zinc-100 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 text-zinc-650 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:text-zinc-900 dark:hover:text-white"
@@ -491,9 +531,33 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { value: "WhatsApp", label: "WhatsApp", icon: "💬" },
-                    { value: "Call", label: "Phone Call", icon: "📞" },
-                    { value: "Email", label: "Email", icon: "✉" }
+                    { 
+                      value: "WhatsApp", 
+                      label: "WhatsApp", 
+                      icon: (
+                        <svg className="w-5 h-5 shrink-0 fill-current" viewBox="0 0 24 24">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.456h.004c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                      )
+                    },
+                    { 
+                      value: "Call", 
+                      label: "Phone Call", 
+                      icon: (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                      )
+                    },
+                    { 
+                      value: "Email", 
+                      label: "Email", 
+                      icon: (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      )
+                    }
                   ].map((ch) => {
                     const isSelected = formData.channel === ch.value;
                     const isWhatsApp = ch.value === "WhatsApp";
@@ -502,7 +566,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                         key={ch.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, channel: ch.value })}
-                        className={`py-3 px-2 rounded-lg border text-xs font-sans font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                        className={`py-3 px-2 rounded-lg border text-xs font-sans font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer no-custom-cursor ${
                           isSelected
                             ? isWhatsApp
                               ? "bg-emerald-600 border-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)] animate-pulse"
@@ -510,8 +574,8 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                             : "bg-zinc-100 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 text-zinc-650 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:text-zinc-900 dark:hover:text-white"
                         }`}
                       >
-                        <span className="text-lg">{ch.icon}</span>
-                        <span>{ch.label}</span>
+                        <div className="w-5 h-5 flex items-center justify-center pointer-events-none">{ch.icon}</div>
+                        <span className="pointer-events-none">{ch.label}</span>
                       </button>
                     );
                   })}
@@ -563,6 +627,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   type="button"
                   onClick={prevStep}
                   hideArrow={true}
+                  disabled={isSubmitting}
                 >
                   Back
                 </ThemeButton>
@@ -575,6 +640,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   <ThemeButton
                     type="button"
                     onClick={nextStep}
+                    disabled={isSubmitting}
                   >
                     Continue
                   </ThemeButton>
@@ -583,8 +649,9 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                 <CoolMode>
                   <ThemeButton
                     type="submit"
+                    disabled={isSubmitting}
                   >
-                    Book My Consultation
+                    {isSubmitting ? "Booking..." : "Book My Consultation"}
                   </ThemeButton>
                 </CoolMode>
               )}
