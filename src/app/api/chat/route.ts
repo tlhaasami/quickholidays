@@ -16,6 +16,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Message query is required" }, { status: 400 });
     }
 
+    if (message.length > 1000) {
+      return NextResponse.json({ error: "Message exceeds character limit of 1000 characters" }, { status: 400 });
+    }
+
     if (!groqKey) {
       return NextResponse.json(
         { error: "GROQ_API_KEY env variable is not configured" },

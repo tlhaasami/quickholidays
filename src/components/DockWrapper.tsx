@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
+import dynamic from "next/dynamic";
+
+const AiAssistantPopup = dynamic(
+  () => import("@/components/AiAssistantPopup").then((mod) => mod.AiAssistantPopup),
+  { ssr: false }
+);
 import {
   MagneticDock,
   DockIconHome,
@@ -611,6 +617,8 @@ export function DockWrapper() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AiAssistantPopup />
     </>
   );
 }

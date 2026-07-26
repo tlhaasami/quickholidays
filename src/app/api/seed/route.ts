@@ -1,11 +1,24 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Client } from "pg";
 import { knowledgeBase } from "@/rag/documents";
 import { RAG_CONFIG } from "@/rag/config";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Security guard: Only allow in development or if valid admin token is provided
+  const { searchParams } = new URL(req.url);
+  const token = searchParams.get("token");
+  const isDev = process.env.NODE_ENV === "development";
+  const adminToken = process.env.ADMIN_SEED_TOKEN;
+
+  if (!isDev && (!adminToken || token !== adminToken)) {
+    return NextResponse.json(
+      { error: "Unauthorized access: Seeding is blocked in production unless a valid token is provided" },
+      { status: 401 }
+    );
+  }
+
   const dbPassword = process.env.DB_PASSWORD;
 
   if (!dbPassword) {

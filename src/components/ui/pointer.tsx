@@ -52,6 +52,21 @@ export function Pointer({
         : null
 
     const handleMouseMove = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null
+      const shouldHideCustom =
+        target?.closest("input") ||
+        target?.closest("textarea") ||
+        target?.closest("select") ||
+        target?.closest(".no-custom-cursor")
+
+      if (shouldHideCustom) {
+        setIsActive(false)
+        if (parentElement) {
+          parentElement.classList.remove("custom-pointer-active")
+        }
+        return
+      }
+
       x.set(e.clientX)
       y.set(e.clientY)
       setIsActive(true)
@@ -61,6 +76,21 @@ export function Pointer({
     }
 
     const handleMouseEnter = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null
+      const shouldHideCustom =
+        target?.closest("input") ||
+        target?.closest("textarea") ||
+        target?.closest("select") ||
+        target?.closest(".no-custom-cursor")
+
+      if (shouldHideCustom) {
+        setIsActive(false)
+        if (parentElement) {
+          parentElement.classList.remove("custom-pointer-active")
+        }
+        return
+      }
+
       x.set(e.clientX)
       y.set(e.clientY)
       setIsActive(true)
@@ -76,12 +106,25 @@ export function Pointer({
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null
       if (target) {
+        const shouldHideCustom =
+          target.closest("input") ||
+          target.closest("textarea") ||
+          target.closest("select") ||
+          target.closest(".no-custom-cursor")
+
+        if (shouldHideCustom) {
+          setIsActive(false)
+          setIsHoveringInteractive(false)
+          if (parentElement) {
+            parentElement.classList.remove("custom-pointer-active")
+          }
+          return
+        }
+
         const isInsideDock = target.closest(".magnetic-dock-container")
         const isClickable =
           target.closest("a") ||
           target.closest("button") ||
-          target.closest("input") ||
-          target.closest("select") ||
           target.closest("[role='button']") ||
           isInsideDock ||
           window.getComputedStyle(target).cursor === "pointer"

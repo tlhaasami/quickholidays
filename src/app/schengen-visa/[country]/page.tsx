@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { COUNTRIES } from "@/constants";
 import { TypeformForm } from "@/components/TypeformForm";
 import { ClientTracker } from "./ClientTracker";
@@ -62,9 +63,11 @@ export default async function CountryPage({
               Applying for a {match.name} short-stay (tourist) visa as a non-UK national living in the UK? Here's what it costs, and how we handle it with you.
             </p>
           </div>
-          <img 
+          <Image 
             src={match.flag} 
             alt={`${match.name} Flag`} 
+            width={96}
+            height={64}
             className="w-24 h-16 object-cover rounded-md border border-zinc-200 dark:border-white/10 filter drop-shadow-lg shrink-0 self-start sm:self-center"
           />
         </div>
