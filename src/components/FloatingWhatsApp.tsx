@@ -3,10 +3,15 @@
 import React from "react";
 import { trackContact } from "@/lib/analytics";
 
+import { usePathname } from "next/navigation";
+
 export function FloatingWhatsApp() {
+  const pathname = usePathname();
   const handleClick = () => {
     trackContact("WhatsApp");
   };
+
+  if (pathname === "/login" || pathname === "/agent-portal" || pathname === "/create-document") return null;
 
   return (
     <a

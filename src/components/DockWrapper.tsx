@@ -157,9 +157,7 @@ const DockIconWhatsapp = (props: React.SVGProps<SVGSVGElement>) => (
 export function DockWrapper() {
   const router = useRouter();
   const pathname = usePathname();
-
-  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal";
-
+  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal" || pathname === "/create-document";
   // --- Dynamic settings from localStorage ---
   const [iconSize, setIconSize] = useState(48);
   const [maxScale, setMaxScale] = useState(1.3);

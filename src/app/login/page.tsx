@@ -84,8 +84,26 @@ export default function LoginPage() {
       return;
     }
 
-    // Check IP restriction first
-    const isIpSuspended = localStorage.getItem(`qh-suspended-ip-${clientIp}`) === "true";
+    // Check IP restriction first – consider expiry after 12 hours
+    const ipSuspendedRaw = localStorage.getItem(`qh-suspended-ip-${clientIp}`);
+    const now = Date.now();
+    let isIpSuspended = false;
+    if (ipSuspendedRaw) {
+      const timestamp = parseInt(ipSuspendedRaw, 10);
+      if (!isNaN(timestamp)) {
+        // stored as timestamp – check expiry
+        if (now - timestamp < 12 * 60 * 60 * 1000) {
+          isIpSuspended = true;
+        } else {
+          // expired – clear entry and related attempts
+          localStorage.removeItem(`qh-suspended-ip-${clientIp}`);
+          localStorage.removeItem(`qh-attempts-ip-${clientIp}`);
+        }
+      } else if (ipSuspendedRaw === "true") {
+        // backward‑compatible flag (treat as suspended until cleared)
+        isIpSuspended = true;
+      }
+    }
     if (isIpSuspended) {
       setError(`Access Denied: Logins from this IP address (${clientIp}) have been temporarily suspended due to consecutive authentication failures. Please contact administrative support.`);
       return;
@@ -114,7 +132,8 @@ export default function LoginPage() {
       const ipAttempts = parseInt(localStorage.getItem(`qh-attempts-ip-${clientIp}`) || "0", 10) + 1;
       localStorage.setItem(`qh-attempts-ip-${clientIp}`, ipAttempts.toString());
       if (ipAttempts >= 10) {
-        localStorage.setItem(`qh-suspended-ip-${clientIp}`, "true");
+        // Store the timestamp of suspension; it will auto‑expire after 12 hours
+        localStorage.setItem(`qh-suspended-ip-${clientIp}`, Date.now().toString());
       }
       logAudit("failure", "Username not found");
       setError("Invalid username or password.");
@@ -156,7 +175,8 @@ export default function LoginPage() {
         localStorage.setItem("qh-agent-accounts", JSON.stringify(accountsData));
       }
       if (maxAttemptsIp) {
-        localStorage.setItem(`qh-suspended-ip-${clientIp}`, "true");
+        // Store suspension timestamp for 12‑hour auto‑renewal
+        localStorage.setItem(`qh-suspended-ip-${clientIp}`, Date.now().toString());
       }
 
       logAudit("failure", "Invalid password");
