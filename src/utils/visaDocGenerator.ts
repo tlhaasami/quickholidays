@@ -23,7 +23,13 @@ export function generateVisaWordDoc(
     label +
     "</td></tr>";
 
-  const surname = parsedData["personal_surname"] || "Applicant";
+  // Uppercase all field values for the exported document
+  const data: Record<string, string> = {};
+  for (const [key, val] of Object.entries(parsedData)) {
+    data[key] = val ? val.toUpperCase() : "";
+  }
+
+  const surname = data["personal_surname"] || "Applicant";
 
   let html = [
     "<html xmlns:o=\'urn:schemas-microsoft-com:office:office\' xmlns:w=\'urn:schemas-microsoft-com:office:word\' xmlns:v=\'urn:schemas-microsoft-com:vml\' xmlns=\'http://www.w3.org/TR/REC-html40\'>",
@@ -78,7 +84,7 @@ export function generateVisaWordDoc(
     if (sec.title === "Applicant Residence Address Details") {
       html += makeSubHeader("Full Residence Address");
       sec.fields.forEach((field) => {
-        const val = parsedData[field.id] || "";
+        const val = data[field.id] || "";
         html +=
           "<tr><th " +
           TH +
@@ -94,7 +100,7 @@ export function generateVisaWordDoc(
       const basicFields = sec.fields.slice(0, 4);
       const addrFields = sec.fields.slice(4);
       basicFields.forEach((field) => {
-        const val = parsedData[field.id] || "";
+        const val = data[field.id] || "";
         html +=
           "<tr><th " +
           TH +
@@ -108,7 +114,7 @@ export function generateVisaWordDoc(
       });
       html += makeSubHeader("Employer/University/College Full Address");
       addrFields.forEach((field) => {
-        const val = parsedData[field.id] || "";
+        const val = data[field.id] || "";
         html +=
           "<tr><th " +
           TH +
@@ -122,7 +128,7 @@ export function generateVisaWordDoc(
       });
     } else {
       sec.fields.forEach((field) => {
-        const val = parsedData[field.id] || "";
+        const val = data[field.id] || "";
         html +=
           "<tr><th " +
           TH +
