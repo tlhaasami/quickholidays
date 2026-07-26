@@ -8,6 +8,7 @@ import {
   type HTMLMotionProps,
 } from "motion/react"
 
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
@@ -24,6 +25,8 @@ export function Pointer({
   children,
   ...props
 }: HTMLMotionProps<"div">): React.ReactNode {
+  const pathname = usePathname()
+  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal"
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const [isActive, setIsActive] = useState<boolean>(false)

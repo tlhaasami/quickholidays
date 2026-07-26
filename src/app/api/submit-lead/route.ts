@@ -104,3 +104,53 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  const dbPassword = process.env.DB_PASSWORD;
+
+  if (!dbPassword) {
+    return NextResponse.json(
+      { error: "DB_PASSWORD env variable is not configured" },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const client = new Client({
+      user: process.env.DB_USER || RAG_CONFIG.DB_DEFAULT_USER,
+      host: process.env.DB_HOST || RAG_CONFIG.DB_DEFAULT_HOST,
+      database: process.env.DB_DATABASE || RAG_CONFIG.DB_DEFAULT_NAME,
+      password: dbPassword,
+      port: parseInt(process.env.DB_PORT || String(RAG_CONFIG.DB_DEFAULT_PORT)),
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
+
+    await client.connect();
+    let leads: any[] = [];
+    try {
+      // Ensure table exists
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS lead_submissions (
+          id SERIAL PRIMARY KEY,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          payload JSONB
+        );
+      `);
+
+      const res = await client.query("SELECT id, created_at, payload FROM lead_submissions ORDER BY created_at DESC LIMIT 50;");
+      leads = res.rows;
+    } finally {
+      await client.end();
+    }
+
+    return NextResponse.json({ leads });
+  } catch (err: any) {
+    console.error("Failed to fetch leads:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to fetch leads" },
+      { status: 500 }
+    );
+  }
+}

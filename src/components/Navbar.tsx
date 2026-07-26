@@ -192,6 +192,9 @@ export function Navbar() {
 
   if (!mounted) return null;
 
+  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal";
+  if (isExcludedPath) return null;
+
   const isHomepage = pathname === "/";
   const showTransparent = isHomepage && !isScrolled;
 
