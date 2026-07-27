@@ -114,7 +114,7 @@ The schema you must output is:
     "minor_phone": string or null,
     "minor_email": string or null
   },
-  "missingFields": string[] (List of critical field IDs that are missing: personal_surname, personal_first_names, personal_dob, passport_number, travel_destinations, travel_start_date, address_email),
+  "missingFields": string[] (List of CRITICAL missing fields ONLY: personal_surname, personal_first_names, passport_number, travel_destinations, travel_start_date, travel_return_date, uk_share_code, address_street. Do NOT include optional fields like address_county, emp_street, emp_phone, emp_email, minor fields in missingFields),
   "message": string (A structured plain-text response in EXACTLY this format — no markdown symbols, no asterisks, no hashes:
 
 EXTRACTED DETAILS
@@ -122,7 +122,7 @@ EXTRACTED DETAILS
 
 REMAINING FIELDS NEEDED
 Please provide the following details to complete the application:
-(List each missing or empty field using its human-readable label. One per line starting with a dash.)
+(List ONLY CRITICAL missing fields necessary for visa application: Surname, First name, Passport Number, Destination Country, Travel Dates, UK Share Code, Street Address. One per line starting with a dash. Do NOT list optional fields like County, Employer Phone, or Employer Email if employment info is provided.)
 
 Use this field ID to human-readable label mapping:
 personal_surname -> Surname (Family name)
@@ -211,8 +211,9 @@ You MUST verify the travel_destinations value:
 - Valid Schengen countries are: Austria, Belgium, Croatia, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Italy, Latvia, Liechtenstein, Lithuania, Luxembourg, Malta, Netherlands, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland.
 - If it is NOT in this list, set it to null and add "travel_destinations" to the missingFields list.
 
-Handling Ambiguities:
-- If there is any ambiguity (e.g. an address provided but unclear if it belongs to residence, employer, accommodation, or sponsor), set those fields to null and list them under Remaining Fields Needed. Do not ask conversational questions.
+Handling Ambiguities & Zero Assumption Rule:
+- ABSOLUTE ZERO ASSUMPTIONS: You must NEVER assume, guess, or invent missing information. If a value is not explicitly stated in the text, set it to null.
+- CONFUSION & MISSING EXPLANATIONS: If the input contains ambiguous or incomplete details (for instance, travel destination is missing or not a Schengen member, travel dates are vague, passport number is omitted, or employment status is unclear), explicitly describe the exact confusion under the "message" response so the agent immediately knows what needs clarification. Do not make conversational chit-chat, but clearly list each point of confusion.
 
 You must return ONLY a valid JSON object matching this schema. Do not output any markup, markdown, backticks, or intro text outside of the JSON block.`
       }

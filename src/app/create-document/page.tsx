@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { visaSections } from "@/constants/visaFields";
-import { downloadVisaDoc } from "@/utils/visaDocGenerator";
+import { downloadVisaDoc, exportVisaDocPDF } from "@/utils/visaDocGenerator";
+import { isAgentAuthenticated } from "@/utils/auth";
 
 // ── LLM Prompt ──────────────────────────────────────────────────────────────
 const FIELD_LIST = visaSections
@@ -41,8 +42,11 @@ export default function CreateDocumentPage() {
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
 
+  const [isAgent, setIsAgent] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    setIsAgent(isAgentAuthenticated());
     const theme = localStorage.getItem("theme");
     const docHasDark = document.documentElement.classList.contains("dark");
     setIsDark(theme === "dark" || (theme === null && docHasDark));
@@ -152,9 +156,15 @@ export default function CreateDocumentPage() {
             </span>
           </a>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <a
+              href="/create-cover-letter"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 transition-all"
+            >
+              AI Cover Letter Tool
+            </a>
             <span className={`text-xs ${LABEL} hidden sm:block`}>
-              Visa Document Generator — No account required
+              Visa Document Generator
             </span>
             {mounted && (
               <button
@@ -245,6 +255,32 @@ export default function CreateDocumentPage() {
         {/* ═══ STEP 1 — Copy Prompt ═══ */}
         {step === 1 && (
           <div className="space-y-6">
+            {/* Agent Mode / Public Mode Auth Notice */}
+            <div className={`p-4 rounded-2xl border text-xs leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+              isAgent
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                : "bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300"
+            }`}>
+              <div>
+                <strong className="block font-bold text-sm">
+                  {isAgent ? "🔒 Agent Mode Active (API Key Generation Unlocked)" : "🌐 Public User Mode"}
+                </strong>
+                <p className="text-xs mt-1 opacity-90">
+                  {isAgent
+                    ? "You are logged in as an authorized agent. Live API key natural language extraction & instant 1-click document creation is enabled."
+                    : "Direct API key generation is restricted to logged-in agents. Copy the AI System Prompt below to use with ChatGPT, Claude, or Gemini — or log into the Agent Portal."}
+                </p>
+              </div>
+              {!isAgent && (
+                <a
+                  href="/agent-portal"
+                  className="shrink-0 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-all shadow-sm"
+                >
+                  Agent Login →
+                </a>
+              )}
+            </div>
+
             <div className={CARD}>
               <div className={`flex items-center justify-between px-6 py-4 border-b ${DIVIDER}`}>
                 <div>
@@ -507,15 +543,24 @@ export default function CreateDocumentPage() {
             </div>
 
             {/* Bottom CTA */}
-            <div className="flex justify-center pt-6 pb-4">
+            <div className="flex flex-wrap justify-center gap-4 pt-6 pb-4">
               <button
                 onClick={handleExport}
-                className={`flex items-center gap-3 ${BTN_GOLD} px-10 py-4 rounded-2xl text-base shadow-[0_0_30px_rgba(201,149,55,0.4)] hover:shadow-[0_0_50px_rgba(201,149,55,0.6)] hover:scale-105 active:scale-100 duration-300`}
+                className={`flex items-center gap-3 ${BTN_GOLD} px-8 py-3.5 rounded-2xl text-sm font-bold shadow-[0_0_30px_rgba(201,149,55,0.4)] hover:shadow-[0_0_50px_rgba(201,149,55,0.6)] hover:scale-105 active:scale-100 duration-300`}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Download Visa Draft (.doc)
+                Export Visa Draft (.doc)
+              </button>
+              <button
+                onClick={() => {
+                  if (parsedData) exportVisaDocPDF(parsedData, exportDocName || "Schengen_Visa_Application");
+                }}
+                className="flex items-center gap-3 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold px-8 py-3.5 rounded-2xl text-sm shadow duration-300 hover:scale-105 active:scale-100"
+              >
+                <span className="text-base">📕</span>
+                Export Visa Form (PDF)
               </button>
             </div>
           </div>
@@ -534,7 +579,7 @@ export default function CreateDocumentPage() {
           <div className={`${CARD} w-full max-w-sm shadow-2xl overflow-hidden`}>
             <div className={`px-6 py-5 border-b ${DIVIDER}`}>
               <h3 className={`text-lg font-bold ${HEADING}`}>Export Visa Draft</h3>
-              <p className={`text-sm ${LABEL} mt-0.5`}>Choose a filename for your document</p>
+              <p className={`text-sm ${LABEL} mt-0.5`}>Choose a filename and select format</p>
             </div>
             <div className="p-6">
               <label className={`block text-sm font-semibold ${BODY} mb-2`}>
@@ -553,19 +598,32 @@ export default function CreateDocumentPage() {
                 placeholder="e.g. John_Doe_Visa"
               />
             </div>
-            <div className={`px-6 py-4 bg-zinc-50 dark:bg-zinc-950/50 border-t ${DIVIDER} flex justify-end gap-3`}>
-              <button
-                onClick={() => setIsExportModalOpen(false)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold ${LABEL} hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmExport}
-                className={`px-5 py-2 rounded-xl text-sm ${BTN_GOLD} shadow`}
-              >
-                Export Document
-              </button>
+            <div className={`px-6 py-4 bg-zinc-50 dark:bg-zinc-950/50 border-t ${DIVIDER} flex flex-col gap-2`}>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setIsExportModalOpen(false)}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold ${LABEL} hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmExport}
+                  className={`px-4 py-2 rounded-xl text-xs ${BTN_GOLD} shadow`}
+                >
+                  Download .DOC
+                </button>
+                <button
+                  onClick={() => {
+                    if (parsedData) {
+                      exportVisaDocPDF(parsedData, exportDocName || "Visa_Draft");
+                      setIsExportModalOpen(false);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold shadow hover:bg-zinc-800 dark:hover:bg-zinc-100"
+                >
+                  Export PDF
+                </button>
+              </div>
             </div>
           </div>
         </div>

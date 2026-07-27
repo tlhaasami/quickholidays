@@ -35,7 +35,7 @@ export default function ContactUs() {
       </div>
 
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
-        
+
         {/* Left Side: Form Content */}
         <div className="lg:col-span-6 flex flex-col justify-start">
           <motion.div
@@ -60,7 +60,7 @@ export default function ContactUs() {
           {/* Subtle gold overlay highlight on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10 transition-opacity duration-300" />
           <img
-            src="/contact-right.png"
+            src="/images/contact-right.png"
             alt="Quick Visa Consultation"
             className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
           />

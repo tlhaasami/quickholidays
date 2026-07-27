@@ -221,7 +221,17 @@ export function DockWrapper() {
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== "undefined") {
-        const isHomePage = window.location.pathname === "/";
+        const path = window.location.pathname;
+        if (
+          path === "/create-cover-letter" ||
+          path === "/create-document" ||
+          path === "/agent-portal"
+        ) {
+          setShowDock(false);
+          return;
+        }
+
+        const isHomePage = path === "/";
         if (isHomePage) {
           setShowDock(window.scrollY > 80);
         } else {
