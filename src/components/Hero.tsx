@@ -333,7 +333,7 @@ export default function Hero() {
         )}
 
         {/* Hero content split container — centered vertically (shifted slightly up on mobile), brand on left, flags on right, pinned using vw */}
-        <div className="absolute top-[40%] lg:top-1/2 -translate-y-[40%] lg:-translate-y-1/2 left-0 z-10 w-full px-[6vw] lg:px-[8vw] flex flex-col lg:flex-row justify-between items-center gap-8 lg:gap-12 pointer-events-none">
+        <div className="absolute inset-0 z-10 w-full px-[6vw] lg:px-[8vw] flex flex-col lg:flex-row justify-start lg:justify-between items-center gap-8 lg:gap-12 pointer-events-none pt-20 sm:pt-24 lg:pt-0 overflow-hidden">
 
           {/* Left Column: Brand Block */}
           <motion.div
@@ -369,10 +369,10 @@ export default function Hero() {
               </div>
               {/* Stacked Heading */}
               <div className={`flex flex-col leading-none select-none tracking-tighter ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
-                <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
+                <span className={`text-4xl xs:text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
                   {word1}
                 </span>
-                <span className={`text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.holidaysColor }}>
+                <span className={`text-4xl xs:text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.holidaysColor }}>
                   {word2}
                 </span>
               </div>
