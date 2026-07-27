@@ -868,7 +868,7 @@ export default function Hero() {
             {/* Subtle gold overlay highlight on hover */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10 transition-opacity duration-300" />
             <img
-              src="/contact-right.png"
+              src="images/contact-right.png"
               alt="Quick Visa Consultation"
               className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
             />

@@ -30,13 +30,13 @@ export default function LoginPage() {
     };
     fetchIp();
     
-    // Seed initial default accounts if none exist
+    // Seed initial default accounts if none exist or update account directory
     let accounts = localStorage.getItem("qh-agent-accounts");
     if (!accounts) {
       const initialAccounts = {
-        admin: { password: "admin123", suspended: false },
-        owner: { password: "owner123", suspended: false },
-        agent: { password: "agent123", suspended: false }
+        owner: { password: "12345678", suspended: false },
+        admin: { password: "12345678", suspended: false },
+        tlhaasami: { password: "12345678", suspended: false }
       };
       localStorage.setItem("qh-agent-accounts", JSON.stringify(initialAccounts));
     } else {
@@ -44,15 +44,19 @@ export default function LoginPage() {
         const parsed = JSON.parse(accounts);
         let changed = false;
         if (!parsed.owner) {
-          parsed.owner = { password: "owner123", suspended: false };
+          parsed.owner = { password: "12345678", suspended: false };
           changed = true;
         }
         if (!parsed.admin) {
-          parsed.admin = { password: "admin123", suspended: false };
+          parsed.admin = { password: "12345678", suspended: false };
           changed = true;
         }
-        if (!parsed.agent) {
-          parsed.agent = { password: "agent123", suspended: false };
+        if (!parsed.tlhaasami) {
+          parsed.tlhaasami = { password: "12345678", suspended: false };
+          changed = true;
+        }
+        if (parsed.agent) {
+          delete parsed.agent;
           changed = true;
         }
         if (parsed.processor) {
@@ -75,7 +79,7 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const userClean = username.trim().toLowerCase();
     
@@ -84,111 +88,25 @@ export default function LoginPage() {
       return;
     }
 
-    // Check IP restriction first – consider expiry after 12 hours
-    const ipSuspendedRaw = localStorage.getItem(`qh-suspended-ip-${clientIp}`);
-    const now = Date.now();
-    let isIpSuspended = false;
-    if (ipSuspendedRaw) {
-      const timestamp = parseInt(ipSuspendedRaw, 10);
-      if (!isNaN(timestamp)) {
-        // stored as timestamp – check expiry
-        if (now - timestamp < 12 * 60 * 60 * 1000) {
-          isIpSuspended = true;
-        } else {
-          // expired – clear entry and related attempts
-          localStorage.removeItem(`qh-suspended-ip-${clientIp}`);
-          localStorage.removeItem(`qh-attempts-ip-${clientIp}`);
-        }
-      } else if (ipSuspendedRaw === "true") {
-        // backward‑compatible flag (treat as suspended until cleared)
-        isIpSuspended = true;
+    try {
+      const res = await fetch("/api/agent/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "login", username: userClean, password })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || "Invalid username or password.");
+        return;
       }
-    }
-    if (isIpSuspended) {
-      setError(`Access Denied: Logins from this IP address (${clientIp}) have been temporarily suspended due to consecutive authentication failures. Please contact administrative support.`);
-      return;
-    }
 
-    // Retrieve accounts data
-    const accountsData = JSON.parse(localStorage.getItem("qh-agent-accounts") || "{}");
-    const accountInfo = accountsData[userClean];
-
-    const logAudit = (status: "success" | "failure", details?: string) => {
-      try {
-        const logs = JSON.parse(localStorage.getItem("qh-login-audit-logs") || "[]");
-        logs.unshift({
-          timestamp: Date.now(),
-          username: userClean,
-          ip: clientIp,
-          status,
-          details
-        });
-        localStorage.setItem("qh-login-audit-logs", JSON.stringify(logs.slice(0, 500)));
-      } catch (err) {}
-    };
-
-    if (!accountInfo) {
-      // Record failed IP attempt
-      const ipAttempts = parseInt(localStorage.getItem(`qh-attempts-ip-${clientIp}`) || "0", 10) + 1;
-      localStorage.setItem(`qh-attempts-ip-${clientIp}`, ipAttempts.toString());
-      if (ipAttempts >= 10) {
-        // Store the timestamp of suspension; it will auto‑expire after 12 hours
-        localStorage.setItem(`qh-suspended-ip-${clientIp}`, Date.now().toString());
-      }
-      logAudit("failure", "Username not found");
-      setError("Invalid username or password.");
-      return;
-    }
-
-    // Check if username is suspended (by admin panel or consecutive failed attempts)
-    const isSuspended = (accountInfo.suspended === true) || (localStorage.getItem(`qh-suspended-${userClean}`) === "true");
-    if (isSuspended) {
-      logAudit("failure", "Profile suspended");
-      setError(`Access Denied: The account "${username}" has been suspended. Please contact administrative support.`);
-      return;
-    }
-
-    // Validate Credentials
-    if (accountInfo.password === password) {
-      // Success! Reset attempts (both user and IP)
-      localStorage.removeItem(`qh-attempts-${userClean}`);
-      localStorage.removeItem(`qh-attempts-ip-${clientIp}`);
       localStorage.setItem("qh-agent-session", "authenticated");
       localStorage.setItem("qh-agent-username", userClean);
       localStorage.setItem("qh-agent-session-time", Date.now().toString());
-      logAudit("success");
       router.push("/agent-portal");
-    } else {
-      // Failure! Log attempts (both user and IP)
-      const currentAttempts = parseInt(localStorage.getItem(`qh-attempts-${userClean}`) || "0", 10) + 1;
-      localStorage.setItem(`qh-attempts-${userClean}`, currentAttempts.toString());
-
-      const ipAttempts = parseInt(localStorage.getItem(`qh-attempts-ip-${clientIp}`) || "0", 10) + 1;
-      localStorage.setItem(`qh-attempts-ip-${clientIp}`, ipAttempts.toString());
-
-      const maxAttemptsUser = currentAttempts >= 10;
-      const maxAttemptsIp = ipAttempts >= 10;
-
-      if (maxAttemptsUser) {
-        localStorage.setItem(`qh-suspended-${userClean}`, "true");
-        accountsData[userClean].suspended = true;
-        localStorage.setItem("qh-agent-accounts", JSON.stringify(accountsData));
-      }
-      if (maxAttemptsIp) {
-        // Store suspension timestamp for 12‑hour auto‑renewal
-        localStorage.setItem(`qh-suspended-ip-${clientIp}`, Date.now().toString());
-      }
-
-      logAudit("failure", "Invalid password");
-
-      if (maxAttemptsIp) {
-        setError(`Access Denied: Logins from this IP address (${clientIp}) have been temporarily suspended due to consecutive authentication failures. Please contact administrative support.`);
-      } else if (maxAttemptsUser) {
-        setError(`Access Denied: The account "${username}" has been suspended due to 10 consecutive failed login attempts. Please contact administrative support.`);
-      } else {
-        const remaining = 10 - currentAttempts;
-        setError(`Invalid username or password. You have ${remaining} attempts remaining before this account is suspended.`);
-      }
+    } catch (err) {
+      console.error(err);
+      setError("Server authentication service error. Please try again.");
     }
   };
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { BorderBeam } from "@/components/ui/border-beam";
 
 // --- Customizable Delay (30 Seconds by default) ---
@@ -16,6 +16,15 @@ interface Message {
 
 export function AiAssistantPopup() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  if (
+    pathname === "/create-cover-letter" ||
+    pathname === "/create-document" ||
+    pathname === "/agent-portal"
+  ) {
+    return null;
+  }
 
   // Visibility & Position states
   const [hasAppeared, setHasAppeared] = useState(false);

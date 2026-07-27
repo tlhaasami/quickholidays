@@ -92,7 +92,9 @@ const MOBILE_NAV_LINKS = [
   { name: "Reviews", href: "/reviews" },
   { name: "About Us", href: "/about-us" },
   { name: "Contact Us", href: "/contact-us" },
-  { name: "AI Assistant", href: "/ai-assistant" }
+  { name: "AI Assistant", href: "/ai-assistant" },
+  { name: "Create Document", href: "/create-document" },
+  { name: "Create Cover Letter", href: "/create-cover-letter" }
 ];
 
 export function Navbar() {
@@ -191,7 +193,7 @@ export function Navbar() {
   };
   if (!mounted) return null;
 
-  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal" || pathname === "/create-document";
+  const isExcludedPath = pathname === "/login" || pathname === "/agent-portal" || pathname === "/create-document" || pathname === "/create-cover-letter";
   if (isExcludedPath) return null;
 
   const isHomepage = pathname === "/";

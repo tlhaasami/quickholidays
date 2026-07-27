@@ -1,10 +1,13 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ThemeButton } from "@/components/ThemeButton";
 import { visaSections } from "@/constants/visaFields";
+import { coverLetterSections, COVER_LETTER_SYSTEM_PROMPT } from "@/constants/coverLetterFields";
+import { generateMasterCoverLetterText, exportCoverLetterPDF, downloadCoverLetterDocx, sanitizeTextForATS, downloadLaTeXCode } from "@/utils/coverLetterGenerator";
+import { downloadVisaDoc, exportVisaDocPDF } from "@/utils/visaDocGenerator";
 import Link from "next/link";
 
 interface Conversation {
@@ -88,12 +91,286 @@ export default function AgentPortal() {
   // Custom toast notifications
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
+  // Active Workspace Mode inside Portal: "visaDoc" (Visa Application Workspace) | "coverLetter" (Visa Cover Letter Workspace)
+  const [portalWorkspaceMode, setPortalWorkspaceMode] = useState<"visaDoc" | "coverLetter">("visaDoc");
+  const [embeddedCoverLetterText, setEmbeddedCoverLetterText] = useState("");
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [copiedLetterText, setCopiedLetterText] = useState(false);
+  const [coverLetterAiInput, setCoverLetterAiInput] = useState("");
+  const [isAiParsingCoverLetter, setIsAiParsingCoverLetter] = useState(false);
+  const [showCoverLetterPreviewModal, setShowCoverLetterPreviewModal] = useState(false);
+  const [coverLetterMessages, setCoverLetterMessages] = useState<
+    Array<{
+      role: "user" | "assistant";
+      content: string;
+      missingFields?: string[];
+    }>
+  >([
+    {
+      role: "assistant",
+      content: "Hello! I am your AI Cover Letter Parser Assistant. Paste any client notes, passport details, travel dates, or share code text below to extract data and build the official Schengen cover letter."
+    }
+  ]);
+
+  const handleParseCoverLetterWithAI = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const inputText = coverLetterAiInput.trim();
+    if (!inputText || isAiParsingCoverLetter) return;
+
+    // Add User Input to Conversation Stream
+    const userMsg = { role: "user" as const, content: inputText };
+    setCoverLetterMessages(prev => [...prev, userMsg]);
+    setCoverLetterAiInput("");
+    setIsAiParsingCoverLetter(true);
+
+    try {
+      const res = await fetch("/api/agent/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: inputText,
+          history: coverLetterMessages.map(m => ({ role: m.role, content: m.content }))
+        })
+      });
+
+      if (!res.ok) throw new Error("AI parser API call failed");
+
+      const resData = await res.json();
+      const extractedData = resData.data || {};
+      const missingList = resData.missingFields || [];
+      const aiMessageText = resData.message || "Processed applicant details.";
+
+      const updated = { ...tempParsedData };
+
+      // Comprehensive Bidirectional Field Mapping
+      if (extractedData.full_name) {
+        updated.full_name = extractedData.full_name;
+      }
+      if (extractedData.personal_surname || extractedData.personal_first_names) {
+        const fn = extractedData.personal_first_names || "";
+        const sn = extractedData.personal_surname || "";
+        updated.full_name = `${fn} ${sn}`.trim() || updated.full_name;
+        updated.personal_surname = sn;
+        updated.personal_first_names = fn;
+      }
+
+      if (extractedData.passport_number) {
+        updated.passport_number = extractedData.passport_number;
+        updated.passport_no = extractedData.passport_number;
+      }
+
+      if (extractedData.personal_nationality || extractedData.nationality) {
+        const nat = extractedData.personal_nationality || extractedData.nationality;
+        updated.nationality = nat;
+        updated.personal_nationality = nat;
+      }
+
+      if (extractedData.address_street || extractedData.uk_address) {
+        const addr = extractedData.uk_address || [extractedData.address_street, extractedData.address_city, extractedData.address_postal_code, extractedData.address_country].filter(Boolean).join(", ");
+        updated.uk_address = addr;
+        updated.address_street = extractedData.address_street || addr;
+      }
+
+      if (extractedData.address_phone || extractedData.phone_number || extractedData.address_mobile) {
+        const ph = extractedData.address_phone || extractedData.phone_number || extractedData.address_mobile;
+        updated.phone_number = ph;
+        updated.address_phone = ph;
+      }
+
+      if (extractedData.address_email || extractedData.email_address) {
+        const em = extractedData.address_email || extractedData.email_address;
+        updated.email_address = em;
+        updated.address_email = em;
+      }
+
+      if (extractedData.uk_share_code || extractedData.residence_share_code) {
+        const sc = extractedData.uk_share_code || extractedData.residence_share_code;
+        updated.uk_share_code = sc;
+        updated.residence_share_code = sc;
+      }
+      if (extractedData.uk_share_code_expiry || extractedData.share_code_expiry || extractedData.residence_permit_expiry) {
+        const sce = extractedData.uk_share_code_expiry || extractedData.share_code_expiry || extractedData.residence_permit_expiry;
+        updated.share_code_expiry = sce;
+        updated.uk_share_code_expiry = sce;
+      }
+
+      if (extractedData.travel_destinations || extractedData.destination_country) {
+        const dest = extractedData.destination_country || extractedData.travel_destinations;
+        updated.destination_country = dest;
+        updated.travel_destinations = dest;
+        updated.target_embassy = extractedData.target_embassy || `Embassy of ${dest}`;
+      }
+
+      if (extractedData.travel_start_date || extractedData.trip_start_date) {
+        const sd = extractedData.travel_start_date || extractedData.trip_start_date;
+        updated.trip_start_date = sd;
+        updated.travel_start_date = sd;
+      }
+      if (extractedData.travel_return_date || extractedData.trip_end_date) {
+        const ed = extractedData.travel_return_date || extractedData.trip_end_date;
+        updated.trip_end_date = ed;
+        updated.travel_return_date = ed;
+      }
+
+      if (extractedData.emp_employer_name || extractedData.institution_or_employer) {
+        const emp = extractedData.emp_employer_name || extractedData.institution_or_employer;
+        updated.institution_or_employer = emp;
+        updated.emp_employer_name = emp;
+      }
+      if (extractedData.emp_job_title || extractedData.job_title_or_degree || extractedData.emp_occupation) {
+        const jt = extractedData.emp_job_title || extractedData.job_title_or_degree || extractedData.emp_occupation;
+        updated.job_title_or_degree = jt;
+        updated.emp_job_title = jt;
+      }
+
+      if (extractedData.acc_hotel_name || extractedData.hotel_booking_details) {
+        const h = extractedData.hotel_booking_details || [extractedData.acc_hotel_name, extractedData.acc_city, extractedData.acc_country].filter(Boolean).join(", ");
+        updated.hotel_booking_details = h;
+        updated.acc_hotel_name = extractedData.acc_hotel_name || h;
+      }
+
+      if (extractedData.finance_costs_covered || extractedData.bank_summary) {
+        const bs = extractedData.bank_summary || extractedData.finance_costs_covered;
+        updated.bank_summary = bs;
+      }
+
+      Object.keys(extractedData).forEach(k => {
+        if (extractedData[k] && !updated[k]) {
+          updated[k] = String(extractedData[k]);
+        }
+      });
+
+      setTempParsedData(updated);
+      const generated = generateMasterCoverLetterText(updated);
+      setEmbeddedCoverLetterText(generated);
+
+      // Append Assistant Message to Conversation Stream
+      const aiMsg = {
+        role: "assistant" as const,
+        content: aiMessageText,
+        missingFields: missingList
+      };
+      setCoverLetterMessages(prev => [...prev, aiMsg]);
+      showToast("Parsed text & updated Cover Letter data!");
+    } catch (err) {
+      console.error(err);
+      setCoverLetterMessages(prev => [
+        ...prev,
+        { role: "assistant", content: "Error: Failed to process notes. Please check connection and try again." }
+      ]);
+      showToast("Failed to parse notes with AI.", "error");
+    } finally {
+      setIsAiParsingCoverLetter(false);
+    }
+  };
+
+  const handleNewCoverLetterSession = () => {
+    setTempParsedData({});
+    setEmbeddedCoverLetterText("");
+    setCoverLetterAiInput("");
+    setCoverLetterMessages([
+      {
+        role: "assistant",
+        content: "Hello! I am your AI Cover Letter Parser Assistant. Paste any client notes, passport details, travel dates, or share code text below to extract data and build the official Schengen cover letter."
+      }
+    ]);
+    showToast("Started new blank Cover Letter session.");
+  };
+
   // Agent Access Code controls
   const [showChangeCodeModal, setShowChangeCodeModal] = useState(false);
   const [oldAgentCode, setOldAgentCode] = useState("");
   const [newAgentCode, setNewAgentCode] = useState("");
   const [confirmAgentCode, setConfirmAgentCode] = useState("");
   const [changeCodeError, setChangeCodeError] = useState<string | null>(null);
+
+  const handleChangeAccessCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangeCodeError(null);
+
+    if (newAgentCode !== confirmAgentCode) {
+      setChangeCodeError("New access codes do not match.");
+      return;
+    }
+
+    if (newAgentCode.length < 6) {
+      setChangeCodeError("Access code must be at least 6 characters long.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/agent/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "change_password",
+          username: agentUsername,
+          oldPassword: oldAgentCode,
+          newPassword: newAgentCode
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setChangeCodeError(data.error || "Failed to update access code.");
+        return;
+      }
+
+      showToast(data.message || "Access code updated server-wide across all production sessions!");
+      setShowChangeCodeModal(false);
+      setOldAgentCode("");
+      setNewAgentCode("");
+      setConfirmAgentCode("");
+    } catch (err) {
+      console.error(err);
+      setChangeCodeError("Server error while updating access code.");
+    }
+  };
+
+  // Missing details export validation modal state
+  const [missingValidationModal, setMissingValidationModal] = useState<{
+    show: boolean;
+    missingFieldsList: string[];
+    exportType: "visaDoc" | "visaPdf" | "coverDoc" | "coverPdf";
+  } | null>(null);
+
+  const executeExportFormat = (type: "visaDoc" | "visaPdf" | "coverDoc" | "coverPdf") => {
+    const surname = tempParsedData.personal_surname || tempParsedData.full_name || "Applicant";
+    if (type === "visaDoc") {
+      if (activeConvo) downloadWordDoc(activeConvo);
+      else downloadVisaDoc(tempParsedData, `Schengen_Visa_Draft_${surname}`);
+      showToast("Downloaded Visa Application (.DOC)");
+    } else if (type === "visaPdf") {
+      exportVisaDocPDF(tempParsedData, `Schengen_Visa_Application_${surname}`);
+      showToast("Generating Visa Application (PDF)...");
+    } else if (type === "coverDoc") {
+      const letterText = generateMasterCoverLetterText(tempParsedData);
+      downloadCoverLetterDocx(letterText, `${surname}_Schengen_Cover_Letter`);
+      showToast("Downloaded Cover Letter (.DOC)");
+    } else if (type === "coverPdf") {
+      const letterText = generateMasterCoverLetterText(tempParsedData);
+      exportCoverLetterPDF(letterText, `${surname}_Schengen_Cover_Letter`);
+      showToast("Generating ATS Cover Letter (PDF)...");
+    }
+  };
+
+  const handleExportWithValidation = (type: "visaDoc" | "visaPdf" | "coverDoc" | "coverPdf") => {
+    const missing: string[] = [];
+    if (!tempParsedData.personal_surname && !tempParsedData.full_name) missing.push("Applicant Surname / Full Name");
+    if (!tempParsedData.passport_number && !tempParsedData.passport_no) missing.push("Passport Number");
+    if (!tempParsedData.travel_destinations && !tempParsedData.destination_country) missing.push("Destination Country");
+    if (!tempParsedData.travel_start_date && !tempParsedData.trip_start_date) missing.push("Travel Start Date");
+    if (!tempParsedData.address_email && !tempParsedData.email_address) missing.push("Applicant Email Address");
+
+    if (missing.length > 0) {
+      setMissingValidationModal({
+        show: true,
+        missingFieldsList: missing,
+        exportType: type
+      });
+    } else {
+      executeExportFormat(type);
+    }
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -283,68 +560,7 @@ export default function AgentPortal() {
     showToast(`Account "${cleanUser}" created successfully.`);
   };
 
-  const handleChangeAccessCode = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanOld = oldAgentCode.trim();
-    const cleanNew = newAgentCode.trim();
-    const cleanConfirm = confirmAgentCode.trim();
 
-    if (!cleanOld || !cleanNew || !cleanConfirm) {
-      setChangeCodeError("Please fill out all access code fields.");
-      return;
-    }
-
-    const accounts = localStorage.getItem("qh-agent-accounts");
-    if (!accounts) {
-      setChangeCodeError("Error: Registry not found.");
-      return;
-    }
-
-    const parsed = JSON.parse(accounts);
-    const userProfile = parsed[agentUsername];
-
-    if (!userProfile) {
-      setChangeCodeError("Error: Agent profile not found in directory.");
-      return;
-    }
-
-    // 1. Verify previous access code matches
-    if (userProfile.password !== cleanOld) {
-      setChangeCodeError("Previous access code is incorrect.");
-      return;
-    }
-
-    // 2. Validate new access code entered twice matches
-    if (cleanNew !== cleanConfirm) {
-      setChangeCodeError("New access codes do not match.");
-      return;
-    }
-
-    // 3. Validate length
-    if (cleanNew.length < 3) {
-      setChangeCodeError("New access code must be at least 3 characters.");
-      return;
-    }
-
-    // 4. Final confirmation
-    const isConfirmed = window.confirm(
-      "CONFIRMATION: Are you sure you want to change your login access code?\n" +
-      "You will need to use your new credentials next time you sign in."
-    );
-    if (!isConfirmed) return;
-
-    // Save
-    userProfile.password = cleanNew;
-    localStorage.setItem("qh-agent-accounts", JSON.stringify(parsed));
-    setAdminAccounts(parsed); // Sync state
-
-    setShowChangeCodeModal(false);
-    setOldAgentCode("");
-    setNewAgentCode("");
-    setConfirmAgentCode("");
-    setChangeCodeError(null);
-    showToast("Your access code has been updated successfully.");
-  };
 
   const handleToggleSuspendAccount = (user: string) => {
     const isCurrentlySuspended = adminAccounts[user].suspended;
@@ -737,8 +953,37 @@ export default function AgentPortal() {
             Quick Holidays Portal
           </span>
           <span className="text-[10px] uppercase font-bold tracking-widest text-[#C99537] bg-[#C99537]/15 px-2 py-0.5 border border-[#C99537]/20">
-            Visa Application Workspace
+            {portalWorkspaceMode === "visaDoc" ? "Visa Application Workspace" : "Visa Cover Letter Workspace"}
           </span>
+
+          {/* 2 Portal Tool Workspace Mode Selectors */}
+          <div className="hidden md:flex items-center gap-2 ml-4">
+            <button
+              onClick={() => setPortalWorkspaceMode("visaDoc")}
+              className={`font-bold uppercase text-[10px] tracking-wider px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer rounded-none border ${
+                portalWorkspaceMode === "visaDoc"
+                  ? "bg-[#C99537] text-zinc-950 border-[#C99537] font-extrabold shadow-[2px_2px_0_#000]"
+                  : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700"
+              }`}
+            >
+              📄 Visa Application Form
+            </button>
+            <button
+              onClick={() => {
+                setPortalWorkspaceMode("coverLetter");
+                if (!embeddedCoverLetterText) {
+                  setEmbeddedCoverLetterText(generateMasterCoverLetterText(tempParsedData));
+                }
+              }}
+              className={`font-bold uppercase text-[10px] tracking-wider px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer rounded-none border ${
+                portalWorkspaceMode === "coverLetter"
+                  ? "bg-[#C99537] text-zinc-950 border-[#C99537] font-extrabold shadow-[2px_2px_0_#000]"
+                  : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700"
+              }`}
+            >
+              ✉️ Visa Cover Letter
+            </button>
+          </div>
 
           {/* Dynamic Sidebar Toggle Controllers in Header Banner */}
           {agentUsername !== "admin" && agentUsername !== "owner" && (
@@ -967,6 +1212,170 @@ export default function AgentPortal() {
               </div>
             </div>
           </main>
+        ) : portalWorkspaceMode === "coverLetter" ? (
+          /* Embedded Visa Cover Letter Workspace */
+          <main className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+            {/* Left Column: Cover Letter Form Fields */}
+            <div className="w-full lg:w-[480px] shrink-0 border-r-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/80 dark:bg-zinc-950/80 flex items-center justify-between">
+                <div>
+                  <h3 className="font-sans text-xs font-extrabold uppercase tracking-wider text-zinc-900 dark:text-white flex items-center gap-1.5">
+                    <span>✉️</span> Embassy Cover Letter Details
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-light">Fields automatically sync with active parsed applicant data.</p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleNewCoverLetterSession}
+                    className="text-[9px] font-extrabold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-2.5 py-1.5 rounded-none hover:bg-[#E2B755] cursor-pointer shadow-[2px_2px_0_#000]"
+                  >
+                    ➕ New Session
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fresh = generateMasterCoverLetterText(tempParsedData);
+                      setEmbeddedCoverLetterText(fresh);
+                      showToast("Refreshed Cover Letter from current applicant details");
+                    }}
+                    className="text-[9px] font-bold uppercase tracking-wider border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-2.5 py-1.5 rounded-none hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  >
+                    🔄 Sync
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700">
+                {coverLetterSections.map((sec, idx) => (
+                  <div key={idx} className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 p-3.5 text-left space-y-3">
+                    <h4 className="font-sans text-[11px] font-bold text-[#C99537] uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 pb-1.5">
+                      {sec.title}
+                    </h4>
+                    <div className="space-y-2 text-[11px]">
+                      {sec.fields.map((field) => (
+                        <div key={field.id} className="flex flex-col gap-1 text-left">
+                          <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            {field.label} {field.required && <span className="text-amber-500">*</span>}
+                          </label>
+                          <input
+                            type="text"
+                            value={tempParsedData[field.id] || ""}
+                            onChange={(e) => {
+                              const updated = { ...tempParsedData, [field.id]: e.target.value };
+                              setTempParsedData(updated);
+                              setEmbeddedCoverLetterText(generateMasterCoverLetterText(updated));
+                            }}
+                            placeholder={field.placeholder}
+                            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs px-2.5 py-1.5 focus:outline-none focus:border-[#C99537] rounded-none w-full"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: AI Extraction Assistant Chat & Conversation Stream */}
+            <div className="flex-1 flex flex-col overflow-hidden bg-zinc-100/50 dark:bg-zinc-950 p-4 sm:p-6 text-left">
+              {/* Top Action Header */}
+              <div className="shrink-0 border-b border-zinc-200 dark:border-zinc-800 pb-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-sans text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <span>🤖</span> AI Cover Letter Extraction Assistant & Chat
+                  </h2>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-light">Interactive AI workspace for parsing applicant notes, share codes, and travel logistics.</p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleNewCoverLetterSession}
+                    className="text-[10px] font-extrabold uppercase tracking-wider bg-[#C99537]/15 border border-[#C99537]/50 text-[#C99537] hover:bg-[#C99537] hover:text-zinc-950 px-3 py-2 rounded-none cursor-pointer flex items-center gap-1.5 transition-all"
+                  >
+                    <span>➕</span> Start New Cover Letter
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCoverLetterPreviewModal(true)}
+                    className="text-[10px] font-extrabold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-4 py-2 hover:bg-[#E2B755] rounded-none cursor-pointer shadow-[2px_2px_0_#000] flex items-center gap-1.5"
+                  >
+                    <span>👁️</span> Preview & Edit Cover Letter
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => handleExportWithValidation("coverDoc")}
+                    className="text-[10px] font-bold uppercase tracking-wider border-2 border-[#C99537] text-[#C99537] px-3.5 py-2 hover:bg-[#C99537] hover:text-zinc-950 rounded-none cursor-pointer"
+                  >
+                    📄 Export Word (.DOC)
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => handleExportWithValidation("coverPdf")}
+                    className="text-[10px] font-bold uppercase tracking-wider border-2 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-3.5 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-none cursor-pointer"
+                  >
+                    📕 Export ATS Cover Letter (PDF)
+                  </button>
+                </div>
+              </div>
+
+              {/* Chat Conversation Log Stream */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-[3px_3px_0_#000] mb-4 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700">
+                {coverLetterMessages.map((m, idx) => {
+                  const isAssistant = m.role === "assistant";
+                  return (
+                    <div key={idx} className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}>
+                      <div className={`max-w-2xl p-4 text-xs font-sans leading-relaxed border-2 ${
+                        isAssistant
+                          ? "bg-zinc-50 dark:bg-zinc-950/80 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-[2px_2px_0_#ccc] dark:shadow-[2px_2px_0_#111]"
+                          : "bg-zinc-100 dark:bg-zinc-800/90 border-[#C99537]/50 text-zinc-900 dark:text-white shadow-[2px_2px_0_rgba(201,149,55,0.2)]"
+                      }`}>
+                        <span className="text-[9px] uppercase font-bold tracking-wider text-[#C99537] block mb-1.5">
+                          {isAssistant ? "AI Cover Letter Parser Assistant" : `@${agentUsername} (Agent Notes)`}
+                        </span>
+                        <div className="whitespace-pre-wrap font-sans text-xs">{m.content}</div>
+
+                        {m.missingFields && m.missingFields.length > 0 && (
+                          <div className="mt-3 pt-2 border-t border-amber-500/25 text-[10px] text-amber-600 dark:text-amber-400 font-semibold">
+                            ⚠️ Remaining Unclear / Missing Fields:
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {m.missingFields.map((f) => (
+                                <span key={f} className="bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded-none text-[9px] font-mono">
+                                  {f}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Chat Input Form */}
+              <form onSubmit={handleParseCoverLetterWithAI} className="p-3 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-[3px_3px_0_#000] flex gap-2 shrink-0">
+                <textarea
+                  rows={2}
+                  value={coverLetterAiInput}
+                  onChange={(e) => setCoverLetterAiInput(e.target.value)}
+                  placeholder="Type or paste raw client notes, passport info, flight booking emails, share code details, or reply to AI questions..."
+                  className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs p-2.5 focus:outline-none focus:border-[#C99537] rounded-none resize-none"
+                />
+                <button
+                  type="submit"
+                  disabled={isAiParsingCoverLetter || !coverLetterAiInput.trim()}
+                  className="bg-[#C99537] text-zinc-950 px-5 py-2.5 font-extrabold uppercase tracking-wider text-[10px] rounded-none hover:bg-[#E2B755] disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-[2px_2px_0_#000] cursor-pointer"
+                >
+                  {isAiParsingCoverLetter ? "Processing..." : "✨ Send to AI Parser"}
+                </button>
+              </form>
+            </div>
+          </main>
         ) : (
           <>
         {/* Left Column: Sidebar History */}
@@ -991,150 +1400,77 @@ export default function AgentPortal() {
             </button>
           </div>
 
-          {/* Tab selectors */}
-          <div className="flex border-b-2 border-zinc-200 dark:border-zinc-805 shrink-0 text-xs font-bold uppercase tracking-wider bg-zinc-200 dark:bg-zinc-950">
-            <button
-              onClick={() => setActiveTab("convos")}
-              className={`flex-1 py-3 text-center transition-colors border-r border-zinc-200 dark:border-zinc-800 cursor-pointer no-custom-cursor flex items-center justify-center ${
-                activeTab === "convos" ? "bg-white dark:bg-zinc-900 text-[#C99537]" : "text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
-              }`}
-            >
-              {/* Active Chats Bubble Icon SVG */}
-              <svg className="w-3.5 h-3.5 mr-1.5 inline-block shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          {/* Active Chats Header */}
+          <div className="py-2.5 px-4 border-b-2 border-zinc-200 dark:border-zinc-800 shrink-0 text-xs font-bold uppercase tracking-wider bg-zinc-200 dark:bg-zinc-950 flex items-center justify-between text-[#C99537]">
+            <span className="flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 inline-block shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
               </svg>
-              Chats ({conversations.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab("entries");
-                fetchFormEntries();
-              }}
-              className={`flex-1 py-3 text-center transition-colors cursor-pointer no-custom-cursor flex items-center justify-center ${
-                activeTab === "entries" ? "bg-white dark:bg-zinc-900 text-[#C99537]" : "text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
-              }`}
-            >
-              {/* Inbox/Inquiries Icon SVG */}
-              <svg className="w-3.5 h-3.5 mr-1.5 inline-block shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.008 1.24l.885 1.77a2.25 2.25 0 002.007 1.24h1.98a2.25 2.25 0 002.007-1.24l.885-1.77a2.25 2.25 0 012.007-1.24h3.86m-18 0h18M2.25 13.5l1.125-11.25h14.25l1.125 11.25M18.75 13.5v7.5a2.25 2.25 0 01-2.25 2.25H7.5a2.25 2.25 0 01-2.25-2.25v-7.5"/>
-              </svg>
-              Inquiries ({formEntries.length})
-            </button>
+              Active Chats ({conversations.length})
+            </span>
           </div>
 
           {/* Sidebar List Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-            {activeTab === "convos" ? (
-              conversations.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="text-zinc-400 dark:text-zinc-650 text-xs uppercase tracking-wider font-bold">No Active Chats</p>
-                  <p className="text-[10px] text-zinc-500 font-light mt-1 max-w-[180px] mx-auto leading-relaxed">
-                    Start a new form session using the button above. Histories are held in storage for 24 hours.
-                  </p>
-                </div>
-              ) : (
-                conversations.map((c) => {
-                  const userMsgs = c.messages.filter((m) => m.role === "user");
-                  const previewText = userMsgs.length > 0 
-                    ? userMsgs[userMsgs.length - 1].content 
-                    : "New Form Session";
-                  
-                  const timeString = new Date(c.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  });
-
-                  const isActive = c.id === activeConvoId;
-
-                  return (
-                    <div
-                      key={c.id}
-                      onClick={() => setActiveConvoId(c.id)}
-                      className={`p-3 border-2 transition-all cursor-pointer flex justify-between items-start group rounded-none no-custom-cursor ${
-                        isActive
-                          ? "border-[#C99537] bg-[#C99537]/10"
-                          : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 hover:border-[#C99537] hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
-                      }`}
-                    >
-                      <div className="flex-1 min-w-0 pr-2">
-                        <p className="text-[11px] font-bold text-zinc-700 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors truncate">
-                          {previewText}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[9px] text-zinc-450 dark:text-zinc-600 font-light block">
-                            {timeString}
-                          </span>
-                          {c.agentUsername && (
-                            <span className="text-[8px] font-bold uppercase tracking-wider text-[#C99537]/70 bg-[#C99537]/10 px-1 py-px">
-                              @{c.agentUsername}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <button
-                        onClick={(e) => handleDeleteConvo(c.id, e)}
-                        className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 p-1 transition-colors cursor-pointer shrink-0 no-custom-cursor"
-                        title="Delete Conversation"
-                      >
-                        {/* Trash Icon SVG */}
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                      </button>
-                    </div>
-                  );
-                })
-              )
+            {conversations.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-zinc-400 dark:text-zinc-650 text-xs uppercase tracking-wider font-bold">No Active Chats</p>
+                <p className="text-[10px] text-zinc-500 font-light mt-1 max-w-[180px] mx-auto leading-relaxed">
+                  Start a new form session using the button above. Histories are held in storage for 24 hours.
+                </p>
+              </div>
             ) : (
-              formEntries.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="text-zinc-400 dark:text-zinc-650 text-xs uppercase tracking-wider font-bold">No Contact Inquiries</p>
-                  <p className="text-[10px] text-zinc-500 font-light mt-1 max-w-[180px] mx-auto leading-relaxed">
-                    Once users submit consultation forms on the public website, leads list will automatically load here.
-                  </p>
-                </div>
-              ) : (
-                formEntries.map((entry) => {
-                  const dateString = new Date(entry.created_at).toLocaleDateString([], {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  });
+              conversations.map((c) => {
+                const userMsgs = c.messages.filter((m) => m.role === "user");
+                const previewText = userMsgs.length > 0 
+                  ? userMsgs[userMsgs.length - 1].content 
+                  : "New Form Session";
+                
+                const timeString = new Date(c.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                });
 
-                  return (
-                    <div
-                      key={entry.id}
-                      onClick={() => handleLoadFormEntry(entry)}
-                      className="p-3 border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 hover:border-[#C99537] hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-all cursor-pointer rounded-none text-left no-custom-cursor"
-                    >
-                      <div className="flex justify-between items-start">
-                        <span className="text-[11px] font-bold text-zinc-800 dark:text-white truncate max-w-[150px] flex items-center gap-1.5">
-                          {/* User Avatar SVG */}
-                          <svg className="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
-                          </svg>
-                          {entry.payload.name || "Unnamed Client"}
-                        </span>
-                        <span className="text-[9px] text-zinc-400 dark:text-zinc-600 font-mono shrink-0">
-                          ID: #{entry.id}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-[#C99537] font-semibold mt-1 truncate pl-5">
-                        Dest: {entry.payload.destination || "Not selected"} | Plan: {entry.payload.plan || "Free"}
+                const isActive = c.id === activeConvoId;
+
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => setActiveConvoId(c.id)}
+                    className={`p-3 border-2 transition-all cursor-pointer flex justify-between items-start group rounded-none no-custom-cursor ${
+                      isActive
+                        ? "border-[#C99537] bg-[#C99537]/10"
+                        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 hover:border-[#C99537] hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0 pr-2">
+                      <p className="text-[11px] font-bold text-zinc-700 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors truncate">
+                        {previewText}
                       </p>
-                      <div className="flex justify-between items-center mt-2 border-t border-zinc-100 dark:border-zinc-800/65 pt-1.5 pl-5">
-                        <span className="text-[9px] text-zinc-500 dark:text-zinc-550 font-light block">
-                          Submitted: {dateString}
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[9px] text-zinc-450 dark:text-zinc-600 font-light block">
+                          {timeString}
                         </span>
-                        <span className="text-[8px] bg-[#C99537]/10 text-[#C99537] border border-[#C99537]/20 px-1.5 py-0.5 font-bold uppercase tracking-wider">
-                          Load Entry
-                        </span>
+                        {c.agentUsername && (
+                          <span className="text-[8px] font-bold uppercase tracking-wider text-[#C99537]/70 bg-[#C99537]/10 px-1 py-px">
+                            @{c.agentUsername}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  );
-                })
-              )
+                    <button
+                      onClick={(e) => handleDeleteConvo(c.id, e)}
+                      className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 p-1 transition-colors cursor-pointer shrink-0 no-custom-cursor"
+                      title="Delete Conversation"
+                    >
+                      {/* Trash Icon SVG */}
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                );
+              })
             )}
           </div>
         </aside>
@@ -1404,7 +1740,7 @@ export default function AgentPortal() {
                 </div>
 
                 {/* Actions */}
-                <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <div className="space-y-2.5 pt-4 border-t border-zinc-200 dark:border-zinc-800">
                   <button
                     onClick={handleSaveChanges}
                     disabled={!hasUnsavedChanges}
@@ -1412,12 +1748,46 @@ export default function AgentPortal() {
                   >
                     Save Changes
                   </button>
-                  <button
-                    onClick={handleExportWordClick}
-                    className="w-full border-2 border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-xs py-2.5 rounded-none transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor animate-none"
-                  >
-                    Export Word Document
-                  </button>
+                  
+                  <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 text-left">
+                      Option 1: Visa Application Form Exports
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleExportWithValidation("visaDoc")}
+                        className="border-2 border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor"
+                      >
+                        📄 Form (.DOC)
+                      </button>
+                      <button
+                        onClick={() => handleExportWithValidation("visaPdf")}
+                        className="bg-[#C99537]/20 border-2 border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor"
+                      >
+                        📕 Form (PDF)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 text-left">
+                      Option 2: Embassy Cover Letter Exports
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleExportWithValidation("coverDoc")}
+                        className="border-2 border-zinc-700 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-zinc-800 hover:text-white no-custom-cursor"
+                      >
+                        📄 Letter (.DOC)
+                      </button>
+                      <button
+                        onClick={() => handleExportWithValidation("coverPdf")}
+                        className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-100 no-custom-cursor"
+                      >
+                        📕 Letter (PDF)
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </>
             ) : (
@@ -1577,6 +1947,100 @@ export default function AgentPortal() {
         )}
       </AnimatePresence>
 
+      {/* Cover Letter Live Preview & Direct Editor Modal */}
+      <AnimatePresence>
+        {showCoverLetterPreviewModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 w-full max-w-4xl max-h-[90vh] flex flex-col p-6 shadow-[8px_8px_0_#000] text-left"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b-2 border-zinc-200 dark:border-zinc-800 pb-4 mb-4 shrink-0">
+                <div>
+                  <h3 className="font-sans text-base font-extrabold uppercase tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
+                    <span>📜</span> Cover Letter Live Preview & Direct Text Editor
+                  </h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-light mt-0.5">
+                    Live ATS-compliant letter matching official embassy standards. Edit text directly below.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fresh = generateMasterCoverLetterText(tempParsedData);
+                      setEmbeddedCoverLetterText(fresh);
+                      showToast("Refreshed Cover Letter from current applicant details");
+                    }}
+                    className="text-[10px] font-bold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-3 py-1.5 rounded-none hover:bg-[#E2B755] cursor-pointer"
+                  >
+                    🔄 Sync Form Data
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCoverLetterPreviewModal(false)}
+                    className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 text-lg font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* Textarea Editor */}
+              <div className="flex-1 flex flex-col overflow-hidden mb-4">
+                <textarea
+                  rows={20}
+                  value={embeddedCoverLetterText || generateMasterCoverLetterText(tempParsedData)}
+                  onChange={(e) => setEmbeddedCoverLetterText(sanitizeTextForATS(e.target.value))}
+                  placeholder="Cover letter text will render here..."
+                  className="flex-1 w-full p-4 font-mono text-xs leading-relaxed bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-[#C99537] rounded-none resize-none scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700"
+                />
+              </div>
+
+              {/* Modal Footer Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
+                <span className="text-[10px] text-zinc-400 font-light">Direct edits are preserved upon export.</span>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleExportWithValidation("coverDoc")}
+                    className="text-[10px] font-bold uppercase tracking-wider border-2 border-[#C99537] text-[#C99537] px-4 py-2 hover:bg-[#C99537] hover:text-zinc-950 rounded-none cursor-pointer"
+                  >
+                    📄 Export Word (.DOC)
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => handleExportWithValidation("coverPdf")}
+                    className="text-[10px] font-bold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-4 py-2 hover:bg-[#E2B755] rounded-none cursor-pointer font-extrabold shadow-[2px_2px_0_#000]"
+                  >
+                    📕 Export ATS Cover Letter (PDF)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCoverLetterPreviewModal(false)}
+                    className="text-[10px] font-bold uppercase tracking-wider border border-zinc-300 dark:border-zinc-700 px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-none cursor-pointer"
+                  >
+                    Close Preview
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Agent Change Access Code Modal */}
       <AnimatePresence>
         {showChangeCodeModal && (
@@ -1663,6 +2127,63 @@ export default function AgentPortal() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Missing Details Validation Warning Modal */}
+      <AnimatePresence>
+        {missingValidationModal?.show && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs pointer-events-auto">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-zinc-900 border-2 border-amber-500 p-6 max-w-md w-full shadow-[6px_6px_0_#000] text-left relative rounded-none"
+            >
+              <div className="flex items-center gap-3 text-amber-500 mb-2">
+                <span className="text-xl font-bold">⚠️</span>
+                <h3 className="font-sans text-base font-extrabold uppercase tracking-wide text-zinc-900 dark:text-white">
+                  Missing Required Applicant Details
+                </h3>
+              </div>
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-300 mb-4 font-light leading-relaxed">
+                Before exporting, please note that the following essential fields are currently blank:
+              </p>
+
+              <div className="bg-amber-500/10 border border-amber-500/30 p-3.5 mb-5 space-y-1.5">
+                {missingValidationModal.missingFieldsList.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                    <span className="text-amber-500">•</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFieldFilter("missing");
+                    setMissingValidationModal(null);
+                  }}
+                  className="bg-[#C99537] text-zinc-950 px-4 py-2 font-bold uppercase tracking-wider text-[10px] rounded-none hover:bg-[#E2B755] cursor-pointer"
+                >
+                  Complete Missing Details
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const exportType = missingValidationModal.exportType;
+                    setMissingValidationModal(null);
+                    executeExportFormat(exportType);
+                  }}
+                  className="border-2 border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-4 py-2 font-bold uppercase tracking-wider text-[10px] rounded-none hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                >
+                  Export Anyway
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

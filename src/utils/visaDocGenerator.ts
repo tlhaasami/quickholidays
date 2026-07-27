@@ -182,3 +182,69 @@ export function downloadVisaDoc(
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export function exportVisaDocPDF(
+  parsedData: Record<string, string>,
+  fileName: string = "Schengen_Visa_Application"
+): void {
+  const html = generateVisaWordDoc(parsedData, "QUICK HOLIDAYS");
+  
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Please allow popups to export PDF");
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${fileName}</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 15mm 15mm 15mm 15mm;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            color: #0F2148;
+            background: #ffffff;
+            margin: 0;
+            padding: 10px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #000000;
+          }
+          th, td {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+          }
+          @media print {
+            body { width: 100%; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        ${html}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          };
+        </script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+

@@ -1,21 +1,21 @@
-# Quick Holidays - Employee Portal Credentials
+# Quick Holidays - Official Production Credentials
 
-This document lists the default seeded credentials for the **Quick Holidays Portal** workspaces.
+This document lists the official production accounts, high-entropy passwords, and server-wide authentication details for the **Quick Holidays Portal**.
 
-> [!WARNING]
-> These credentials are local development defaults initialized in the browser's `localStorage` (key: `qh-agent-accounts`).
+---
 
-## Portal Accounts Directory
+## 1. Production Credentials Directory
 
-| Username | Default Password / Access Code | Account Type / Mode | Permissions Profile |
+| Username | Production Password | Account Role | Global Permissions |
 | :--- | :--- | :--- | :--- |
-| `@admin` | `admin123` | **System Administrator** | Full access to portal settings, user creations, directory list edits, credential edits, and manual suspensions/deletions. |
-| `@owner` | `owner123` | **Owner Mode** | Full access to accounts directory list, credential edits, manual suspensions/deletions. *Note: User profile creation is restricted.* |
-| `@agent` | `agent123` | **Agent** | Normal access to the 3-column Schengen Visa Form parser assistant workspace. |
+| **`@owner`** | `QH_Owner#2026!Secured89` | **Owner** | Master portal account with full administration & control privileges. |
+| **`@admin`** | `QH_Admin#2026!Master74` | **System Administrator** | Access to portal administration, user management, and audit registries. |
+| **`@tlhaasami`** | `QH_Agent#2026!Talha92` | **Agent** | Active agent account for Schengen Visa Application and Cover Letter workspaces. |
 
-## Security & Anti-Brute-Force Lockout Rules
+---
 
-To protect the portal from brute force and automated attacks:
-1. **Username lockouts**: 10 consecutive failed login attempts on any individual username automatically suspends the profile. The administrator or owner must manually activate it in the Control Center.
-2. **IP Address lockouts**: 10 consecutive failed attempts from the same client IP address locks out all login requests from that IP globally, displaying a network restriction warning.
-3. **Login Audit Trail**: Every authentication attempt is logged in detail under the `qh-login-audit-logs` registry, including username, client IP, timestamp, and status.
+## 2. Server-Wide Global Password Persistence
+
+- **Global Production Sync**: Password changes made inside the portal (`Change Access Code`) are submitted to `/api/agent/auth` and saved **server-wide**, immediately applying to all production sessions, devices, and browsers.
+- **10-Attempt Lockout**: 10 consecutive failed login attempts automatically lock out the username.
+- **12-Hour IP Suspension**: 10 failed login attempts from a single IP temporarily suspend login requests from that IP address.
