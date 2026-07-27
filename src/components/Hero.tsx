@@ -284,22 +284,27 @@ export default function Hero() {
               loop
               playsInline
               preload="auto"
-              onLoadedData={() => {
+              onPlaying={() => {
                 setVideoLoaded(true);
+              }}
+              onTimeUpdate={() => {
+                if (videoRef.current && videoRef.current.currentTime > 0) {
+                  setVideoLoaded(true);
+                }
+              }}
+              onLoadedData={() => {
                 if (videoRef.current) {
-                  videoRef.current.play().catch(() => { });
+                  videoRef.current.play().then(() => setVideoLoaded(true)).catch(() => { });
                 }
               }}
               onCanPlay={() => {
-                setVideoLoaded(true);
                 if (videoRef.current) {
-                  videoRef.current.play().catch(() => { });
+                  videoRef.current.play().then(() => setVideoLoaded(true)).catch(() => { });
                 }
               }}
               onCanPlayThrough={() => {
-                setVideoLoaded(true);
                 if (videoRef.current) {
-                  videoRef.current.play().catch(() => { });
+                  videoRef.current.play().then(() => setVideoLoaded(true)).catch(() => { });
                 }
               }}
               onEnded={() => {
