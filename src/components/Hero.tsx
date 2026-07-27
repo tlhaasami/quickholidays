@@ -159,7 +159,7 @@ export default function Hero() {
       videoRef.current.load();
       videoRef.current.play().then(() => {
         setVideoLoaded(true);
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }, [videoSrc]);
 
@@ -270,9 +270,8 @@ export default function Hero() {
             alt="Hero Background"
             fetchPriority="high"
             decoding="async"
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-              videoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
           />
 
           {videoSrc && (
@@ -288,33 +287,31 @@ export default function Hero() {
               onLoadedData={() => {
                 setVideoLoaded(true);
                 if (videoRef.current) {
-                  videoRef.current.play().catch(() => {});
+                  videoRef.current.play().catch(() => { });
                 }
               }}
               onCanPlay={() => {
                 setVideoLoaded(true);
                 if (videoRef.current) {
-                  videoRef.current.play().catch(() => {});
+                  videoRef.current.play().catch(() => { });
                 }
               }}
               onCanPlayThrough={() => {
                 setVideoLoaded(true);
                 if (videoRef.current) {
-                  videoRef.current.play().catch(() => {});
+                  videoRef.current.play().catch(() => { });
                 }
               }}
               onEnded={() => {
                 if (videoRef.current) {
                   videoRef.current.currentTime = 0;
-                  videoRef.current.play().catch(() => {});
+                  videoRef.current.play().catch(() => { });
                 }
               }}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                videoLoaded ? "opacity-100" : "opacity-0"
-              }`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? "opacity-100" : "opacity-0"
+                }`}
             >
               <source src="/videos/bg-video.webm" type="video/webm" />
-              <source src="/videos/bg-video-muted-720p.mp4" type="video/mp4" />
             </video>
           )}
         </div>
