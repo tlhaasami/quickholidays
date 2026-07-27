@@ -89,15 +89,10 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
       const urlPlan = params.get("plan");
 
       let planName = "";
-      let priorityUpgrade = false;
       if (urlPlan) {
         if (urlPlan === "complete") planName = "Complete Visa Service (£175)";
         else if (urlPlan === "documentation") planName = "Documentation Service (£95)";
         else if (urlPlan === "appointment") planName = "Appointment Booking Service (£95)";
-        else if (urlPlan === "priority") {
-          planName = "Help Me Choose / Consultation (Free)";
-          priorityUpgrade = true;
-        }
       }
 
       setFormData((prev) => ({
@@ -107,7 +102,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
         email: urlEmail || prev.email,
         comment: urlNotes || prev.comment,
         plan: planName || prev.plan,
-        priorityUpgrade: priorityUpgrade || prev.priorityUpgrade
+        priorityUpgrade: prev.priorityUpgrade
       }));
     }
   }, []);
@@ -407,10 +402,10 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               transition={{ duration: 0.2 }}
               className="space-y-6"
             >
-              <div className="text-left">
+               <div className="text-left">
                 <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest">Step 03 / 05</span>
                 <h3 className="text-zinc-900 dark:text-white font-serif text-2xl mt-1 font-semibold">Choose Your Visa Plan</h3>
-                <p className="font-sans text-xs text-zinc-500 font-light mt-1">Select a service level and choose if you want priority processing.</p>
+                <p className="font-sans text-xs text-zinc-500 font-light mt-1">Select a service level.</p>
               </div>
 
               <div className="space-y-2.5 mt-4">
@@ -448,29 +443,6 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                     </button>
                   );
                 })}
-              </div>
-
-              {/* Priority Option Toggle */}
-              <div className="pt-4 border-t border-zinc-200 dark:border-white/5 space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="text-left">
-                    <span className="font-sans font-bold text-sm text-zinc-900 dark:text-white block">
-                      Immediate Priority Upgrade (+£15)
-                    </span>
-                    <span className="text-[10px] sm:text-xs text-zinc-500 font-light leading-normal block max-w-[340px]">
-                      Fast-track your application to the front of our processing queue.
-                    </span>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={formData.priorityUpgrade}
-                      onChange={(e) => setFormData({ ...formData, priorityUpgrade: e.target.checked })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C99537]"></div>
-                  </label>
-                </div>
               </div>
             </motion.div>
           )}

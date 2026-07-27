@@ -7,7 +7,6 @@ import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 import { TiltedCard } from "@/components/ui/tilted-card";
 import { TypeformForm } from "@/components/TypeformForm";
 import { FLAG_IMAGES, MARQUEE_CONFIG, HERO_CONFIG, COUNTRIES, INFINITE_MENU_CONFIG, COUNTRY_NICHES } from "@/constants";
-import { Pointer } from "@/components/ui/pointer";
 import { Highlighter } from "@/components/ui/highlighter";
 import { VerticalAccordion } from "@/components/VerticalAccordion";
 import { ThemeButton } from "@/components/ThemeButton";

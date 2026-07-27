@@ -3,7 +3,6 @@ import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
-import { Pointer } from "@/components/ui/pointer";
 import { DockWrapper } from "@/components/DockWrapper";
 import { GlobalCoolMode } from "@/components/GlobalCoolMode";
 
@@ -64,7 +63,6 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen">
-        <Pointer />
         <GlobalCoolMode />
         <Navbar />
         <main>{children}</main>

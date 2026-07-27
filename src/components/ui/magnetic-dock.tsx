@@ -180,14 +180,14 @@ function DockItem({
                     <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-amber-500 border-l border-b border-zinc-950 dark:border-white transform rotate-45 translate-x-1.5 translate-y-[-1.5px] z-20 pointer-events-none" />
                 )}
 
-                {/* Creative Accent: Mini yellow airplane floating next to item on hover when on left dock */}
+                {/* Creative Accent: Mini computer mouse floating next to item on hover when on left dock */}
                 {iconStyle === "creative" && isHovered && position === "left" && (
                     <motion.div
                         initial={{ scale: 0, opacity: 0, x: -10 }}
                         animate={{ scale: 1, opacity: 1, x: 0 }}
                         className="absolute -left-6 top-1/2 -translate-y-1/2 text-[#C99537] z-20 text-[11px]"
                     >
-                        ✈️
+                        🖱️
                     </motion.div>
                 )}
 

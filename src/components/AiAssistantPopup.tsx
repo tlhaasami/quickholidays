@@ -279,10 +279,10 @@ export function AiAssistantPopup() {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           whileHover={{ scale: 1.05 }}
           onClick={() => setIsCentered(true)}
-          className="fixed bottom-6 right-6 z-40 flex flex-col items-center cursor-pointer pointer-events-auto"
+          className="fixed bottom-6 right-6 z-40 w-16 h-16 cursor-pointer pointer-events-auto"
         >
           {/* Rotating Text Label */}
-          <div className="bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap mb-1.5 min-h-[24px] flex items-center justify-center">
+          <div className="absolute bottom-full right-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] uppercase font-bold tracking-wider px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.span
                 key={punchlineIndex}
@@ -297,7 +297,7 @@ export function AiAssistantPopup() {
           </div>
 
           {/* Retro Robot Icon in Sharp Square box */}
-          <div className="w-16 h-16 bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 flex items-center justify-center shadow-2xl border border-[#C99537]/20">
+          <div className="w-full h-full bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 flex items-center justify-center shadow-2xl border border-[#C99537]/20">
             <svg
               className="w-10 h-10 text-zinc-950"
               viewBox="0 0 24 24"

@@ -33,7 +33,7 @@ export const knowledgeBase: DocumentChunk[] = [
     metadata: { category: "Pricing Tiers", type: "service" }
   },
   {
-    content: "Add-Ons and Deposit payment breakdown: We offer an Immediate Priority Option (+£15 upgrade) to fast-track your application, placing your case file at the absolute front of our preparation queue with direct caseworker updates: [Add Priority Upgrade](/services/priority-upgrade). For the Complete Visa Service (£175), we charge an Initial Case Deposit of £100 to start document compiling, checklist generation, and slot tracking. The remaining Service Balance of £75 is only due after an official appointment slot at VFS/TLS is successfully secured and confirmed in your name.",
+    content: "Add-Ons and Deposit payment breakdown: For the Complete Visa Service (£175), we charge an Initial Case Deposit of £100 to start document compiling, checklist generation, and slot tracking. The remaining Service Balance of £75 is only due after an official appointment slot at VFS/TLS is successfully secured and confirmed in your name.",
     metadata: { category: "Fees & Payments", type: "service" }
   },
 
@@ -79,7 +79,7 @@ export const knowledgeBase: DocumentChunk[] = [
     metadata: { category: "Documents", type: "faq" }
   },
   {
-    content: "What if I already booked non-refundable flights but do not have my visa? Schengen embassies advise against buying non-refundable tickets before visa approval due to potential consulate processing delays (takes 15-30 days). If you already booked, we will use your itinerary. To ensure your file is audited immediately and processed fast, we highly recommend adding our Priority processing upgrade. [Add Immediate Priority (+£15)](/services/priority-upgrade)",
+    content: "What if I already booked non-refundable flights but do not have my visa? Schengen embassies advise against buying non-refundable tickets before visa approval due to potential consulate processing delays (takes 15-30 days). If you already booked, we will use your itinerary.",
     metadata: { category: "Visa Process", type: "faq" }
   },
   {

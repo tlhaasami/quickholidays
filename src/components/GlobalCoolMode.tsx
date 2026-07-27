@@ -41,10 +41,10 @@ export function GlobalCoolMode() {
 
     // SVGs for travel-related entities: Airplane, Paper Airplane, Calendar, Passport/Document, Globe
     const travelSVGs = [
-      // Airplane
-      `<path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>`,
-      // Paper Airplane
-      `<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>`,
+      // Mouse Pointer Arrow
+      `<path d="M4 3v16l4.58-4.59L12 21l3-1.5-3.41-6.41L17 12z"/>`,
+      // Mouse Hand Pointer
+      `<path d="M10 21.5c-1.8 0-3.4-.7-4.6-2L2 15.6l1.4-1.4c.4-.4 1-.5 1.4-.2l2.2 1.3V5.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V12h1V8.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V12h1V9.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V12h1v-1.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v8c0 3-2.5 5.5-5.5 5.5h-2.5z"/>`,
       // Calendar
       `<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 3h5v5h-5z"/>`,
       // Passport / Document

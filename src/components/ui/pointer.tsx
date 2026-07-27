@@ -197,7 +197,7 @@ export function Pointer({
           >
             {children || (
               isHoveringInteractive ? (
-                // Hover state: Paper airplane pointing to the top-left (left side) matching normal plane rotation
+                // Hover state: Simple hand pointer pointing to the top-left matching interactive hover cursor
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -205,14 +205,14 @@ export function Pointer({
                   height="26"
                   width="26"
                   className={cn(
-                    "text-amber-400 fill-amber-400 drop-shadow-[0_4px_12px_rgba(245,158,11,0.5)] rotate-[-45deg] transition-all duration-300",
+                    "text-[#C99537] fill-[#C99537] drop-shadow-[0_4px_12px_rgba(201,149,55,0.5)] transition-all duration-300",
                     className
                   )}
                 >
-                  <path d="M12 2L2 22l10-6 10 6L12 2z" />
+                  <path d="M10 21.5c-1.8 0-3.4-.7-4.6-2L2 15.6l1.4-1.4c.4-.4 1-.5 1.4-.2l2.2 1.3V5.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V12h1V8.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V12h1V9.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V12h1v-1.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v8c0 3-2.5 5.5-5.5 5.5h-2.5z" />
                 </svg>
               ) : (
-                // Normal state: Passenger plane flying pointing to the top-left (left side)
+                // Normal state: Simple mouse pointer arrow
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -220,11 +220,11 @@ export function Pointer({
                   height="24"
                   width="24"
                   className={cn(
-                    "text-yellow-400 fill-yellow-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] rotate-[-45deg] transition-all duration-300",
+                    "text-zinc-900 dark:text-white fill-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-all duration-300",
                     className
                   )}
                 >
-                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+                  <path d="M4 3v16l4.58-4.59L12 21l3-1.5-3.41-6.41L17 12z" />
                 </svg>
               )
             )}

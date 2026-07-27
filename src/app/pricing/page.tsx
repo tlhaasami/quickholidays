@@ -63,24 +63,6 @@ export default function Pricing() {
       buttonHref: "/contact-us?plan=appointment",
       popular: false
     },
-    {
-      name: "Immediate Priority Option",
-      originalPrice: null,
-      price: "+£15",
-      period: "on top of plan price",
-      description: "Fast-track processing for urgent travel. Add this option to any of our plans to process your application on an immediate priority basis. Your file is put at the front of our preparation queue and we keep in constant touch.",
-      features: [
-        "Priority Basis Processing: Prepared and completed ahead of standard cases.",
-        "Immediate Slot Monitor: Biometrics slots checked and booked on priority.",
-        "Keep In Touch: Active Caseworker updates via phone/WhatsApp at every single stage.",
-        "Flexible Upgrade: Can be added on top of any selected normal plan."
-      ],
-      footerNote: "Processed on priority basis & kept in touch.",
-      buttonText: "Book Priority Option",
-      buttonHref: "/contact-us?plan=priority",
-      popular: false,
-      priority: true
-    }
   ];
 
   return (
@@ -110,7 +92,7 @@ export default function Pricing() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch max-w-7xl mx-auto text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch max-w-7xl mx-auto text-left">
           {tiers.map((tier, idx) => (
             <motion.div
               key={tier.name}
@@ -121,19 +103,12 @@ export default function Pricing() {
               className={`flex flex-col justify-between p-6 rounded-2xl border transition-all duration-300 relative ${
                 tier.popular
                   ? "bg-zinc-50 dark:bg-zinc-900/60 border-primary shadow-2xl scale-102 z-10"
-                  : tier.priority
-                  ? "bg-zinc-50 dark:bg-zinc-900/40 border-amber-500/70 shadow-xl scale-102"
                   : "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-white/10"
               }`}
             >
               {tier.popular && (
                 <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] tracking-widest font-sans font-bold uppercase py-1 px-3 rounded-full shadow-lg">
                   Most Popular
-                </span>
-              )}
-              {tier.priority && (
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-500 text-zinc-950 text-[10px] tracking-widest font-sans font-bold uppercase py-1 px-3 rounded-full shadow-lg">
-                  Highly Recommended
                 </span>
               )}
               <div>
