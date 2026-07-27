@@ -141,6 +141,7 @@ export default function Hero() {
 
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [flagsLoaded, setFlagsLoaded] = useState(false);
 
   useEffect(() => {
     // Deferred video source loading until after hero elements and images complete loading
@@ -152,6 +153,23 @@ export default function Hero() {
       const timer = setTimeout(loadDeferredVideo, 800);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  // Preload all flag images — show Stack only once every flag is ready
+  useEffect(() => {
+    let cancelled = false;
+    const total = FLAG_IMAGES.length;
+    if (total === 0) { setFlagsLoaded(true); return; }
+    let loaded = 0;
+    FLAG_IMAGES.forEach((src) => {
+      const img = new window.Image();
+      img.onload = img.onerror = () => {
+        loaded++;
+        if (!cancelled && loaded >= total) setFlagsLoaded(true);
+      };
+      img.src = src;
+    });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -421,36 +439,47 @@ export default function Hero() {
             className="block relative w-[280px] xs:w-[320px] sm:w-[420px] h-[180px] xs:h-[200px] sm:h-[265px] pr-0 sm:pr-8 pointer-events-auto select-none mt-14 lg:mt-0"
           >
             <div className="w-full h-full">
-              <Stack
-                randomRotation={true}
-                sensitivity={45}
-                sendToBackOnClick={true}
-                autoplay={true}
-                autoplayDelay={3500}
-                pauseOnHover={true}
-                cards={FLAG_IMAGES.map((src, i) => {
-                  const countryName = COUNTRIES[i]?.name || "Schengen Country";
-                  return (
-                    <div key={i} className="w-full h-full p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl flex flex-col justify-between select-none">
-                      <div className="w-full h-[84%] overflow-hidden rounded-xl border border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
-                        <img
-                          src={src}
-                          alt={countryName}
-                          className="w-full h-full object-cover pointer-events-none"
-                        />
-                      </div>
-                      <div className="flex items-center justify-between px-1 pt-1 shrink-0">
-                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                          {countryName}
-                        </span>
-                        <span className="text-[10px] font-sans font-extrabold uppercase text-[#C99537]">
-                          Schengen Visa
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              />
+              {flagsLoaded ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="w-full h-full"
+                >
+                  <Stack
+                    randomRotation={true}
+                    sensitivity={45}
+                    sendToBackOnClick={true}
+                    autoplay={true}
+                    autoplayDelay={3500}
+                    pauseOnHover={true}
+                    cards={FLAG_IMAGES.map((src, i) => {
+                      const countryName = COUNTRIES[i]?.name || "Schengen Country";
+                      return (
+                        <div key={i} className="w-full h-full p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl flex flex-col justify-between select-none">
+                          <div className="w-full h-[84%] overflow-hidden rounded-xl border border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
+                            <img
+                              src={src}
+                              alt={countryName}
+                              className="w-full h-full object-cover pointer-events-none"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between px-1 pt-1 shrink-0">
+                            <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                              {countryName}
+                            </span>
+                            <span className="text-[10px] font-sans font-extrabold uppercase text-[#C99537]">
+                              Schengen Visa
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  />
+                </motion.div>
+              ) : (
+                <div className="w-full h-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+              )}
             </div>
           </motion.div>
         </div>
