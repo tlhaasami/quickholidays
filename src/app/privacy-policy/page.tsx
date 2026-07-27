@@ -76,6 +76,7 @@ export default function PrivacyPolicy() {
           </section>
         </div>
 
+<<<<<<< HEAD
         {/* Footer actions */}
         <div className="border-t border-zinc-200 dark:border-white/10 pt-8 mt-12 flex justify-between items-center text-xs font-sans">
           <Link href="/service-terms" className="text-primary hover:text-zinc-900 dark:hover:text-white underline transition-colors">
@@ -87,6 +88,23 @@ export default function PrivacyPolicy() {
         </div>
 
       </div>
+=======
+            <section className="space-y-3">
+              <h2 className="text-xl font-bold text-brand-navy font-serif">5. Contact Us</h2>
+              <p>
+                If you have any questions or concerns about this privacy policy, please contact us at:
+              </p>
+              <p className="font-semibold text-brand-navy">
+                Quick Holidays Ltd<br />
+                Email: info@quickholidays.co.uk<br />
+                Phone: +448000584673<br />
+                Address: Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ
+              </p>
+            </section>
+          </div>
+        </ScrollReveal>
+      </main>
+>>>>>>> 49712fb2633b8678708f1ac806a7bef898376d2f
     </div>
   );
 }
