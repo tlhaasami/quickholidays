@@ -257,8 +257,18 @@ export default function Hero() {
 
       {/* 1. Hero Section (7.1) */}
       <section id="hero" className="relative w-full h-screen overflow-hidden bg-black">
-        {/* Background Video (Deferred loading & plays only when fully loaded) */}
+        {/* Background Hero Image (Visible immediately until video is fully loaded) */}
         <div className="absolute inset-0 overflow-hidden z-0 bg-black">
+          <img
+            src="/videos/bg-video-first-frame.jpg"
+            alt="Hero Background"
+            fetchPriority="high"
+            decoding="async"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+              videoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
+          />
+
           {videoSrc && (
             <video
               ref={videoRef}
