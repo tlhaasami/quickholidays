@@ -136,10 +136,26 @@ export default function Hero() {
   const word1 = titleWords[0]?.toUpperCase() || "QUICK";
   const word2 = titleWords.slice(1).join(" ")?.toUpperCase() || "HOLIDAYS";
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // Deferred video source loading until after hero elements and images complete loading
+    const loadDeferredVideo = () => {
+      setVideoSrc("/videos/bg-video.mp4");
+    };
+
+    if (document.readyState === "complete") {
+      const timer = setTimeout(loadDeferredVideo, 800);
+      return () => clearTimeout(timer);
+    } else {
+      window.addEventListener("load", loadDeferredVideo);
+      return () => window.removeEventListener("load", loadDeferredVideo);
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -241,24 +257,28 @@ export default function Hero() {
 
       {/* 1. Hero Section (7.1) */}
       <section id="hero" className="relative w-full h-screen overflow-hidden bg-black">
-        {/* Background Video */}
-        <div className="absolute inset-0 overflow-hidden z-0">
-          <video
-            ref={videoRef}
-            src="/videos/bg-video.mp4"
-            poster="/videos/bg-video-first-frame.jpg"
-            autoPlay
-            muted
-            loop
-            playsInline
-            onEnded={() => {
-              if (videoRef.current) {
-                videoRef.current.currentTime = 0;
-                videoRef.current.play().catch(() => { });
-              }
-            }}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+        {/* Background Video (Deferred loading & plays only when fully loaded) */}
+        <div className="absolute inset-0 overflow-hidden z-0 bg-black">
+          {videoSrc && (
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              poster="/videos/bg-video-first-frame.jpg"
+              muted
+              loop
+              playsInline
+              preload="none"
+              onCanPlayThrough={() => {
+                setVideoLoaded(true);
+                if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                videoLoaded ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          )}
         </div>
 
         {/* Optional golden shimmer overlay */}
