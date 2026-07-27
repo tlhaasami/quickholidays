@@ -92,6 +92,15 @@ function DockItem({
     // Calculate the size based on scale
     const size = useTransform(smoothScale, (s) => s * iconSize)
 
+    // Calculate font size dynamically based on scale
+    const fontSize = useTransform(smoothScale, (s) => s * 9.5)
+
+    // Calculate padding dynamically based on scale
+    const paddingX = useTransform(smoothScale, (s) => s * 14)
+
+    // Calculate icon container size dynamically based on scale
+    const iconWrapperSize = useTransform(smoothScale, (s) => s * (item.id === "theme-toggle" ? 20 : 16))
+
     // Floating effect for horizontal; sliding offset for vertical
     const y = useTransform(smoothScale, (s) => (s - 1) * -10)
     const smoothY = useSpring(y, springConfig)
@@ -133,17 +142,16 @@ function DockItem({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{
-                width: size,
                 height: size,
                 y: isVertical ? 0 : smoothY,
                 x: slideX,
             }}
-            className="relative flex items-center justify-center pointer-events-auto cursor-pointer"
+            className="relative flex items-center justify-center pointer-events-auto cursor-pointer w-auto shrink-0"
         >
             {/* Icon Container */}
             <motion.div
                 className={cn(
-                    "relative w-full h-full",
+                    "relative h-full flex items-center gap-2 px-0",
                     design === "brutalist" ? "rounded-none" : "rounded-2xl",
                     item.id === "theme-toggle" ? "overflow-visible" : "overflow-hidden",
                     item.id === "theme-toggle"
@@ -155,11 +163,12 @@ function DockItem({
                                     ? "bg-zinc-950 border-2 border-[#C99537] shadow-[0_0_10px_rgba(201,149,55,0.2)]"
                                     : "bg-gradient-to-b from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-lg shadow-black/10 dark:shadow-black/30"
                         ),
-                    "flex items-center justify-center",
                     "transition-all duration-200",
                     item.className
                 )}
                 style={{
+                    paddingLeft: paddingX,
+                    paddingRight: paddingX,
                     boxShadow: item.id === "theme-toggle" || design === "brutalist" || design === "neon"
                         ? "none"
                         : (isHovered
@@ -168,12 +177,22 @@ function DockItem({
                 }}
             >
                 {/* Icon */}
-                <div className={cn(
-                    "flex items-center justify-center text-neutral-700 dark:text-white",
-                    item.id === "theme-toggle" ? "w-full h-full" : "w-[60%] h-[60%]"
-                )}>
+                <motion.div 
+                    style={{ width: iconWrapperSize, height: iconWrapperSize }}
+                    className="flex items-center justify-center text-neutral-700 dark:text-white shrink-0"
+                >
                     {item.icon}
-                </div>
+                </motion.div>
+
+                {/* Option Name */}
+                {item.id !== "theme-toggle" && (
+                    <motion.span 
+                        style={{ fontSize: fontSize }}
+                        className="font-sans font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 whitespace-nowrap select-none pointer-events-none"
+                    >
+                        {item.label}
+                    </motion.span>
+                )}
 
                 {/* Creative Accent: Top-Right flag triangle */}
                 {iconStyle === "creative" && item.id !== "theme-toggle" && (

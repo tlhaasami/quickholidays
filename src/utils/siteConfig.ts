@@ -8,6 +8,7 @@ export interface SiteConfig {
   whatsappUrl: string;
   address: string;
   companyNumber: string;
+  promoText: string;
 }
 
 export const defaultSiteConfig: SiteConfig = {
@@ -17,7 +18,8 @@ export const defaultSiteConfig: SiteConfig = {
   phone: "+44 7828 707425",
   whatsappUrl: "https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application.",
   address: "Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN",
-  companyNumber: "15948457"
+  companyNumber: "15948457",
+  promoText: "avail 35% Discount now"
 };
 
 export function getSiteConfig(): SiteConfig {
@@ -28,7 +30,7 @@ export function getSiteConfig(): SiteConfig {
   try {
     const config: Partial<SiteConfig> = {};
     const keys: (keyof SiteConfig)[] = [
-      "heroTitle", "heroSubtitle", "heroDescription", "phone", "whatsappUrl", "address", "companyNumber"
+      "heroTitle", "heroSubtitle", "heroDescription", "phone", "whatsappUrl", "address", "companyNumber", "promoText"
     ];
     
     let hasSaved = false;
@@ -57,6 +59,7 @@ export function saveSiteConfig(config: SiteConfig) {
     localStorage.setItem("site_whatsappUrl", config.whatsappUrl);
     localStorage.setItem("site_address", config.address);
     localStorage.setItem("site_companyNumber", config.companyNumber);
+    localStorage.setItem("site_promoText", config.promoText);
     
     // Dispatch storage event to notify other open tabs / components
     window.dispatchEvent(new Event("storage"));

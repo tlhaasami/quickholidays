@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const [whatsappUrl, setWhatsappUrl] = useState(defaultSiteConfig.whatsappUrl);
   const [address, setAddress] = useState(defaultSiteConfig.address);
   const [companyNumber, setCompanyNumber] = useState(defaultSiteConfig.companyNumber);
+  const [promoText, setPromoText] = useState(defaultSiteConfig.promoText);
 
   // --- MagneticDock Local Settings State ---
   const [dockIconSize, setDockIconSize] = useState(40);
@@ -71,6 +72,7 @@ export default function SettingsPage() {
       setWhatsappUrl(config.whatsappUrl);
       setAddress(config.address);
       setCompanyNumber(config.companyNumber);
+      setPromoText(config.promoText);
 
       // Dock properties
       const savedDockSize = localStorage.getItem("dock_iconSize");
@@ -164,7 +166,8 @@ export default function SettingsPage() {
         phone,
         whatsappUrl,
         address,
-        companyNumber
+        companyNumber,
+        promoText
       });
       localStorage.setItem("hero_goldenOverlay", heroGoldenOverlay.toString());
       
@@ -185,7 +188,8 @@ export default function SettingsPage() {
         phone,
         whatsappUrl,
         address,
-        companyNumber
+        companyNumber,
+        promoText
       });
       
       window.dispatchEvent(new Event("storage"));
@@ -206,7 +210,8 @@ export default function SettingsPage() {
         phone,
         whatsappUrl,
         address,
-        companyNumber
+        companyNumber,
+        promoText
       });
 
       localStorage.setItem("dock_iconSize", dockIconSize.toString());
@@ -243,6 +248,7 @@ export default function SettingsPage() {
       localStorage.removeItem("site_whatsappUrl");
       localStorage.removeItem("site_address");
       localStorage.removeItem("site_companyNumber");
+      localStorage.removeItem("site_promoText");
 
       setHeroTitle(defaultSiteConfig.heroTitle);
       setHeroSubtitle(defaultSiteConfig.heroSubtitle);
@@ -251,6 +257,7 @@ export default function SettingsPage() {
       setWhatsappUrl(defaultSiteConfig.whatsappUrl);
       setAddress(defaultSiteConfig.address);
       setCompanyNumber(defaultSiteConfig.companyNumber);
+      setPromoText(defaultSiteConfig.promoText);
 
       localStorage.removeItem("dock_iconSize");
       localStorage.removeItem("dock_maxScale");
@@ -892,6 +899,17 @@ export default function SettingsPage() {
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            {/* Promo Strip Text */}
+            <div className="space-y-2">
+              <label className="font-semibold block">Top Promo Strip Text</label>
+              <input
+                type="text"
+                value={promoText}
+                onChange={(e) => setPromoText(e.target.value)}
                 className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
               />
             </div>

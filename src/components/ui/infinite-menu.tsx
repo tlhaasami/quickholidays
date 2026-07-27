@@ -1205,6 +1205,8 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null) as MutableRefObject<HTMLCanvasElement | null>;
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
   const [isMoving, setIsMoving] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [hasClicked, setHasClicked] = useState<boolean>(false);
   const router = useRouter();
 
   const lastIndexRef = useRef<number | null>(null);
@@ -1265,7 +1267,27 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full min-h-[400px]">
+    <div 
+      className="relative w-full h-full min-h-[400px]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setHasClicked(false);
+      }}
+      onClick={() => setHasClicked(true)}
+    >
+      {/* Mobile Help Banner */}
+      <div className="block sm:hidden text-center text-[10px] text-zinc-550 dark:text-zinc-500 font-sans font-bold uppercase tracking-widest pb-3 select-none pointer-events-none">
+        press and drag for options
+      </div>
+
+      {/* Desktop Help Banner */}
+      {isHovered && !hasClicked && (
+        <div className="hidden sm:block absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-zinc-950/80 backdrop-blur-xs text-white text-[10px] font-sans font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/10 shadow-lg pointer-events-none select-none animate-pulse">
+          click to see other countries
+        </div>
+      )}
+
       <canvas
         id="infinite-grid-menu-canvas"
         ref={canvasRef}

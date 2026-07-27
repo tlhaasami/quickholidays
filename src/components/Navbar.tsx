@@ -246,7 +246,7 @@ export function Navbar() {
 
       {/* Sticky Mobile Navbar (Mobile Only) */}
       <header className={cn(
-        "fixed top-0 left-0 right-0 h-16 z-[998] md:hidden transition-all duration-300",
+        "fixed top-8 left-0 right-0 h-16 z-[998] md:hidden transition-all duration-300",
         showTransparent 
           ? "bg-transparent border-transparent" 
           : "bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-white/10"
@@ -278,7 +278,7 @@ export function Navbar() {
           }}
           aria-label="Toggle Navigation Menu"
           className={cn(
-            "fixed top-2.5 right-6 z-[1000] p-2.5 rounded-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-white/10 shadow-lg cursor-pointer md:hidden flex flex-col justify-center items-center gap-1.5 w-11 h-11 pointer-events-auto transition-all duration-300 hover:scale-105 active:scale-95",
+            "fixed top-[42px] right-6 z-[1000] p-2.5 rounded-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-white/10 shadow-lg cursor-pointer md:hidden flex flex-col justify-center items-center gap-1.5 w-11 h-11 pointer-events-auto transition-all duration-300 hover:scale-105 active:scale-95",
             isOpen ? "rotate-90" : "rotate-0"
           )}
         >

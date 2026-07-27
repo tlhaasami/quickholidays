@@ -91,16 +91,16 @@ export default function Stack({
 
   const [stack, setStack] = useState<{ id: number; content: React.ReactNode }[]>(() => {
     if (cards.length) {
-      return cards.map((content, index) => ({ id: index + 1, content }));
+      return cards.map((content, index) => ({ id: index + 1, content })).reverse();
     }
     return [];
   });
 
   useEffect(() => {
-    if (cards.length) {
-      setStack(cards.map((content, index) => ({ id: index + 1, content })));
+    if (cards.length && stack.length !== cards.length) {
+      setStack(cards.map((content, index) => ({ id: index + 1, content })).reverse());
     }
-  }, [cards]);
+  }, [cards.length]);
 
   const sendToBack = (id: number) => {
     setStack(prev => {
