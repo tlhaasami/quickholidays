@@ -262,42 +262,7 @@ export function AiAssistantPopup() {
 
   return (
     <>
-      {/* Sitting Robot Mascot (bottom right) when minimized */}
-      {!isCentered && (
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 30 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          whileHover={{ scale: 1.05 }}
-          onClick={() => setIsCentered(true)}
-          className="fixed bottom-6 right-6 z-[9995] flex flex-col items-center cursor-pointer pointer-events-auto"
-        >
-          {/* Rotating Text Label */}
-          <div className="bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap mb-1.5 min-h-[24px] flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={punchlineIndex}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-              >
-                {punchlines[punchlineIndex]}
-              </motion.span>
-            </AnimatePresence>
-          </div>
-
-          {/* Retro Robot Icon in Sharp Square box */}
-          <div className="w-16 h-16 bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 flex items-center justify-center shadow-2xl border border-[#C99537]/20">
-            <svg
-              className="w-10 h-10 text-zinc-950"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path fill="currentColor" d="M2 10h1v7H2v-1H1v-5h1zm17-3h-1V6h-5V3h-2v3H6v1H5v1H4v10h1v1h1v1h12v-1h1v-1h1V8h-1zm-2 6h-3v-3h3zm-4 4h-2v-1h2zm-6-1h3v1H7zm0-6h3v3H7zm7 7v-1h3v1zm9-6v5h-1v1h-1v-7h1v1z" />
-            </svg>
-          </div>
-        </motion.div>
-      )}
+      {/* Floating Robot Mascot widget hidden by default */}
 
       {/* Center Screen Modal view */}
       <AnimatePresence>

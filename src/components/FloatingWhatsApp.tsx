@@ -19,7 +19,7 @@ export function FloatingWhatsApp() {
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="fixed bottom-6 right-20 z-50 flex items-center justify-center w-12 h-12 bg-emerald-600 text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-emerald-500/30 md:hidden pointer-events-auto"
+      className="fixed bottom-6 left-6 z-50 flex items-center justify-center w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 border border-emerald-400/40 pointer-events-auto"
       aria-label="Chat on WhatsApp"
     >
       <svg
