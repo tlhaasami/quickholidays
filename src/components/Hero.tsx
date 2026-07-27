@@ -145,7 +145,7 @@ export default function Hero() {
   useEffect(() => {
     // Deferred video source loading until after hero elements and images complete loading
     const loadDeferredVideo = () => {
-      setVideoSrc("/videos/bg-video.mp4");
+      setVideoSrc("/videos/bg-video.webm");
     };
 
     if (document.readyState === "complete") {
@@ -272,7 +272,6 @@ export default function Hero() {
           {videoSrc && (
             <video
               ref={videoRef}
-              src={videoSrc}
               poster="/videos/bg-video-first-frame.jpg"
               muted
               loop
@@ -287,7 +286,10 @@ export default function Hero() {
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                 videoLoaded ? "opacity-100" : "opacity-0"
               }`}
-            />
+            >
+              <source src="/videos/bg-video.webm" type="video/webm" />
+              <source src="/videos/bg-video-muted-720p.mp4" type="video/mp4" />
+            </video>
           )}
         </div>
 
