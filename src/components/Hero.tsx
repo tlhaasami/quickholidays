@@ -151,11 +151,17 @@ export default function Hero() {
     if (document.readyState === "complete") {
       const timer = setTimeout(loadDeferredVideo, 800);
       return () => clearTimeout(timer);
-    } else {
-      window.addEventListener("load", loadDeferredVideo);
-      return () => window.removeEventListener("load", loadDeferredVideo);
     }
   }, []);
+
+  useEffect(() => {
+    if (videoSrc && videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().then(() => {
+        setVideoLoaded(true);
+      }).catch(() => {});
+    }
+  }, [videoSrc]);
 
   useEffect(() => {
     setMounted(true);
@@ -274,13 +280,32 @@ export default function Hero() {
               ref={videoRef}
               src={videoSrc}
               poster="/videos/bg-video-first-frame.jpg"
+              autoPlay
               muted
               loop
               playsInline
-              preload="none"
+              preload="auto"
+              onLoadedData={() => {
+                setVideoLoaded(true);
+                if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+              onCanPlay={() => {
+                setVideoLoaded(true);
+                if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
               onCanPlayThrough={() => {
                 setVideoLoaded(true);
                 if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+              onEnded={() => {
+                if (videoRef.current) {
+                  videoRef.current.currentTime = 0;
                   videoRef.current.play().catch(() => {});
                 }
               }}
