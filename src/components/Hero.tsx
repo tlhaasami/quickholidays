@@ -272,6 +272,7 @@ export default function Hero() {
           {videoSrc && (
             <video
               ref={videoRef}
+              src={videoSrc}
               poster="/videos/bg-video-first-frame.jpg"
               muted
               loop
