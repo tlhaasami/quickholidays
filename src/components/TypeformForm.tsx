@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { COUNTRIES } from "@/constants";
 import { trackLead, trackFormAbandon } from "@/lib/analytics";
@@ -16,6 +16,199 @@ const COMMON_NATIONALITIES = [
   "Kenyan", "Mexican", "Ukrainian", "Iranian", "Iraqi"
 ].sort();
 
+const COUNTRY_CODES = [
+  { name: "United Kingdom", code: "+44", flag: "🇬🇧" },
+  { name: "Afghanistan", code: "+93", flag: "🇦🇫" },
+  { name: "Albania", code: "+355", flag: "🇦🇱" },
+  { name: "Algeria", code: "+213", flag: "🇩🇿" },
+  { name: "Andorra", code: "+376", flag: "🇦🇩" },
+  { name: "Angola", code: "+244", flag: "🇦🇴" },
+  { name: "Argentina", code: "+54", flag: "🇦🇷" },
+  { name: "Armenia", code: "+374", flag: "🇦🇲" },
+  { name: "Australia", code: "+61", flag: "🇦🇺" },
+  { name: "Austria", code: "+43", flag: "🇦🇹" },
+  { name: "Azerbaijan", code: "+994", flag: "🇦🇿" },
+  { name: "Bahamas", code: "+1", flag: "🇧🇸" },
+  { name: "Bahrain", code: "+973", flag: "🇧🇭" },
+  { name: "Bangladesh", code: "+880", flag: "🇧🇩" },
+  { name: "Barbados", code: "+1", flag: "🇧🇧" },
+  { name: "Belarus", code: "+375", flag: "🇧🇾" },
+  { name: "Belgium", code: "+32", flag: "🇧🇪" },
+  { name: "Belize", code: "+501", flag: "🇧🇿" },
+  { name: "Benin", code: "+229", flag: "🇧🇯" },
+  { name: "Bermuda", code: "+1", flag: "🇧🇲" },
+  { name: "Bhutan", code: "+975", flag: "🇧🇹" },
+  { name: "Bolivia", code: "+591", flag: "🇧🇴" },
+  { name: "Bosnia & Herzegovina", code: "+387", flag: "🇧🇦" },
+  { name: "Botswana", code: "+267", flag: "🇧🇼" },
+  { name: "Brazil", code: "+55", flag: "🇧🇷" },
+  { name: "Brunei", code: "+673", flag: "🇧🇳" },
+  { name: "Bulgaria", code: "+359", flag: "🇧🇬" },
+  { name: "Burkina Faso", code: "+226", flag: "🇧🇫" },
+  { name: "Burundi", code: "+257", flag: "🇧🇮" },
+  { name: "Cambodia", code: "+855", flag: "🇰🇭" },
+  { name: "Cameroon", code: "+237", flag: "🇨🇲" },
+  { name: "Canada", code: "+1", flag: "🇨🇦" },
+  { name: "Cape Verde", code: "+238", flag: "🇨🇻" },
+  { name: "Cayman Islands", code: "+1", flag: "🇰🇾" },
+  { name: "Central African Rep.", code: "+236", flag: "🇨🇫" },
+  { name: "Chad", code: "+235", flag: "🇹🇩" },
+  { name: "Chile", code: "+56", flag: "🇨🇱" },
+  { name: "China", code: "+86", flag: "🇨🇳" },
+  { name: "Colombia", code: "+57", flag: "🇨🇴" },
+  { name: "Comoros", code: "+269", flag: "🇰🇲" },
+  { name: "Congo", code: "+242", flag: "🇨🇬" },
+  { name: "Costa Rica", code: "+506", flag: "🇨🇷" },
+  { name: "Croatia", code: "+385", flag: "🇭🇷" },
+  { name: "Cuba", code: "+53", flag: "🇨🇺" },
+  { name: "Cyprus", code: "+357", flag: "🇨🇾" },
+  { name: "Czech Republic", code: "+420", flag: "🇨🇿" },
+  { name: "DR Congo", code: "+243", flag: "🇨🇩" },
+  { name: "Denmark", code: "+45", flag: "🇩🇰" },
+  { name: "Djibouti", code: "+253", flag: "🇩🇯" },
+  { name: "Dominica", code: "+1", flag: "🇩🇲" },
+  { name: "Dominican Republic", code: "+1", flag: "🇩🇴" },
+  { name: "Ecuador", code: "+593", flag: "🇪🇨" },
+  { name: "Egypt", code: "+20", flag: "🇪🇬" },
+  { name: "El Salvador", code: "+503", flag: "🇸🇻" },
+  { name: "Equatorial Guinea", code: "+240", flag: "🇬🇶" },
+  { name: "Eritrea", code: "+291", flag: "🇪🇷" },
+  { name: "Estonia", code: "+372", flag: "🇪🇪" },
+  { name: "Eswatini", code: "+268", flag: "🇸🇿" },
+  { name: "Ethiopia", code: "+251", flag: "🇪🇹" },
+  { name: "Fiji", code: "+679", flag: "🇫🇯" },
+  { name: "Finland", code: "+358", flag: "🇫🇮" },
+  { name: "France", code: "+33", flag: "🇫🇷" },
+  { name: "Gabon", code: "+241", flag: "🇬🇦" },
+  { name: "Gambia", code: "+220", flag: "🇬🇲" },
+  { name: "Georgia", code: "+995", flag: "🇬🇪" },
+  { name: "Germany", code: "+49", flag: "🇩🇪" },
+  { name: "Ghana", code: "+233", flag: "🇬🇭" },
+  { name: "Greece", code: "+30", flag: "🇬🇷" },
+  { name: "Grenada", code: "+1", flag: "🇬🇩" },
+  { name: "Guatemala", code: "+502", flag: "🇬🇹" },
+  { name: "Guinea", code: "+224", flag: "🇬🇳" },
+  { name: "Guinea-Bissau", code: "+245", flag: "🇬🇼" },
+  { name: "Guyana", code: "+592", flag: "🇬🇾" },
+  { name: "Haiti", code: "+509", flag: "🇭🇹" },
+  { name: "Honduras", code: "+504", flag: "🇭🇳" },
+  { name: "Hong Kong", code: "+852", flag: "🇭🇰" },
+  { name: "Hungary", code: "+36", flag: "🇭🇺" },
+  { name: "Iceland", code: "+354", flag: "🇮🇸" },
+  { name: "India", code: "+91", flag: "🇮🇳" },
+  { name: "Indonesia", code: "+62", flag: "🇮🇩" },
+  { name: "Iran", code: "+98", flag: "🇮🇷" },
+  { name: "Iraq", code: "+964", flag: "🇮🇶" },
+  { name: "Ireland", code: "+353", flag: "🇮🇪" },
+  { name: "Israel", code: "+972", flag: "🇮🇱" },
+  { name: "Italy", code: "+39", flag: "🇮🇹" },
+  { name: "Jamaica", code: "+1", flag: "🇯🇲" },
+  { name: "Japan", code: "+81", flag: "🇯🇵" },
+  { name: "Jordan", code: "+962", flag: "🇯🇴" },
+  { name: "Kazakhstan", code: "+7", flag: "🇰🇿" },
+  { name: "Kenya", code: "+254", flag: "🇰🇪" },
+  { name: "Kosovo", code: "+383", flag: "🇽🇰" },
+  { name: "Kuwait", code: "+965", flag: "🇰🇼" },
+  { name: "Kyrgyzstan", code: "+996", flag: "🇰🇬" },
+  { name: "Laos", code: "+856", flag: "🇱🇦" },
+  { name: "Latvia", code: "+371", flag: "🇱🇻" },
+  { name: "Lebanon", code: "+961", flag: "🇱🇧" },
+  { name: "Lesotho", code: "+266", flag: "🇱🇸" },
+  { name: "Liberia", code: "+231", flag: "🇱🇷" },
+  { name: "Libya", code: "+218", flag: "🇱🇾" },
+  { name: "Liechtenstein", code: "+423", flag: "🇱🇮" },
+  { name: "Lithuania", code: "+370", flag: "🇱🇹" },
+  { name: "Luxembourg", code: "+352", flag: "🇱🇺" },
+  { name: "Macau", code: "+853", flag: "🇲🇴" },
+  { name: "Madagascar", code: "+261", flag: "🇲🇬" },
+  { name: "Malawi", code: "+265", flag: "🇲🇼" },
+  { name: "Malaysia", code: "+60", flag: "🇲🇾" },
+  { name: "Maldives", code: "+960", flag: "🇲🇻" },
+  { name: "Mali", code: "+223", flag: "🇲🇱" },
+  { name: "Malta", code: "+356", flag: "🇲🇹" },
+  { name: "Mauritania", code: "+222", flag: "🇲🇷" },
+  { name: "Mauritius", code: "+230", flag: "🇲🇺" },
+  { name: "Mexico", code: "+52", flag: "🇲🇽" },
+  { name: "Moldova", code: "+373", flag: "🇲🇩" },
+  { name: "Monaco", code: "+377", flag: "🇲🇨" },
+  { name: "Mongolia", code: "+976", flag: "🇲🇳" },
+  { name: "Montenegro", code: "+382", flag: "🇲🇪" },
+  { name: "Morocco", code: "+212", flag: "🇲🇦" },
+  { name: "Mozambique", code: "+258", flag: "🇲🇿" },
+  { name: "Myanmar", code: "+95", flag: "🇲🇲" },
+  { name: "Namibia", code: "+264", flag: "🇳🇦" },
+  { name: "Nepal", code: "+977", flag: "🇳🇵" },
+  { name: "Netherlands", code: "+31", flag: "🇳🇱" },
+  { name: "New Zealand", code: "+64", flag: "🇳🇿" },
+  { name: "Nicaragua", code: "+505", flag: "🇳🇮" },
+  { name: "Niger", code: "+227", flag: "🇳🇪" },
+  { name: "Nigeria", code: "+234", flag: "🇳🇬" },
+  { name: "North Korea", code: "+850", flag: "🇰🇵" },
+  { name: "North Macedonia", code: "+389", flag: "🇲🇰" },
+  { name: "Norway", code: "+47", flag: "🇳🇴" },
+  { name: "Oman", code: "+968", flag: "🇴🇲" },
+  { name: "Pakistan", code: "+92", flag: "🇵🇰" },
+  { name: "Palestine", code: "+970", flag: "🇵🇸" },
+  { name: "Panama", code: "+507", flag: "🇵🇦" },
+  { name: "Papua New Guinea", code: "+675", flag: "🇵🇬" },
+  { name: "Paraguay", code: "+595", flag: "🇵🇾" },
+  { name: "Peru", code: "+51", flag: "🇵🇪" },
+  { name: "Philippines", code: "+63", flag: "🇵🇭" },
+  { name: "Poland", code: "+48", flag: "🇵🇱" },
+  { name: "Portugal", code: "+351", flag: "🇵🇹" },
+  { name: "Qatar", code: "+974", flag: "🇶🇦" },
+  { name: "Romania", code: "+40", flag: "🇷🇴" },
+  { name: "Russia", code: "+7", flag: "🇷🇺" },
+  { name: "Rwanda", code: "+250", flag: "🇷🇼" },
+  { name: "Samoa", code: "+685", flag: "🇼🇸" },
+  { name: "San Marino", code: "+378", flag: "🇸🇲" },
+  { name: "Saudi Arabia", code: "+966", flag: "🇸🇦" },
+  { name: "Senegal", code: "+221", flag: "🇸🇳" },
+  { name: "Serbia", code: "+381", flag: "🇷🇸" },
+  { name: "Seychelles", code: "+248", flag: "🇸🇨" },
+  { name: "Sierra Leone", code: "+232", flag: "🇸🇱" },
+  { name: "Singapore", code: "+65", flag: "🇸🇬" },
+  { name: "Slovakia", code: "+421", flag: "🇸🇰" },
+  { name: "Slovenia", code: "+386", flag: "🇸🇮" },
+  { name: "Solomon Islands", code: "+677", flag: "🇸🇧" },
+  { name: "Somalia", code: "+252", flag: "🇸🇴" },
+  { name: "South Africa", code: "+27", flag: "🇿🇦" },
+  { name: "South Korea", code: "+82", flag: "🇰🇷" },
+  { name: "South Sudan", code: "+211", flag: "🇸🇸" },
+  { name: "Spain", code: "+34", flag: "🇪🇸" },
+  { name: "Sri Lanka", code: "+94", flag: "🇱🇰" },
+  { name: "Sudan", code: "+249", flag: "🇸🇩" },
+  { name: "Suriname", code: "+597", flag: "🇸🇷" },
+  { name: "Sweden", code: "+46", flag: "🇸🇪" },
+  { name: "Switzerland", code: "+41", flag: "🇨🇭" },
+  { name: "Syria", code: "+963", flag: "🇸🇾" },
+  { name: "Taiwan", code: "+886", flag: "🇹🇼" },
+  { name: "Tajikistan", code: "+992", flag: "🇹🇯" },
+  { name: "Tanzania", code: "+255", flag: "🇹🇿" },
+  { name: "Thailand", code: "+66", flag: "🇹🇭" },
+  { name: "Togo", code: "+228", flag: "🇹🇬" },
+  { name: "Trinidad & Tobago", code: "+1", flag: "🇹🇹" },
+  { name: "Tunisia", code: "+216", flag: "🇹🇳" },
+  { name: "Turkey", code: "+90", flag: "🇹🇷" },
+  { name: "Turkmenistan", code: "+993", flag: "🇹🇲" },
+  { name: "UAE", code: "+971", flag: "🇦🇪" },
+  { name: "Uganda", code: "+256", flag: "🇺🇬" },
+  { name: "Ukraine", code: "+380", flag: "🇺🇦" },
+  { name: "Uruguay", code: "+598", flag: "🇺🇾" },
+  { name: "Uzbekistan", code: "+998", flag: "🇺🇿" },
+  { name: "Vatican City", code: "+39", flag: "🇻🇦" },
+  { name: "Venezuela", code: "+58", flag: "🇻🇪" },
+  { name: "Vietnam", code: "+84", flag: "🇻🇳" },
+  { name: "Yemen", code: "+967", flag: "🇾🇪" },
+  { name: "Zambia", code: "+260", flag: "🇿🇲" },
+  { name: "Zimbabwe", code: "+263", flag: "🇿🇼" }
+].sort((a, b) => a.name.localeCompare(b.name));
+
+const COUNTRY_CODES_LIST = [
+  { name: "United Kingdom", code: "+44", flag: "🇬🇧" },
+  ...COUNTRY_CODES.filter(c => c.name !== "United Kingdom")
+];
+
 interface TypeformFormProps {
   defaultDestination?: string;
 }
@@ -25,7 +218,9 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
+    phone: "+44 ",
+    phoneCode: "+44",
+    phoneNoOnly: "",
     email: "",
     nationality: "",
     destination: defaultDestination,
@@ -41,6 +236,20 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
   const nationalityContainerRef = useRef<HTMLDivElement>(null);
   const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
   const destinationContainerRef = useRef<HTMLDivElement>(null);
+
+  const phoneCodeContainerRef = useRef<HTMLDivElement>(null);
+  const [showPhoneCodeDropdown, setShowPhoneCodeDropdown] = useState(false);
+  const [phoneCodeSearch, setPhoneCodeSearch] = useState("");
+
+  const filteredPhoneCodes = useMemo(() => {
+    const q = phoneCodeSearch.trim().toLowerCase();
+    if (!q) return COUNTRY_CODES_LIST;
+    return COUNTRY_CODES_LIST.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q)
+    );
+  }, [phoneCodeSearch]);
   
   // Tracks the current step ref for abandonment analytics
   const stepRef = useRef(1);
@@ -118,6 +327,17 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Handle outside clicks for phone code dropdown
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (phoneCodeContainerRef.current && !phoneCodeContainerRef.current.contains(e.target as Node)) {
+        setShowPhoneCodeDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Handle outside clicks for destination dropdown
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -135,7 +355,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
         showWarning("Please enter your full name.");
         return;
       }
-      if (!formData.phone.trim()) {
+      if (!formData.phoneNoOnly.trim()) {
         showWarning("Please enter your phone number.");
         return;
       }
@@ -269,29 +489,108 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   />
                   <label className="brutalist-label">Full Name</label>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <div className="brutalist-container">
+
+                <div className="flex gap-4 items-end brutalist-phone-wrapper w-full">
+                  {/* Country Code Custom Select */}
+                  <div ref={phoneCodeContainerRef} className="brutalist-container !w-[115px] shrink-0 relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowPhoneCodeDropdown(!showPhoneCodeDropdown)}
+                      className="w-full brutalist-input cursor-pointer font-bold flex items-center justify-between pointer-events-auto bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white pr-3 py-3.5"
+                    >
+                      <span className="truncate">
+                        {COUNTRY_CODES_LIST.find((c) => c.code === formData.phoneCode)?.flag || "🇬🇧"}{" "}
+                        {formData.phoneCode}
+                      </span>
+                      <svg
+                        className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 shrink-0 ${showPhoneCodeDropdown ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <label className="brutalist-label">Code</label>
+
+                    {showPhoneCodeDropdown && (
+                      <div className="absolute left-0 mt-2 bg-white dark:bg-zinc-900 border-3 border-black dark:border-white z-[999] shadow-2xl w-[260px] max-h-56 flex flex-col overflow-hidden pointer-events-auto">
+                        {/* Search Input inside the dropdown */}
+                        <div className="p-2 border-b-2 border-black dark:border-white bg-zinc-50 dark:bg-zinc-950 shrink-0">
+                          <input
+                            type="text"
+                            placeholder="Search country/code..."
+                            value={phoneCodeSearch}
+                            onChange={(e) => setPhoneCodeSearch(e.target.value)}
+                            className="w-full px-2 py-1.5 text-xs border-2 border-black dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white outline-none font-bold placeholder-zinc-400 rounded-none"
+                          />
+                        </div>
+                        
+                        {/* Scrollable list */}
+                        <div className="flex-1 overflow-y-auto max-h-[170px] bg-white dark:bg-zinc-900">
+                          {filteredPhoneCodes.length > 0 ? (
+                            filteredPhoneCodes.map((c) => (
+                              <button
+                                key={`${c.code}-${c.name}`}
+                                type="button"
+                                onClick={() => {
+                                  setFormData({
+                                    ...formData,
+                                    phoneCode: c.code,
+                                    phone: `${c.code} ${formData.phoneNoOnly}`
+                                  });
+                                  setShowPhoneCodeDropdown(false);
+                                  setPhoneCodeSearch("");
+                                }}
+                                className="w-full text-left px-3 py-2 text-xs text-zinc-900 dark:text-zinc-300 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors font-bold flex items-center gap-2 cursor-pointer border-b border-zinc-100 dark:border-zinc-800/40"
+                              >
+                                <span className="text-sm shrink-0">{c.flag}</span>
+                                <span className="truncate flex-1">{c.name}</span>
+                                <span className="text-zinc-500 dark:text-zinc-400 shrink-0">{c.code}</span>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="p-3 text-xs text-zinc-500 dark:text-zinc-400 font-bold text-center">
+                              No countries found
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Phone Number Input */}
+                  <div className="brutalist-container flex-1">
                     <input
                       type="tel"
                       required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="e.g. +44 7700 900077"
+                      value={formData.phoneNoOnly}
+                      onChange={(e) => {
+                        const newNum = e.target.value;
+                        setFormData({
+                          ...formData,
+                          phoneNoOnly: newNum,
+                          phone: `${formData.phoneCode} ${newNum}`
+                        });
+                      }}
+                      placeholder="e.g. 7700 900077"
                       className="brutalist-input smooth-type"
                     />
                     <label className="brutalist-label">Phone Number</label>
                   </div>
-                  <div className="brutalist-container">
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. john@example.com"
-                      className="brutalist-input smooth-type"
-                    />
-                    <label className="brutalist-label">Email Address</label>
-                  </div>
+                </div>
+
+                <div className="brutalist-container">
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="e.g. john@example.com"
+                    className="brutalist-input smooth-type"
+                  />
+                  <label className="brutalist-label">Email Address</label>
                 </div>
               </div>
             </motion.div>

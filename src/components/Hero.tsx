@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useInView, useMotionValue, useSpring, useTransform, AnimatePresence } from "motion/react";
 import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 import { TiltedCard } from "@/components/ui/tilted-card";
 import { TypeformForm } from "@/components/TypeformForm";
@@ -13,6 +13,8 @@ import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
 import Stack from "@/components/ui/stack";
 import InfiniteMenu from "@/components/ui/infinite-menu";
+import DomeGallery from "@/components/ui/dome-gallery/DomeGallery";
+import { GALLERY_IMAGES } from "@/constants/galleryImages";
 
 import { trackContact } from "@/lib/analytics";
 import { CoolMode } from "@/components/ui/cool-mode";
@@ -141,6 +143,14 @@ export default function Hero() {
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [flagsLoaded, setFlagsLoaded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCountries = useMemo(() => {
+    return COUNTRIES.filter((c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
   useEffect(() => {
     // Deferred video source loading until after hero elements and images complete loading
@@ -452,6 +462,7 @@ export default function Hero() {
                     autoplay={true}
                     autoplayDelay={3500}
                     pauseOnHover={true}
+                    onCardClick={() => setIsModalOpen(true)}
                     cards={FLAG_IMAGES.map((src, i) => {
                       const countryName = COUNTRIES[i]?.name || "Schengen Country";
                       return (
@@ -475,6 +486,23 @@ export default function Hero() {
                       );
                     })}
                   />
+                  
+                  {/* Instructional helper labels */}
+                  <div className="flex items-center justify-between gap-2 mt-4 px-1 text-[11px] uppercase tracking-widest font-extrabold font-sans pointer-events-auto">
+                    <span 
+                      className="flex items-center gap-1.5 select-none text-black"
+                      style={{ color: "#000000", textShadow: "0 1px 2px rgba(255, 255, 255, 0.9)" }}
+                    >
+                      ← Swipe to see →
+                    </span>
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className="text-black hover:text-zinc-800 hover:underline active:scale-95 transition-all duration-200 cursor-pointer font-extrabold"
+                      style={{ color: "#000000", textShadow: "0 1px 2px rgba(255, 255, 255, 0.9)" }}
+                    >
+                      See all countries
+                    </button>
+                  </div>
                 </motion.div>
               ) : (
                 <div className="w-full h-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
@@ -766,6 +794,33 @@ export default function Hero() {
           </div>
         </div>
 
+      </section>
+
+      {/* 2.6b Discover Countries Section */}
+      <section id="discover-countries" className="relative w-full py-24 bg-zinc-50 dark:bg-zinc-950/20 z-20 border-t border-b border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+        <div className="max-w-7xl mx-auto text-center px-8 sm:px-16 mb-12">
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
+          >
+            Globe Dome <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>Gallery</Highlighter>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-2xl mx-auto"
+          >
+            Explore Schengen destinations on our interactive 3D globe. The gallery spins continuously—drag to rotate manually, and click any landscape to zoom in.
+          </motion.p>
+        </div>
+        <div className="w-full h-[500px] md:h-[650px] relative overflow-hidden">
+          <DomeGallery images={GALLERY_IMAGES} />
+        </div>
       </section>
 
       {/* 2.7 Reviews Section */}
@@ -1118,6 +1173,101 @@ export default function Hero() {
           </div>
         </div>
       </footer>
+
+      {/* Country Selection Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-auto">
+            {/* Backdrop Scrim */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-black/75 backdrop-blur-md cursor-pointer"
+            />
+            
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-4xl max-h-[85vh] bg-zinc-900 border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden text-left"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-white/5 flex items-start justify-between shrink-0">
+                <div>
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-1">
+                    Select Schengen Destination
+                  </h3>
+                  <p className="font-sans text-xs sm:text-sm text-zinc-400 font-light">
+                    Choose a country to view custom visa requirements, document checklists, and book your consultation.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-colors cursor-pointer"
+                  aria-label="Close modal"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Search input & Grid */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                {/* Search Bar */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search countries..."
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full py-3 pl-11 pr-4 bg-white/5 border border-white/10 rounded-xl font-sans text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#C99537]/50 focus:ring-1 focus:ring-[#C99537]/50 transition-all"
+                  />
+                  <svg className="absolute left-4 top-3.5 w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                
+                {/* Countries list */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {filteredCountries.map((c) => (
+                    <div
+                      key={c.slug}
+                      className="group p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between gap-4 hover:bg-white/10 hover:border-white/10 transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={c.flag}
+                          alt={`${c.name} flag`}
+                          className="w-8 h-5.5 object-cover rounded-sm border border-white/10 shrink-0"
+                        />
+                        <span className="font-sans text-sm font-medium text-white group-hover:text-[#C99537] transition-colors">
+                          {c.name}
+                        </span>
+                      </div>
+                      <Link
+                        href={`/schengen-visa/${c.slug}`}
+                        onClick={() => setIsModalOpen(false)}
+                        className="py-1.5 px-3 rounded-lg font-sans text-[10px] font-bold uppercase tracking-wider text-black bg-[#C99537] hover:bg-amber-500 transition-colors shadow-sm cursor-pointer"
+                      >
+                        Book Visa
+                      </Link>
+                    </div>
+                  ))}
+                  {filteredCountries.length === 0 && (
+                    <div className="col-span-full py-12 text-center text-zinc-500 font-sans text-sm font-light">
+                      No countries match your search query.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

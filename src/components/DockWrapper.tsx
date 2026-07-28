@@ -181,6 +181,7 @@ export function DockWrapper() {
 
   // --- Theme toggle states & callbacks ---
   const [isDark, setIsDark] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -368,13 +369,6 @@ export function DockWrapper() {
       isActive: pathname === "/contact-us",
       onClick: () => router.push("/contact-us"),
     },
-    {
-      id: "whatsapp",
-      label: "WhatsApp Chat",
-      icon: <DockIconWhatsapp className="w-[24px] h-[24px]" />,
-      isActive: false,
-      onClick: () => window.open("https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20ask%20about%20a%20Schengen%20visa.", "_blank"),
-    },
 
     {
       id: "theme-toggle",
@@ -449,7 +443,7 @@ export function DockWrapper() {
   const getDockStyles = (): React.CSSProperties => {
     const styles: React.CSSProperties = {
       position: "fixed",
-      zIndex: 100,
+      zIndex: 9999,
     };
 
     // 1. Horizontal Side Positioning
@@ -464,13 +458,13 @@ export function DockWrapper() {
 
     // 2. Vertical Align Positioning with custom offset support
     if (dockSide === "top") {
-      styles.top = `${24 + dockCenterOffset}px`;
+      styles.top = "32px";
     } else if (dockSide === "bottom") {
       styles.bottom = `${24 - dockCenterOffset}px`;
     } else {
       // Left or Right Side -> Vertical Alignments
       if (dockVerticalAlign === "top") {
-        styles.top = `${24 + dockCenterOffset}px`;
+        styles.top = "32px";
       } else if (dockVerticalAlign === "bottom") {
         styles.bottom = `${24 - dockCenterOffset}px`;
       } else {
@@ -486,11 +480,16 @@ export function DockWrapper() {
     if (dockSide !== "left" && dockSide !== "right") {
       xTrans = "-50%";
     }
-    if (dockSide !== "top" && dockSide !== "bottom" && dockVerticalAlign === "center") {
+    
+    if (dockSide === "top" || (dockSide !== "bottom" && dockVerticalAlign === "top")) {
+      // 30% visible when not hovered (translated up by 65%)
+      yTrans = isHovered ? "12px" : "-65%";
+    } else if (dockSide !== "bottom" && dockVerticalAlign === "center") {
       yTrans = `calc(-50% + ${dockCenterOffset}px)`;
     }
 
     styles.transform = `translate(${xTrans}, ${yTrans})`;
+    styles.transition = "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), top 0.3s cubic-bezier(0.25, 1, 0.5, 1)";
     return styles;
   };
 
@@ -503,7 +502,12 @@ export function DockWrapper() {
   return (
     <>
       {/* Desktop Dock wrapper with dynamic layouts */}
-      <div className="hidden md:block" style={getDockStyles()}>
+      <div 
+        className="hidden md:block" 
+        style={getDockStyles()}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {/* SVG sketchy turbulence filter definitions required for the theme switch inside the dock */}
         <svg
           style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}

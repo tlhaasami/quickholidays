@@ -57,6 +57,7 @@ interface StackProps {
   pauseOnHover?: boolean;
   mobileClickOnly?: boolean;
   mobileBreakpoint?: number;
+  onCardClick?: () => void;
 }
 
 export default function Stack({
@@ -69,7 +70,8 @@ export default function Stack({
   autoplayDelay = 3000,
   pauseOnHover = false,
   mobileClickOnly = false,
-  mobileBreakpoint = 768
+  mobileBreakpoint = 768,
+  onCardClick
 }: StackProps) {
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -147,7 +149,13 @@ export default function Stack({
             >
               <motion.div
                 className="rounded-2xl overflow-hidden w-full h-full"
-                onClick={() => shouldEnableClick && sendToBack(card.id)}
+                onClick={() => {
+                  if (onCardClick) {
+                    onCardClick();
+                  } else if (shouldEnableClick) {
+                    sendToBack(card.id);
+                  }
+                }}
                 animate={{
                   rotateZ: (visibleStack.length - index - 1) * 2.5 + (randomRotation ? Math.random() * 4 - 2 : 0),
                   scale: 1 + index * 0.02 - visibleStack.length * 0.02,

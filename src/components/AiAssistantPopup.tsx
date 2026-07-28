@@ -34,7 +34,7 @@ export function AiAssistantPopup() {
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "bot",
-      text: "Hello! I am your Schengen Visa Assistant. Are you looking for a visa booking or custom document preparation? I can walk you through our website services, answer details, or connect you with our visa officers directly. How would you like to proceed?"
+      text: "Hello! I am your Schengen Visa Assistant. Are you looking for a visa booking or custom document preparation? I can walk you through our website services, answer details, or connect you with our visa experts directly. How would you like to proceed?"
     }
   ]);
   const [chatMode, setChatMode] = useState(false); // false: initial options, true: chat view
@@ -90,23 +90,11 @@ export function AiAssistantPopup() {
     }
   }, [messages, isTyping, chatMode]);
 
-  // Delayed appearance effect
+  // Delayed appearance effect — disabled, bot only opens on manual trigger
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const pathname = window.location.pathname;
-      const isBookingArea = pathname === "/contact-us";
-      const isSettingsPage = pathname === "/settings";
-      const hasShownSession = sessionStorage.getItem("quick_holidays_ai_agent_shown");
-
-      if (!isBookingArea && !isSettingsPage && !hasShownSession) {
-        const timer = setTimeout(() => {
-          setHasAppeared(true);
-          setIsCentered(true);
-          sessionStorage.setItem("quick_holidays_ai_agent_shown", "true");
-        }, APPEARANCE_DELAY);
-
-        return () => clearTimeout(timer);
-      }
+      // Just mark as appeared so the floating icon shows immediately
+      setHasAppeared(true);
     }
   }, []);
 
@@ -296,14 +284,12 @@ export function AiAssistantPopup() {
             </AnimatePresence>
           </div>
 
-          {/* Retro Robot Icon in Sharp Square box */}
+          {/* Sparkle AI Icon */}
           <div className="w-full h-full bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 flex items-center justify-center shadow-2xl border border-[#C99537]/20">
-            <svg
-              className="w-10 h-10 text-zinc-950"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path fill="currentColor" d="M2 10h1v7H2v-1H1v-5h1zm17-3h-1V6h-5V3h-2v3H6v1H5v1H4v10h1v1h1v1h12v-1h1v-1h1V8h-1zm-2 6h-3v-3h3zm-4 4h-2v-1h2zm-6-1h3v1H7zm0-6h3v3H7zm7 7v-1h3v1zm9-6v5h-1v1h-1v-7h1v1z" />
+            <svg className="w-9 h-9 text-zinc-950" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" />
+              <path d="M19 14L19.75 17.25L23 18L19.75 18.75L19 22L18.25 18.75L15 18L18.25 17.25L19 14Z" opacity="0.7" />
+              <path d="M5 3L5.5 5.5L8 6L5.5 6.5L5 9L4.5 6.5L2 6L4.5 5.5L5 3Z" opacity="0.7" />
             </svg>
           </div>
         </motion.div>
@@ -342,8 +328,10 @@ export function AiAssistantPopup() {
                     <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 border border-white dark:border-zinc-950 animate-ping" />
                     <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 border border-white dark:border-zinc-950" />
                     
-                    <svg className="w-8 h-8 text-zinc-950" viewBox="0 0 24 24" fill="none">
-                      <path fill="currentColor" d="M2 10h1v7H2v-1H1v-5h1zm17-3h-1V6h-5V3h-2v3H6v1H5v1H4v10h1v1h1v1h12v-1h1v-1h1V8h-1zm-2 6h-3v-3h3zm-4 4h-2v-1h2zm-6-1h3v1H7zm0-6h3v3H7zm7 7v-1h3v1zm9-6v5h-1v1h-1v-7h1v1z" />
+                    <svg className="w-9 h-9 text-zinc-950" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" />
+                      <path d="M19 14L19.75 17.25L23 18L19.75 18.75L19 22L18.25 18.75L15 18L18.25 17.25L19 14Z" opacity="0.7" />
+                      <path d="M5 3L5.5 5.5L8 6L5.5 6.5L5 9L4.5 6.5L2 6L4.5 5.5L5 3Z" opacity="0.7" />
                     </svg>
                   </div>
                 </motion.div>
@@ -367,7 +355,7 @@ export function AiAssistantPopup() {
                   </div>
                   <button
                     onClick={closeAssistant}
-                    className="w-7 h-7 rounded-none bg-zinc-200/50 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 flex items-center justify-center text-zinc-555 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors cursor-pointer border border-transparent hover:border-zinc-300"
+                    className="w-7 h-7 rounded-none bg-red-500/10 hover:bg-red-500 flex items-center justify-center text-red-500 hover:text-white transition-colors cursor-pointer border border-red-500/30 hover:border-red-500"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -381,7 +369,7 @@ export function AiAssistantPopup() {
                     <div className="space-y-4">
                       <div className="relative bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-white/5 p-4 rounded-none text-[13px] text-zinc-800 dark:text-zinc-300 leading-relaxed font-sans font-light">
                         <div className="absolute -top-2 left-6 w-3 h-3 bg-zinc-50 dark:bg-zinc-900 border-t border-l border-zinc-200/50 dark:border-white/5 transform rotate-45" />
-                        Hello! I am your Schengen Visa Assistant. Are you looking for a visa booking or custom document preparation? I can walk you through our website services, answer details, or connect you with our visa officers directly. How would you like to proceed?
+                        Hello! I am your Schengen Visa Assistant. Are you looking for a visa booking or custom document preparation? I can walk you through our website services, answer details, or connect you with our visa experts directly. How would you like to proceed?
                       </div>
 
                       <div className="space-y-2.5 pt-2">
@@ -416,7 +404,7 @@ export function AiAssistantPopup() {
                           rel="noopener noreferrer"
                           className="w-full py-3.5 px-4 text-left text-xs font-semibold border border-emerald-500/20 rounded-none bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500 hover:text-white hover:shadow-[0_8px_20px_rgba(16,185,129,0.08)] transition-all flex items-center justify-between cursor-pointer font-sans group"
                         >
-                          <span className="group-hover:text-white transition-colors">Chat with visa officers on WhatsApp</span>
+                          <span className="group-hover:text-white transition-colors">Chat with visa experts on WhatsApp</span>
                           <span className="text-emerald-500/70 group-hover:text-white group-hover:translate-x-1 transition-all">→</span>
                         </motion.a>
                       </div>
@@ -491,7 +479,7 @@ export function AiAssistantPopup() {
                   {invalidCount >= 3 ? (
                     <div className="text-center space-y-1.5 py-1">
                       <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-light leading-relaxed">
-                        Limit reached. Please contact our live officers directly on WhatsApp or drop us a message.
+                        Limit reached. Please contact our live experts directly on WhatsApp or drop us a message.
                       </p>
                       <a
                         href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."

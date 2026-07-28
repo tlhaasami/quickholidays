@@ -504,6 +504,7 @@ class ArcballControl {
   private previousPointerPos = vec2.create();
   private _rotationVelocity = 0;
   private _combinedQuat = quat.create();
+  private lastInteractionTime = Date.now();
 
   private readonly EPSILON = 0.1;
   private readonly IDENTITY_QUAT = quat.create();
@@ -512,6 +513,7 @@ class ArcballControl {
     vec2.set(this.pointerPos, e.clientX, e.clientY);
     vec2.copy(this.previousPointerPos, this.pointerPos);
     this.isPointerDown = true;
+    this.lastInteractionTime = Date.now();
   };
 
   private handlePointerUp = () => {
@@ -521,6 +523,7 @@ class ArcballControl {
   private handlePointerMove = (e: PointerEvent) => {
     if (this.isPointerDown) {
       vec2.set(this.pointerPos, e.clientX, e.clientY);
+      this.lastInteractionTime = Date.now();
     }
   };
 
@@ -547,7 +550,11 @@ class ArcballControl {
     let angleFactor = timeScale;
     const snapRotation = quat.create();
 
+    const timeSinceLastInteraction = Date.now() - this.lastInteractionTime;
+    const isAutoRotating = !this.isPointerDown && timeSinceLastInteraction > 2500;
+
     if (this.isPointerDown) {
+      this.lastInteractionTime = Date.now();
       const INTENSITY = 0.3 * timeScale;
       const ANGLE_AMPLIFICATION = 5 / timeScale;
       const midPointerPos = vec2.sub(vec2.create(), this.pointerPos, this.previousPointerPos);
@@ -569,6 +576,20 @@ class ArcballControl {
       } else {
         quat.slerp(this.pointerRotation, this.pointerRotation, this.IDENTITY_QUAT, INTENSITY);
       }
+    } else if (isAutoRotating) {
+      const autoRotQuat = quat.create();
+      // Modulate spin axis over time (diagonal down -> diagonal up -> straight -> diagonal)
+      const time = Date.now() * 0.0004;
+      const x = Math.sin(time) * 0.5;
+      const y = 0.8;
+      const z = Math.cos(time * 0.7) * 0.2;
+      const spinAxis = vec3.fromValues(x, y, z);
+      vec3.normalize(spinAxis, spinAxis);
+      
+      quat.setAxisAngle(autoRotQuat, spinAxis, 0.004);
+      
+      const INTENSITY = 0.05 * timeScale;
+      quat.slerp(this.pointerRotation, this.pointerRotation, autoRotQuat, INTENSITY);
     } else {
       const INTENSITY = 0.1 * timeScale;
       quat.slerp(this.pointerRotation, this.pointerRotation, this.IDENTITY_QUAT, INTENSITY);
@@ -1133,7 +1154,7 @@ class InfiniteGridMenu {
     let damping = 5 / timeScale;
     let cameraTargetZ = 3 * this.scaleFactor;
 
-    const isMoving = this.control.isPointerDown || Math.abs(this.smoothRotationVelocity) > 0.01;
+    const isMoving = this.control.isPointerDown;
 
     if (isMoving !== this.movementActive) {
       this.movementActive = isMoving;
