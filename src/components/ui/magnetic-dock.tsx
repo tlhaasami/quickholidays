@@ -137,7 +137,7 @@ function DockItem({
 
     const glowActive = item.isActive || isHovered;
 
-    const theme = {
+    const themeMap = {
         home: {
             bg: "var(--glow-home-bg)",
             border: "var(--glow-home-border)",
@@ -210,7 +210,9 @@ function DockItem({
             defaultBorder: "var(--dock-contact-us-border)",
             defaultText: "text-rose-600/75 dark:text-rose-450/80"
         }
-    }[item.id as keyof typeof theme] || {
+    };
+
+    const theme = themeMap[item.id as keyof typeof themeMap] || {
         bg: "transparent",
         border: "transparent",
         shadow: "none",
