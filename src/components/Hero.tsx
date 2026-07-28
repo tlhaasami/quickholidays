@@ -285,7 +285,7 @@ export default function Hero() {
         {/* Background Hero Image (Visible immediately until video is fully loaded) */}
         <div className="absolute inset-0 overflow-hidden z-0 bg-black">
           <img
-            src="/videos/bg-video-first-frame.jpg"
+            src="/videos/bg-video-first-frame.webp"
             alt="Hero Background"
             fetchPriority="high"
             decoding="async"
@@ -297,7 +297,7 @@ export default function Hero() {
             <video
               ref={videoRef}
               src={videoSrc}
-              poster="/videos/bg-video-first-frame.jpg"
+              poster="/videos/bg-video-first-frame.webp"
               autoPlay
               muted
               loop
@@ -357,7 +357,7 @@ export default function Hero() {
           {/* Left Column: Brand Block */}
           <motion.div
             initial="hidden"
-            animate={flagsLoaded ? "visible" : "hidden"}
+            animate="visible"
             variants={{
               hidden: { opacity: 0 },
               visible: {
@@ -1003,7 +1003,7 @@ export default function Hero() {
             {/* Subtle gold overlay highlight on hover */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10 transition-opacity duration-300" />
             <img
-              src="images/contact-right.png"
+              src="images/contact-right.webp"
               alt="Quick Visa Consultation"
               className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
             />
