@@ -147,9 +147,9 @@ export default function CreateDocumentPage() {
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="/" className="flex items-center gap-3 group">
             <img
-              src="/logos/logo-search.png"
+              src="/logos/logo.svg"
               alt="Quick Holidays"
-              className="h-8 w-auto"
+              className="h-8 w-8 object-contain"
             />
             <span className="font-black text-zinc-900 dark:text-white text-lg tracking-tight">
               QUICK<span className={GOLD}> HOLIDAYS</span>

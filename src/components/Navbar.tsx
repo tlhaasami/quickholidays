@@ -257,9 +257,9 @@ export function Navbar() {
         )}>
           <Link href="/" className="flex items-center gap-2.5 select-none">
             <img
-              src="/logos/logo-search.png"
+              src="/logos/logo.svg"
               alt="Quick Holidays Logo"
-              className="h-8 w-auto object-contain filter brightness-95"
+              className="h-8 w-8 object-contain filter brightness-95"
             />
             <span className="font-serif text-base font-bold tracking-tight text-zinc-900 dark:text-white">
               Quick Holidays

@@ -1094,9 +1094,9 @@ export default function Hero() {
           {/* Brand Column */}
           <div className="flex flex-col gap-6 text-left items-start">
             <img
-              src="/logos/logo-search.png"
+              src="/logos/logo.svg"
               alt="Quick Holidays Logo"
-              className="h-10 w-auto object-contain self-start filter brightness-95"
+              className="h-10 w-10 object-contain self-start filter brightness-95"
             />
             <p className="font-sans text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
               Quick Holidays Ltd — Schengen visa specialists for Non-UK nationals living in the UK. Clear costs, honest advice, and full accountability, every step.

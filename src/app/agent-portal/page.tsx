@@ -947,7 +947,7 @@ export default function AgentPortal() {
       <header className="h-16 shrink-0 border-b-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center px-6 z-10 transition-colors duration-300">
         <div className="flex items-center gap-3">
           {/* Logo Prefix */}
-          <img src="/logos/logo-search.png" alt="Logo" className="h-8 w-auto object-contain" />
+          <img src="/logos/logo.svg" alt="Logo" className="h-8 w-8 object-contain" />
           
           <span className="font-sans text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight">
             Quick Holidays Portal
@@ -1494,7 +1494,7 @@ export default function AgentPortal() {
         <main className="flex-1 flex flex-col bg-white dark:bg-zinc-950 relative overflow-hidden transition-colors duration-300">
           {/* Logo Watermark behind workspace */}
           <div className="absolute inset-0 flex justify-center items-center pointer-events-none opacity-[0.03] dark:opacity-[0.015]">
-            <img src="/logos/logo-search.png" alt="Watermark" className="w-[420px] h-auto object-contain" />
+            <img src="/logos/logo.svg" alt="Watermark" className="w-[420px] h-[420px] object-contain" />
           </div>
 
           {/* Messages Display */}

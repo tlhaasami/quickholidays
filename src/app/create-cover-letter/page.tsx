@@ -145,7 +145,7 @@ export default function CreateCoverLetterPage() {
       <nav className={`sticky top-0 z-50 ${NAV_BG}`}>
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <img src="/logos/logo-search.png" alt="Quick Holidays" className="h-8 w-auto" />
+            <img src="/logos/logo.svg" alt="Quick Holidays" className="h-8 w-8 object-contain" />
             <span className="font-black text-zinc-900 dark:text-white text-lg tracking-tight">
               Quick Holidays <span className="text-[#C99537] font-normal text-xs ml-1 uppercase tracking-widest">AI Cover Letter</span>
             </span>
