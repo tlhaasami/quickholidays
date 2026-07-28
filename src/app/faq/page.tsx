@@ -57,15 +57,15 @@ export default function FAQ() {
       ]
     },
     {
-      category: "Fees & Payments",
+      category: "Fees and Payments",
       items: [
         {
           q: "What is the breakdown of Schengen visa fees?",
           a: "A standard application incurs: (1) Embassy fee (set at €90 for adults by EU law), (2) Outsourcing partner booking fee (typically £30–£45 paid directly to VFS/TLS), and (3) Our fixed consultancy service fee. We do not bundle these fees to hide margins; everything is transparently itemized."
         },
         {
-          q: "What does my deposit cover?",
-          a: "Your initial deposit initiates active case tracking. This covers your comprehensive case assessment, creation of your custom document checklists, compiling official application forms, and search bookings. The final balance is only triggered once your biometrics appointment is confirmed."
+          q: "What is included in the Complete Visa Service fee?",
+          a: "Our Complete Visa Service (£175 total; split as a £45 case deposit to open your file and a £130 balance paid after your slot is confirmed) includes: (1) Free consultation and checklist assessment, (2) A custom document checklist tailored to your profile, (3) A professional cover letter written for you, (4) Fully completed official application forms, (5) Travel insurance sorted to meet Schengen rules, (6) Automated slot tracking and appointment booking, (7) Flight and hotel reservation guidance, and (8) Case tracking to Decision Day."
         },
         {
           q: "How does the Accountability Promise refund process work?",

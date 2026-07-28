@@ -357,7 +357,7 @@ export default function Hero() {
           {/* Left Column: Brand Block */}
           <motion.div
             initial="hidden"
-            animate="visible"
+            animate={flagsLoaded ? "visible" : "hidden"}
             variants={{
               hidden: { opacity: 0 },
               visible: {
@@ -450,7 +450,6 @@ export default function Hero() {
                     autoplay={true}
                     autoplayDelay={3500}
                     pauseOnHover={true}
-                    onCardClick={() => setIsModalOpen(true)}
                     cards={FLAG_IMAGES.map((src, i) => {
                       const countryName = COUNTRIES[i]?.name || "Schengen Country";
                       return (

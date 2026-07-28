@@ -15,9 +15,9 @@ export const defaultSiteConfig: SiteConfig = {
   heroTitle: "Quick Holidays",
   heroSubtitle: "Schengen Visa Consulting",
   heroDescription: "Quick Holidays is a UK-based Schengen visa consultancy trusted by hundreds of non-UK nationals — BRP holders, spouse, work, and student visa holders — who need expert, honest help securing their European tourist visas. No hidden fees, no guesswork, just results.",
-  phone: "+44 7828 707425",
+  phone: "+44 800 058 4673",
   whatsappUrl: "https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application.",
-  address: "Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN",
+  address: "Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ",
   companyNumber: "15948457",
   promoText: "avail 35% Discount now"
 };

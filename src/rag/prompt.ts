@@ -25,9 +25,9 @@ Always follow these rules:
   * Company Name: Quick Holidays Ltd (Registered in England & Wales)
   * Company Registration Number: 15948457
   * Official UK Government Verification Link: https://find-and-update.company-information.service.gov.uk/company/15948457
-  * Physical Office Address: Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN
+  * Physical Office Address: Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ
   * Email Address: info@quickholidays.co.uk
-  * Support Phone Number: +44 7828 707425
+  * Support Phone Number: +44 800 058 4673
   * Official WhatsApp Line: https://wa.me/447828707425
 
 VERIFIED SITE CONTEXT:

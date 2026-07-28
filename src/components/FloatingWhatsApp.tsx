@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "motion/react";
 export function FloatingWhatsApp() {
   const pathname = usePathname();
   const [messageIndex, setMessageIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   const messages = [
     "Get 10 pounds discount over whatsapp now",
@@ -16,11 +17,32 @@ export function FloatingWhatsApp() {
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 3000);
-    return () => clearInterval(interval);
+    // 1. Initial delay: appear after 3.5 seconds
+    const startTimeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 3500);
+
+    return () => clearTimeout(startTimeout);
   }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    // 2. Rotate through the messages once
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => {
+        if (prev >= messages.length - 1) {
+          // If we completed one full cycle, hide the tag and stop
+          setIsVisible(false);
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isVisible]);
 
   const handleClick = () => {
     trackContact("WhatsApp");
@@ -31,19 +53,30 @@ export function FloatingWhatsApp() {
   return (
     <div className="fixed bottom-6 left-6 z-50 w-14 h-14 pointer-events-auto select-none">
       {/* Rotating Tagline Label — always visible above the button */}
-      <div className="absolute bottom-full left-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-serif font-bold tracking-tight px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={messageIndex}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.2 }}
-          >
-            {messages[messageIndex]}
-          </motion.span>
-        </AnimatePresence>
-      </div>
+      {isVisible && (
+        <div className="absolute bottom-full left-0 mb-3.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-sans font-semibold tracking-wide px-4 py-2 rounded-xl border border-zinc-800 dark:border-zinc-200 shadow-xl whitespace-nowrap min-h-[32px] flex items-center justify-center gap-2">
+          {/* Speech bubble pointer arrow */}
+          <div className="absolute top-full left-6 -mt-[5px] w-2 h-2 bg-zinc-950 dark:bg-white border-r border-b border-zinc-800 dark:border-zinc-200 transform rotate-45" />
+          
+          {/* Pulsing WhatsApp Indicator */}
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={messageIndex}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              {messages[messageIndex]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* WhatsApp Button */}
       <a
@@ -51,7 +84,7 @@ export function FloatingWhatsApp() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="flex items-center justify-center w-full h-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 border border-emerald-400/40"
+        className="flex items-center justify-center w-full h-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-none shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 border border-emerald-400/40"
         aria-label="Chat on WhatsApp"
       >
         <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24">

@@ -139,13 +139,13 @@ function DockItem({
 
     const themeMap = {
         home: {
-            bg: "var(--glow-home-bg)",
-            border: "var(--glow-home-border)",
-            shadow: "var(--glow-home-shadow)",
-            textClass: "text-blue-600 dark:text-blue-400",
-            defaultBg: "var(--dock-home-bg)",
-            defaultBorder: "var(--dock-home-border)",
-            defaultText: "text-blue-600/75 dark:text-blue-400/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         "schengen-visa": {
             bg: "var(--glow-schengen-visa-bg)",
@@ -157,58 +157,58 @@ function DockItem({
             defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         pricing: {
-            bg: "var(--glow-pricing-bg)",
-            border: "var(--glow-pricing-border)",
-            shadow: "var(--glow-pricing-shadow)",
-            textClass: "text-emerald-600 dark:text-emerald-400",
-            defaultBg: "var(--dock-pricing-bg)",
-            defaultBorder: "var(--dock-pricing-border)",
-            defaultText: "text-emerald-600/75 dark:text-emerald-400/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         "how-it-works": {
-            bg: "var(--glow-how-it-works-bg)",
-            border: "var(--glow-how-it-works-border)",
-            shadow: "var(--glow-how-it-works-shadow)",
-            textClass: "text-indigo-650 dark:text-indigo-400",
-            defaultBg: "var(--dock-how-it-works-bg)",
-            defaultBorder: "var(--dock-how-it-works-border)",
-            defaultText: "text-indigo-650/75 dark:text-indigo-400/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         faq: {
-            bg: "var(--glow-faq-bg)",
-            border: "var(--glow-faq-border)",
-            shadow: "var(--glow-faq-shadow)",
-            textClass: "text-purple-600 dark:text-purple-400",
-            defaultBg: "var(--dock-faq-bg)",
-            defaultBorder: "var(--dock-faq-border)",
-            defaultText: "text-purple-600/75 dark:text-purple-400/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         reviews: {
-            bg: "var(--glow-reviews-bg)",
-            border: "var(--glow-reviews-border)",
-            shadow: "var(--glow-reviews-shadow)",
-            textClass: "text-orange-600 dark:text-orange-400",
-            defaultBg: "var(--dock-reviews-bg)",
-            defaultBorder: "var(--dock-reviews-border)",
-            defaultText: "text-orange-600/75 dark:text-orange-400/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         "about-us": {
-            bg: "var(--glow-about-us-bg)",
-            border: "var(--glow-about-us-border)",
-            shadow: "var(--glow-about-us-shadow)",
-            textClass: "text-teal-650 dark:text-teal-400",
-            defaultBg: "var(--dock-about-us-bg)",
-            defaultBorder: "var(--dock-about-us-border)",
-            defaultText: "text-teal-650/75 dark:text-teal-400/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
         "contact-us": {
-            bg: "var(--glow-contact-us-bg)",
-            border: "var(--glow-contact-us-border)",
-            shadow: "var(--glow-contact-us-shadow)",
-            textClass: "text-rose-600 dark:text-rose-450",
-            defaultBg: "var(--dock-contact-us-bg)",
-            defaultBorder: "var(--dock-contact-us-border)",
-            defaultText: "text-rose-600/75 dark:text-rose-450/80"
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         }
     };
 

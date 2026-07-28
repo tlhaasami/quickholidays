@@ -41,8 +41,10 @@ export default function Pricing() {
         "Flights and Hotels guidance: We help identify cheapest refundable options — booked and paid directly by you."
       ],
       notIncluded: [
-        "Appointment booking",
-        "Visa application form completion"
+        "Appointment booking & confirmation",
+        "Visa application form completion",
+        "Tracked to Decision Day status monitoring",
+        "Consultation timeline assessment before you pay"
       ],
       buttonText: "Book Documentation Service",
       buttonHref: "/contact-us?plan=documentation",
@@ -58,7 +60,13 @@ export default function Pricing() {
         "Appointment Booking: Secured and confirmed at your preferred centre.",
         "Visa Application Form: Completed for you accurately."
       ],
-      footerNote: "Fast, simple, done.",
+      notIncluded: [
+        "Custom Document Checklist",
+        "Professional Cover Letter",
+        "Travel Insurance sorted",
+        "Flights and Hotels guidance",
+        "Tracked to Decision Day status monitoring"
+      ],
       buttonText: "Book Appointment Booking",
       buttonHref: "/contact-us?plan=appointment",
       popular: false

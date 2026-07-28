@@ -52,6 +52,7 @@ export function AiAssistantPopup() {
     "Direct Visa Assistance"
   ];
   const [punchlineIndex, setPunchlineIndex] = useState(0);
+  const [isPunchlineVisible, setIsPunchlineVisible] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -65,11 +66,32 @@ export function AiAssistantPopup() {
 
   useEffect(() => {
     if (isCentered) return;
-    const interval = setInterval(() => {
-      setPunchlineIndex((prev) => (prev + 1) % punchlines.length);
-    }, 3000);
-    return () => clearInterval(interval);
+
+    // 1. Initial delay: appear after 3.5 seconds
+    const startTimeout = setTimeout(() => {
+      setIsPunchlineVisible(true);
+    }, 3500);
+
+    return () => clearTimeout(startTimeout);
   }, [isCentered]);
+
+  useEffect(() => {
+    if (!isPunchlineVisible || isCentered) return;
+
+    // 2. Rotate through the punchlines once
+    const interval = setInterval(() => {
+      setPunchlineIndex((prev) => {
+        if (prev >= punchlines.length - 1) {
+          setIsPunchlineVisible(false);
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isPunchlineVisible, isCentered]);
 
   // Prevent background scrolling when chat modal is active
   useEffect(() => {
@@ -268,19 +290,30 @@ export function AiAssistantPopup() {
           className="fixed bottom-6 right-6 z-40 w-16 h-16 cursor-pointer pointer-events-auto"
         >
           {/* Rotating Text Label */}
-          <div className="absolute bottom-full right-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-serif font-bold tracking-tight px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={punchlineIndex}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-              >
-                {punchlines[punchlineIndex]}
-              </motion.span>
-            </AnimatePresence>
-          </div>
+          {isPunchlineVisible && (
+            <div className="absolute bottom-full right-0 mb-3.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-sans font-semibold tracking-wide px-4 py-2 rounded-xl border border-zinc-800 dark:border-zinc-200 shadow-xl whitespace-nowrap min-h-[32px] flex items-center justify-center gap-2">
+              {/* Speech bubble pointer arrow */}
+              <div className="absolute top-full right-6 -mt-[5px] w-2 h-2 bg-zinc-950 dark:bg-white border-r border-b border-zinc-800 dark:border-zinc-200 transform rotate-45" />
+              
+              {/* Pulsing AI Indicator */}
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C99537] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C99537]"></span>
+              </span>
+
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={punchlineIndex}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {punchlines[punchlineIndex]}
+                </motion.span>
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* Chat Bubble AI Icon — dark circle with gold ring and gold message icon */}
           <div className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center shadow-2xl"

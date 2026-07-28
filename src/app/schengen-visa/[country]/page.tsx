@@ -84,12 +84,14 @@ export default async function CountryPage({
                 period: "per applicant",
                 description: "Everything handled. Start to finish. Nothing left for you to figure out. This is our premium, end-to-end service designed for maximum peace of mind.",
                 features: [
-                  "Consultation: Cost, checklist, and timeline assessment.",
-                  "Custom Document Checklist: Built perfectly for your exact profile.",
-                  "Professional Cover Letter: Written for you.",
-                  "Visa Application Forms: Completed for you.",
-                  "Travel Insurance & Bookings: Flights/hotels reservations.",
-                  "Appointment Booking & Slot Tracking: Secured in your name."
+                  "Consultation: Cost, checklist, and timeline assessment provided before you pay.",
+                  "Custom Document Checklist: Built perfectly for your exact situation and profile.",
+                  "Professional Cover Letter: Written for you to present a compelling and accurate itinerary to the embassy.",
+                  "Visa Application Forms: Completed for you to ensure zero errors.",
+                  "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
+                  "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
+                  "Flights and Hotels guidance: We help you find the cheapest refundable options — booked and paid directly by you. Not included in our fee.",
+                  "Tracked to Decision Day: Continuous monitoring of your application status."
                 ],
                 footerNote: "One price. Every step covered.",
                 buttonText: "Book Complete Service",
@@ -103,10 +105,16 @@ export default async function CountryPage({
                 period: "per applicant",
                 description: "Your paperwork, done right — you handle the appointment yourself. Perfect if you already have an appointment booked.",
                 features: [
-                  "Document Checklist: Tailored to your profile.",
-                  "Professional Cover Letter: Expertly written.",
-                  "Travel Insurance: Sorted for your dates.",
-                  "Flights & Hotels: Refundable options booked."
+                  "Document Checklist: Built precisely for your personal and financial profile.",
+                  "Professional Cover Letter: Expertly written for you.",
+                  "Travel Insurance: Sorted for your exact travel dates.",
+                  "Flights and Hotels guidance: We help identify cheapest refundable options — booked and paid directly by you."
+                ],
+                notIncluded: [
+                  "Appointment booking & confirmation",
+                  "Visa application form completion",
+                  "Tracked to Decision Day status monitoring",
+                  "Consultation timeline assessment before you pay"
                 ],
                 buttonText: "Book Documentation",
                 buttonHref: `/contact-us?plan=documentation&destination=${match.slug}`,
@@ -119,8 +127,15 @@ export default async function CountryPage({
                 period: "per applicant",
                 description: "Already have your documents ready? We secure your biometrics appointment and complete your application form.",
                 features: [
-                  "Appointment Booking: Secured at your preferred centre.",
-                  "Visa Application Form: Completed accurately."
+                  "Appointment Booking: Secured and confirmed at your preferred centre.",
+                  "Visa Application Form: Completed for you accurately."
+                ],
+                notIncluded: [
+                  "Custom Document Checklist",
+                  "Professional Cover Letter",
+                  "Travel Insurance sorted",
+                  "Flights and Hotels guidance",
+                  "Tracked to Decision Day status monitoring"
                 ],
                 buttonText: "Book Appointment",
                 buttonHref: `/contact-us?plan=appointment&destination=${match.slug}`,
@@ -170,6 +185,22 @@ export default async function CountryPage({
                       </li>
                     ))}
                   </ul>
+
+                  {tier.notIncluded && (
+                    <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-white/5 mb-6">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-2">What is NOT Included:</span>
+                      <ul className="space-y-2">
+                        {tier.notIncluded.map((item) => (
+                          <li key={item} className="flex items-center gap-2 text-xs text-zinc-505 dark:text-zinc-400 line-through">
+                            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-red-500 shrink-0">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                            </svg>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <Link
                   href={tier.buttonHref}

@@ -47,7 +47,7 @@ export default function Reviews() {
         "@type": "PostalAddress",
         "streetAddress": "Office 25 Innovation Park, Edge Lane",
         "addressLocality": "Liverpool",
-        "postalCode": "L7 9NN",
+        "postalCode": "L7 9NJ",
         "addressCountry": "GB"
       }
     },

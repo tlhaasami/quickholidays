@@ -19,7 +19,7 @@ export const knowledgeBase: DocumentChunk[] = [
 
   // Section 2: Company Profile, Legitimacy & Trust Framework
   {
-    content: "Is Quick Holidays Ltd a registered company in the UK? Yes, Quick Holidays Ltd is registered in England & Wales under Companies House Registry Number 15948457. You can check our active business registry details, filing history, and company status directly via the UK registry link: [Verify Companies House Record](/verify-legitimacy). Our physical registered office is located at Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NN.",
+    content: "Is Quick Holidays Ltd a registered company in the UK? Yes, Quick Holidays Ltd is registered in England & Wales under Companies House Registry Number 15948457. You can check our active business registry details, filing history, and company status directly via the UK registry link: [Verify Companies House Record](/verify-legitimacy). Our physical registered office is located at Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ.",
     metadata: { category: "Trust & Verification", type: "faq" }
   },
   {
@@ -33,13 +33,13 @@ export const knowledgeBase: DocumentChunk[] = [
     metadata: { category: "Pricing Tiers", type: "service" }
   },
   {
-    content: "Add-Ons and Deposit payment breakdown: For the Complete Visa Service (£175), we charge an Initial Case Deposit of £100 to start document compiling, checklist generation, and slot tracking. The remaining Service Balance of £75 is only due after an official appointment slot at VFS/TLS is successfully secured and confirmed in your name.",
+    content: "Add-Ons and Deposit payment breakdown: For the Complete Visa Service (£175), we charge an Initial Case Deposit of £45 to start document compiling, checklist generation, and slot tracking. The remaining Service Balance of £130 is only due after an official appointment slot at VFS/TLS is successfully secured and confirmed in your name.",
     metadata: { category: "Fees & Payments", type: "service" }
   },
 
   // Section 4: Operational Workflow & Visa Mechanics
   {
-    content: "Schengen Visa Process Steps:\n- Step 1: Free Consultation (timeline, eligibility check)\n- Step 2: Pay £100 Case Deposit (initiates documents, custom checklist, letter, and slot tracking)\n- Step 3: Slot Tracking & Booking (monitoring VFS/TLS for biometrics dates)\n- Step 4: Confirm Slot & Pay £75 Balance (complete application forms, insurance, flights & hotel reservations)\n- Step 5: Attend Biometrics Appointment (attend center in London, Manchester, or Edinburgh in person to submit physical passport and capture fingerprints)\n- Step 6: Embassy Decision & Passport Return (embassy processes the visa, typically taking 15 calendar days).",
+    content: "Schengen Visa Process Steps:\n- Step 1: Free Consultation (timeline, eligibility check)\n- Step 2: Pay £45 Case Deposit (initiates documents, custom checklist, letter, and slot tracking)\n- Step 3: Slot Tracking & Booking (monitoring VFS/TLS for biometrics dates)\n- Step 4: Confirm Slot & Pay £130 Balance (complete application forms, insurance, flights & hotel reservations)\n- Step 5: Attend Biometrics Appointment (attend center in London, Manchester, or Edinburgh in person to submit physical passport and capture fingerprints)\n- Step 6: Embassy Decision & Passport Return (embassy processes the visa, typically taking 15 calendar days).",
     metadata: { category: "Visa Process", type: "faq" }
   },
   {
@@ -59,7 +59,7 @@ export const knowledgeBase: DocumentChunk[] = [
 
   // Section 6: Guarantees, Accountability Promise & Refund Policy
   {
-    content: "The Accountability Promise and Refund Terms: If your visa is rejected due to a verifiable documentation error made by Quick Holidays Ltd (e.g. incorrect form detail, wrong checklist, or faulty insurance policy), we refund your full service fee (up to £175) within 5 working days. This promise does not cover rejections caused by embassy discretion (e.g. Article 32 refusal for doubting intention to return), insufficient personal bank funds, forged/unverifiable documents provided by you, or failure to attend your biometrics appointment. Cancellations made before our team begins work/checklist creation are eligible for a 100% deposit refund. Once work begins or slots are booked, fees are non-refundable unless covered by our documentation error promise.",
+    content: "The Accountability Promise and Refund Terms: If your visa is rejected due to a verifiable documentation error made by Quick Holidays Ltd (e.g. incorrect form detail, wrong checklist, or faulty insurance policy), we refund your full service fee (Exclude paid appointment and insurance fees) within 5 working days. This promise does not cover rejections caused by embassy discretion (e.g. Article 32 refusal for doubting intention to return), insufficient personal bank funds, forged/unverifiable documents provided by you, or failure to attend your biometrics appointment. Cancellations made before our team begins work/checklist creation are eligible for a 100% deposit refund. Once work begins or slots are booked, fees are non-refundable unless covered by our documentation error promise.",
     metadata: { category: "Refund Policy", type: "policy" }
   },
 
