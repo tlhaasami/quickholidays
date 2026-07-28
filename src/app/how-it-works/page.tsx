@@ -15,7 +15,7 @@ export default function HowItWorks() {
     },
     {
       num: "02",
-      title: "Deposit & Documentation",
+      title: "Deposit and Documentation",
       description: "Paying the deposit opens your case file. We construct your custom document checklist, prepare your cover letters, compile your official application forms, and find flight/hotel reservations where possible. Every document is reviewed before submission."
     },
     {
@@ -25,7 +25,7 @@ export default function HowItWorks() {
     },
     {
       num: "04",
-      title: "Decision & After",
+      title: "Decision and After",
       description: "We track your application through the processing cycle. If something is wrong due to our error, you're covered by our Accountability Promise refund. Once you get your passport back, we verify your visa stamps for dates and accuracy."
     }
   ];

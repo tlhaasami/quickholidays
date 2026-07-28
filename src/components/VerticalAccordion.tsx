@@ -110,6 +110,37 @@ const Panel = ({ open, setOpen, id, Icon, title, imgSrc, description }: PanelPro
 
 export function VerticalAccordion() {
   const [open, setOpen] = useState(items[0].id);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setOpen((prev) => {
+        const currentIndex = items.findIndex((item) => item.id === prev);
+        const nextIndex = (currentIndex + 1) % items.length;
+        return items[nextIndex].id;
+      });
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  // Resume auto-rotation after 8 seconds of inactivity
+  useEffect(() => {
+    if (isAutoPlaying) return;
+
+    const resumeTimeout = setTimeout(() => {
+      setIsAutoPlaying(true);
+    }, 8000);
+
+    return () => clearTimeout(resumeTimeout);
+  }, [isAutoPlaying, open]);
+
+  const handlePanelOpen = (id: number) => {
+    setOpen(id);
+    setIsAutoPlaying(false);
+  };
 
   return (
     <section className="w-full max-w-6xl mx-auto transition-colors duration-300">
@@ -118,7 +149,7 @@ export function VerticalAccordion() {
           <Panel
             key={item.id}
             open={open}
-            setOpen={setOpen}
+            setOpen={handlePanelOpen}
             id={item.id}
             Icon={item.Icon}
             title={item.title}
@@ -177,7 +208,7 @@ const items = [
     title: "02. Documentation",
     Icon: IconFiles,
     imgSrc: "/images/step2_documentation.png",
-    description: "Your checklist, cover letter, and application forms — built for your situation. We also help find refundable flights and pay-at-property hotels, wherever possible. Everything reviewed before submission.",
+    description: "Your checklist, cover letter, and application forms — built for your situation. We help you find the cheapest refundable flight and hotel options, booked and paid directly by you. Everything reviewed before submission.",
   },
   {
     id: 3,

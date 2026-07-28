@@ -56,9 +56,9 @@ export const HERO_CONFIG = {
   holidaysColor: "#C99537",      // Hex color for "HOLIDAYS"
 
   // Logo dimensions
-  logoSizeMobile: "w-20 h-20",
-  logoSizeTablet: "sm:w-28 sm:h-28",
-  logoSizeDesktop: "md:w-36 md:h-36",
+  logoSizeMobile: "w-28 h-28",
+  logoSizeTablet: "sm:w-36 sm:h-36",
+  logoSizeDesktop: "md:w-44 md:h-44",
 
   // Typography & Boldness configuration (e.g., font-sans, font-serif, font-playfair)
   headingFont: "font-serif",      // Best serif typography for premium travel brand
@@ -100,7 +100,7 @@ export const COUNTRY_NICHES: Record<string, string> = {
   "Austria": "Austria is famous for Alpine resorts and Vienna tours. Accommodation proof and financial stability checks are strictly verified.",
   "Belgium": "Belgium is easily accessible via Eurostar. Perfect for short weekend breaks; applications are processed with high efficiency.",
   "Bulgaria": "Bulgaria offers rich history and beautiful Black Sea resorts. We verify all travel itineraries and accommodation details.",
-  "Croatia": "Croatia is popular for historic coastal towns and islands. We check your flight layouts and hotel bookings for precision.",
+  "Croatia": "Croatia is popular for historic coastal towns and islands. We verify your documentation and assist in ensuring your travel proof meets embassy requirements.",
   "Czech Republic": "Czech Republic is a top choice for Prague city breaks. Applications require precise travel insurance and funds check.",
   "Denmark": "Denmark is a premium Nordic destination. Applications are processed via London visa centers with swift processing timelines.",
   "Estonia": "Estonia is perfect for quiet Baltic medieval escapes. We prepare all documents to ensure hassle-free embassy checks.",
@@ -109,7 +109,7 @@ export const COUNTRY_NICHES: Record<string, string> = {
   "Spain": "Spain is a top choice for summer vacations and quick getaways. Applications are processed in London, Manchester, and Edinburgh.",
   "Greece": "Greece is heavily requested for summer travel. Appointments are processed at the GVC centers across the UK.",
   "Hungary": "Hungary is a top thermal bath and cultural destination. We audit your application files to match embassy guidelines.",
-  "Iceland": "Iceland is famous for the Northern Lights and glaciers. Requires comprehensive travel insurance and flight layouts.",
+  "Iceland": "Iceland is famous for the Northern Lights and glaciers. Requires comprehensive travel insurance and proof of travel plans.",
   "Italy": "Italy tourist visas require detailed proof of travel. Slots are highly competitive and require early booking.",
   "Latvia": "Latvia offers beautiful nature and historic Riga. We coordinate your checklist to ensure quick and positive processing.",
   "Liechtenstein": "Liechtenstein is nestled in the Alps. Applications are processed under Swiss embassy guidelines with full precision.",
@@ -120,11 +120,11 @@ export const COUNTRY_NICHES: Record<string, string> = {
   "Norway": "Norway is famous for fjords and polar nights. Checklists require highly detailed proof of internal travel bookings.",
   "Poland": "Poland is popular for historic cities like Krakow and Warsaw. We compile and verify all employment and banking documents.",
   "Portugal": "Portugal is highly popular for beach and cultural trips. Applications are processed via VFS centers in London and Manchester.",
-  "Romania": "Romania is famous for Transylvanian castles and mountains. We ensure all flights and accommodation bookings align with rules.",
+  "Romania": "Romania is famous for Transylvanian castles and mountains. We ensure all your travel documentation and proof aligns with embassy rules.",
   "Slovakia": "Slovakia is ideal for hiking and exploring medieval castles. Financial requirements and insurance coverage must be precisely audited.",
   "Slovenia": "Slovenia is a scenic green destination featuring Lake Bled. We draft custom cover letters and verify checklists.",
   "Germany": "Germany is high-demand for business and holiday travelers. Embassy guidelines are strict and require complete precision.",
   "Sweden": "Sweden is a major Scandinavian business and holiday hub. Embassy processing is strict and requires error-free applications.",
-  "Switzerland": "Switzerland is famed for the scenic Alps. We organize complete day-by-day flight, hotel, and travel itineraries."
+  "Switzerland": "Switzerland is famed for the scenic Alps. We draft custom cover letters and guide you in preparing a complete day-by-day travel plan."
 };
 

@@ -30,8 +30,8 @@ export function FloatingWhatsApp() {
 
   return (
     <div className="fixed bottom-6 left-6 z-50 w-14 h-14 pointer-events-auto select-none">
-      {/* Rotating Tagline Label — always visible above the button (matching AI assistant style & animations, left-aligned) */}
-      <div className="absolute bottom-full left-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] uppercase font-bold tracking-wider px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
+      {/* Rotating Tagline Label — always visible above the button */}
+      <div className="absolute bottom-full left-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-serif font-bold tracking-tight px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.span
             key={messageIndex}

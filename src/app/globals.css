@@ -28,6 +28,142 @@
   }
 }
 
+:root {
+  /* Selected/Active States */
+  --glow-home-bg: rgba(59, 130, 246, 0.08);
+  --glow-home-border: rgba(59, 130, 246, 0.45);
+  --glow-home-shadow: rgba(59, 130, 246, 0.25);
+
+  --glow-schengen-visa-bg: rgba(201, 149, 55, 0.08);
+  --glow-schengen-visa-border: rgba(201, 149, 55, 0.45);
+  --glow-schengen-visa-shadow: rgba(201, 149, 55, 0.25);
+
+  --glow-pricing-bg: rgba(16, 185, 129, 0.08);
+  --glow-pricing-border: rgba(16, 185, 129, 0.45);
+  --glow-pricing-shadow: rgba(16, 185, 129, 0.25);
+
+  --glow-how-it-works-bg: rgba(99, 102, 241, 0.08);
+  --glow-how-it-works-border: rgba(99, 102, 241, 0.45);
+  --glow-how-it-works-shadow: rgba(99, 102, 241, 0.25);
+
+  --glow-faq-bg: rgba(168, 85, 247, 0.08);
+  --glow-faq-border: rgba(168, 85, 247, 0.45);
+  --glow-faq-shadow: rgba(168, 85, 247, 0.25);
+
+  --glow-reviews-bg: rgba(249, 115, 22, 0.08);
+  --glow-reviews-border: rgba(249, 115, 22, 0.45);
+  --glow-reviews-shadow: rgba(249, 115, 22, 0.25);
+
+  --glow-about-us-bg: rgba(20, 184, 166, 0.08);
+  --glow-about-us-border: rgba(20, 184, 166, 0.45);
+  --glow-about-us-shadow: rgba(20, 184, 166, 0.25);
+
+  --glow-contact-us-bg: rgba(244, 63, 94, 0.08);
+  --glow-contact-us-border: rgba(244, 63, 94, 0.45);
+  --glow-contact-us-shadow: rgba(244, 63, 94, 0.25);
+
+  /* Default (At Rest) States */
+  --dock-home-bg: rgba(59, 130, 246, 0.08);
+  --dock-home-border: rgba(59, 130, 246, 0.28);
+  --dock-home-text: rgba(59, 130, 246, 0.85);
+
+  --dock-schengen-visa-bg: rgba(201, 149, 55, 0.08);
+  --dock-schengen-visa-border: rgba(201, 149, 55, 0.28);
+  --dock-schengen-visa-text: rgba(201, 149, 55, 0.85);
+
+  --dock-pricing-bg: rgba(16, 185, 129, 0.08);
+  --dock-pricing-border: rgba(16, 185, 129, 0.28);
+  --dock-pricing-text: rgba(16, 185, 129, 0.85);
+
+  --dock-how-it-works-bg: rgba(99, 102, 241, 0.08);
+  --dock-how-it-works-border: rgba(99, 102, 241, 0.28);
+  --dock-how-it-works-text: rgba(99, 102, 241, 0.85);
+
+  --dock-faq-bg: rgba(168, 85, 247, 0.08);
+  --dock-faq-border: rgba(168, 85, 247, 0.28);
+  --dock-faq-text: rgba(168, 85, 247, 0.85);
+
+  --dock-reviews-bg: rgba(249, 115, 22, 0.08);
+  --dock-reviews-border: rgba(249, 115, 22, 0.28);
+  --dock-reviews-text: rgba(249, 115, 22, 0.85);
+
+  --dock-about-us-bg: rgba(20, 184, 166, 0.08);
+  --dock-about-us-border: rgba(20, 184, 166, 0.28);
+  --dock-about-us-text: rgba(20, 184, 166, 0.85);
+
+  --dock-contact-us-bg: rgba(244, 63, 94, 0.08);
+  --dock-contact-us-border: rgba(244, 63, 94, 0.28);
+  --dock-contact-us-text: rgba(244, 63, 94, 0.85);
+}
+
+.dark {
+  /* Selected/Active States */
+  --glow-home-bg: rgba(59, 130, 246, 0.16);
+  --glow-home-border: rgba(59, 130, 246, 0.55);
+  --glow-home-shadow: rgba(59, 130, 246, 0.35);
+
+  --glow-schengen-visa-bg: rgba(201, 149, 55, 0.16);
+  --glow-schengen-visa-border: rgba(201, 149, 55, 0.55);
+  --glow-schengen-visa-shadow: rgba(201, 149, 55, 0.35);
+
+  --glow-pricing-bg: rgba(16, 185, 129, 0.16);
+  --glow-pricing-border: rgba(16, 185, 129, 0.55);
+  --glow-pricing-shadow: rgba(16, 185, 129, 0.35);
+
+  --glow-how-it-works-bg: rgba(99, 102, 241, 0.16);
+  --glow-how-it-works-border: rgba(99, 102, 241, 0.55);
+  --glow-how-it-works-shadow: rgba(99, 102, 241, 0.35);
+
+  --glow-faq-bg: rgba(168, 85, 247, 0.16);
+  --glow-faq-border: rgba(168, 85, 247, 0.55);
+  --glow-faq-shadow: rgba(168, 85, 247, 0.35);
+
+  --glow-reviews-bg: rgba(249, 115, 22, 0.16);
+  --glow-reviews-border: rgba(249, 115, 22, 0.55);
+  --glow-reviews-shadow: rgba(249, 115, 22, 0.35);
+
+  --glow-about-us-bg: rgba(20, 184, 166, 0.16);
+  --glow-about-us-border: rgba(20, 184, 166, 0.55);
+  --glow-about-us-shadow: rgba(20, 184, 166, 0.35);
+
+  --glow-contact-us-bg: rgba(244, 63, 94, 0.16);
+  --glow-contact-us-border: rgba(244, 63, 94, 0.55);
+  --glow-contact-us-shadow: rgba(244, 63, 94, 0.35);
+
+  /* Default (At Rest) States */
+  --dock-home-bg: rgba(59, 130, 246, 0.06);
+  --dock-home-border: rgba(59, 130, 246, 0.32);
+  --dock-home-text: rgba(59, 130, 246, 0.82);
+
+  --dock-schengen-visa-bg: rgba(201, 149, 55, 0.06);
+  --dock-schengen-visa-border: rgba(201, 149, 55, 0.32);
+  --dock-schengen-visa-text: rgba(201, 149, 55, 0.82);
+
+  --dock-pricing-bg: rgba(16, 185, 129, 0.06);
+  --dock-pricing-border: rgba(16, 185, 129, 0.32);
+  --dock-pricing-text: rgba(16, 185, 129, 0.82);
+
+  --dock-how-it-works-bg: rgba(99, 102, 241, 0.06);
+  --dock-how-it-works-border: rgba(99, 102, 241, 0.32);
+  --dock-how-it-works-text: rgba(99, 102, 241, 0.82);
+
+  --dock-faq-bg: rgba(168, 85, 247, 0.06);
+  --dock-faq-border: rgba(168, 85, 247, 0.32);
+  --dock-faq-text: rgba(168, 85, 247, 0.82);
+
+  --dock-reviews-bg: rgba(249, 115, 22, 0.06);
+  --dock-reviews-border: rgba(249, 115, 22, 0.32);
+  --dock-reviews-text: rgba(249, 115, 22, 0.82);
+
+  --dock-about-us-bg: rgba(20, 184, 166, 0.06);
+  --dock-about-us-border: rgba(20, 184, 166, 0.32);
+  --dock-about-us-text: rgba(20, 184, 166, 0.82);
+
+  --dock-contact-us-bg: rgba(244, 63, 94, 0.06);
+  --dock-contact-us-border: rgba(244, 63, 94, 0.32);
+  --dock-contact-us-text: rgba(244, 63, 94, 0.82);
+}
+
 @layer base {
   body {
     @apply bg-surface-ivory text-ink font-sans antialiased;
@@ -646,172 +782,113 @@ html {
   }
 }
 
-/* --- Brutalist Input Fields (Uiverse.io by 0xnihilism) --- */
+/* --- Clean Input Fields --- */
 .brutalist-container {
   position: relative;
   width: 100%;
-  font-family: var(--font-sans), monospace;
+  font-family: var(--font-sans), sans-serif;
   margin-top: 1.8rem;
   margin-bottom: 0.5rem;
 }
 
 .brutalist-input {
   width: 100%;
-  padding: 14px 18px;
-  font-size: 15px;
-  font-weight: bold;
-  color: #000;
-  background-color: #fff;
-  border: 3px solid #000;
-  position: relative;
-  overflow: hidden;
-  border-radius: 0;
+  padding: 13px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #18181b;
+  background-color: #f9f9fb;
+  border: 1.5px solid #d4d4d8;
+  border-radius: 8px;
   outline: none;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 4px 4px 0 #000, 8px 8px 0 #C99537;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: none;
 }
 
-/* Dark mode variations for brutalist input! */
+/* Dark mode */
 .dark .brutalist-input {
   color: #fff;
-  background-color: #09090b;
-  border-color: #fff;
-  box-shadow: 4px 4px 0 #fff, 8px 8px 0 #C99537;
-}
-
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+  background-color: #18181b;
+  border-color: #3f3f46;
+  box-shadow: none;
 }
 
 .brutalist-input:focus {
-  animation: focus-pulse 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+  border-color: #C99537;
+  box-shadow: 0 0 0 3px rgba(201, 149, 55, 0.15);
+  animation: none;
 }
 
 .dark .brutalist-input:focus {
-  animation: focus-pulse-dark 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+  border-color: #C99537;
+  box-shadow: 0 0 0 3px rgba(201, 149, 55, 0.2);
+  animation: none;
 }
 
-.brutalist-input:focus::after {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: white;
-  z-index: -1;
-}
-
-.dark .brutalist-input:focus::after {
-  background: #000;
-}
-
-.brutalist-input:focus::before {
-  content: none;
-}
-
+.brutalist-input:focus::after,
+.brutalist-input:focus::before,
+.dark .brutalist-input:focus::after,
 .dark .brutalist-input:focus::before {
   content: none;
 }
 
-@keyframes glitch-slice {
-  0% { clip-path: inset(0 100% 0 0); }
-  10% { clip-path: inset(0 5% 0 0); }
-  20% { clip-path: inset(0 80% 0 0); }
-  30% { clip-path: inset(0 10% 0 0); }
-  40% { clip-path: inset(0 50% 0 0); }
-  50% { clip-path: inset(0 30% 0 0); }
-  60% { clip-path: inset(0 70% 0 0); }
-  70% { clip-path: inset(0 15% 0 0); }
-  80% { clip-path: inset(0 90% 0 0); }
-  90% { clip-path: inset(0 5% 0 0); }
-  100% { clip-path: inset(0 100% 0 0); }
-}
-
 .brutalist-label {
   position: absolute;
-  left: -3px;
-  top: -26px;
+  left: 0;
+  top: -22px;
   font-size: 10px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #000;
-  padding: 3px 6px;
-  transform: rotate(-1deg);
+  font-weight: 700;
+  color: #71717a;
+  background-color: transparent;
+  padding: 0;
+  transform: none;
   z-index: 1;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease;
 }
 
 .dark .brutalist-label {
-  color: #000;
-  background-color: #fff;
+  color: #a1a1aa;
+  background-color: transparent;
 }
 
 .brutalist-input:focus + .brutalist-label {
-  transform: rotate(0deg) scale(1.05);
-  background-color: #C99537;
-  color: #fff;
+  transform: none;
+  background-color: transparent;
+  color: #C99537;
 }
 
 .dark .brutalist-input:focus + .brutalist-label {
-  transform: rotate(0deg) scale(1.05);
-  background-color: #C99537;
-  color: #fff;
+  transform: none;
+  background-color: transparent;
+  color: #C99537;
 }
 
 .smooth-type {
   position: relative;
-  overflow: hidden;
 }
 
 .smooth-type::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  content: none;
 }
 
 .smooth-type:focus::before {
-  opacity: 1;
-  animation: type-gradient 2s linear infinite;
-}
-
-@keyframes type-gradient {
-  0% { background-position: 300px 0; }
-  100% { background-position: 0 0; }
+  content: none;
+  animation: none;
 }
 
 .brutalist-input::placeholder {
-  color: #888;
-  transition: color 0.3s ease;
+  color: #a1a1aa;
+  font-weight: 400;
 }
 
 .brutalist-input:focus::placeholder {
-  color: transparent;
+  color: #d4d4d8;
 }
 
-@keyframes focus-pulse {
-  0%, 100% { border-color: #000; }
-  50% { border-color: #C99537; }
-}
 
-@keyframes focus-pulse-dark {
-  0%, 100% { border-color: #fff; }
-  50% { border-color: #C99537; }
-}
+
 
 /* Chrome/Safari Autofill Style Overrides */
 input:-webkit-autofill,

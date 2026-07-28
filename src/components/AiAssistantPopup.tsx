@@ -241,19 +241,17 @@ export function AiAssistantPopup() {
     );
   };
 
-  // Cute SVG Robot mascot markup
+  // Chat bubble mascot — dark circle with gold ring, matching the floating icon
   const renderRobotMascot = (sizeClass = "w-14 h-14") => (
-    <div className={`${sizeClass} rounded-none bg-gradient-to-br from-[#C99537] to-amber-500 shadow-lg border-2 border-white dark:border-zinc-900 flex items-center justify-center relative overflow-visible`}>
-      {/* Blinking power light */}
-      <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-none bg-emerald-500 border border-white dark:border-zinc-950 animate-ping" />
-      <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-none bg-emerald-500 border border-white dark:border-zinc-950" />
-      
-      {/* Golden robot graphic */}
-      <svg className="w-8 h-8 text-zinc-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v4M8 6h8M5 10a2 2 0 012-2h10a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6z" />
-        <circle cx="9" cy="12" r="1.2" fill="currentColor" />
-        <circle cx="15" cy="12" r="1.2" fill="currentColor" />
-        <path strokeLinecap="round" d="M10 15h4" />
+    <div
+      className={`${sizeClass} rounded-full bg-[#1a1a1a] flex items-center justify-center relative`}
+      style={{ boxShadow: "0 0 0 3px #C99537, 0 8px 32px rgba(201,149,55,0.35)" }}
+    >
+      {/* Live indicator dot */}
+      <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 animate-pulse" />
+      {/* Gold chat bubble */}
+      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="#C99537" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
     </div>
   );
@@ -270,7 +268,7 @@ export function AiAssistantPopup() {
           className="fixed bottom-6 right-6 z-40 w-16 h-16 cursor-pointer pointer-events-auto"
         >
           {/* Rotating Text Label */}
-          <div className="absolute bottom-full right-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] uppercase font-bold tracking-wider px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
+          <div className="absolute bottom-full right-0 mb-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-serif font-bold tracking-tight px-4 py-1.5 rounded-none border border-zinc-800 dark:border-zinc-200 shadow-md whitespace-nowrap min-h-[24px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.span
                 key={punchlineIndex}
@@ -284,12 +282,11 @@ export function AiAssistantPopup() {
             </AnimatePresence>
           </div>
 
-          {/* Sparkle AI Icon */}
-          <div className="w-full h-full bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 flex items-center justify-center shadow-2xl border border-[#C99537]/20">
-            <svg className="w-9 h-9 text-zinc-950" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" />
-              <path d="M19 14L19.75 17.25L23 18L19.75 18.75L19 22L18.25 18.75L15 18L18.25 17.25L19 14Z" opacity="0.7" />
-              <path d="M5 3L5.5 5.5L8 6L5.5 6.5L5 9L4.5 6.5L2 6L4.5 5.5L5 3Z" opacity="0.7" />
+          {/* Chat Bubble AI Icon — dark circle with gold ring and gold message icon */}
+          <div className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center shadow-2xl"
+            style={{ boxShadow: "0 0 0 3px #C99537, 0 8px 32px rgba(201,149,55,0.35)" }}>
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="#C99537" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
         </motion.div>
@@ -323,15 +320,16 @@ export function AiAssistantPopup() {
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div className="w-16 h-16 bg-gradient-to-tr from-[#C99537] to-amber-500 text-zinc-950 flex items-center justify-center shadow-2xl border-2 border-white dark:border-zinc-900 relative overflow-visible">
-                    {/* Blinking power light */}
-                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 border border-white dark:border-zinc-950 animate-ping" />
-                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 border border-white dark:border-zinc-950" />
+                  <div
+                    className="w-16 h-16 rounded-full bg-[#1a1a1a] flex items-center justify-center relative shadow-2xl"
+                    style={{ boxShadow: "0 0 0 3px #C99537, 0 8px 32px rgba(201,149,55,0.35)" }}
+                  >
+                    {/* Live indicator dot */}
+                    <span className="absolute top-0.5 right-0.5 w-3 h-3 rounded-full bg-emerald-500 border border-white dark:border-zinc-950 animate-pulse" />
                     
-                    <svg className="w-9 h-9 text-zinc-950" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" />
-                      <path d="M19 14L19.75 17.25L23 18L19.75 18.75L19 22L18.25 18.75L15 18L18.25 17.25L19 14Z" opacity="0.7" />
-                      <path d="M5 3L5.5 5.5L8 6L5.5 6.5L5 9L4.5 6.5L2 6L4.5 5.5L5 3Z" opacity="0.7" />
+                    {/* Gold chat bubble */}
+                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="#C99537" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                   </div>
                 </motion.div>
@@ -436,7 +434,7 @@ export function AiAssistantPopup() {
                               <div className="flex gap-2 mt-3.5">
                                 <a
                                   href="/contact-us"
-                                  className="px-3 py-1.5 bg-[#C99537] text-zinc-950 font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white text-center flex-1 shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] transition-all hover:scale-102"
+                                  className="px-3 py-2 bg-[#C99537] text-zinc-950 font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white text-center flex-1 rounded-lg transition-all hover:brightness-105 active:scale-98"
                                 >
                                   Book Consultation
                                 </a>
@@ -444,7 +442,7 @@ export function AiAssistantPopup() {
                                   href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="px-3 py-1.5 bg-emerald-600 text-white font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white text-center flex-1 shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] transition-all hover:scale-102"
+                                  className="px-3 py-2 bg-emerald-600 text-white font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white text-center flex-1 rounded-lg transition-all hover:brightness-105 active:scale-98"
                                 >
                                   WhatsApp Help
                                 </a>
@@ -484,14 +482,14 @@ export function AiAssistantPopup() {
                       <a
                         href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
                         target="_blank"
-                        className="inline-block px-4 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-none shadow-md"
+                        className="inline-block px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg transition-all hover:brightness-105 active:scale-98"
                       >
                         Send Message
                       </a>
                     </div>
                   ) : (
                     <div className="relative w-full">
-                      <div className="brutalist-container !my-1.5">
+                      <div className="relative w-full my-2.5">
                         <input
                           type="text"
                           placeholder="Type custom visa question..."
@@ -503,14 +501,14 @@ export function AiAssistantPopup() {
                               handleSend(input);
                             }
                           }}
-                          className="brutalist-input smooth-type !pr-24"
+                          className="w-full px-4 py-3.5 text-sm text-zinc-900 dark:text-white bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all !pr-24"
                         />
-                        <label className="brutalist-label">Visa Inquiry</label>
+                        <label className="absolute left-3 -top-2.5 px-1.5 text-[9px] font-extrabold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-950">Visa Inquiry</label>
                       </div>
-                      <div className="absolute right-3 top-[54%] -translate-y-1/2 z-10">
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center">
                         <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             if (input.trim()) {
                               setChatMode(true);
@@ -518,7 +516,7 @@ export function AiAssistantPopup() {
                             }
                           }}
                           disabled={!input.trim()}
-                          className="py-1 px-3.5 bg-primary text-zinc-950 font-bold text-xs border-2 border-zinc-950 dark:border-white shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff] cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5 shrink-0"
+                          className="py-1.5 px-3.5 bg-primary text-zinc-950 font-bold text-xs rounded-lg cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5 shrink-0"
                         >
                           <span>Send</span>
                           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

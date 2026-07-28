@@ -6,7 +6,7 @@ import { COUNTRIES } from "@/constants";
 import { trackLead, trackFormAbandon } from "@/lib/analytics";
 import Link from "next/link";
 import { ThemeButton } from "@/components/ThemeButton";
-import { CoolMode } from "@/components/ui/cool-mode";
+
 import { usePathname } from "next/navigation";
 
 const COMMON_NATIONALITIES = [
@@ -515,15 +515,15 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                     <label className="brutalist-label">Code</label>
 
                     {showPhoneCodeDropdown && (
-                      <div className="absolute left-0 mt-2 bg-white dark:bg-zinc-900 border-3 border-black dark:border-white z-[999] shadow-2xl w-[260px] max-h-56 flex flex-col overflow-hidden pointer-events-auto">
+                      <div className="absolute left-0 mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl z-[999] shadow-xl w-[260px] max-h-56 flex flex-col overflow-hidden pointer-events-auto">
                         {/* Search Input inside the dropdown */}
-                        <div className="p-2 border-b-2 border-black dark:border-white bg-zinc-50 dark:bg-zinc-950 shrink-0">
+                        <div className="p-2 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 shrink-0">
                           <input
                             type="text"
                             placeholder="Search country/code..."
                             value={phoneCodeSearch}
                             onChange={(e) => setPhoneCodeSearch(e.target.value)}
-                            className="w-full px-2 py-1.5 text-xs border-2 border-black dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white outline-none font-bold placeholder-zinc-400 rounded-none"
+                            className="w-full px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white outline-none font-medium placeholder-zinc-400"
                           />
                         </div>
                         
@@ -543,15 +543,15 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                                   setShowPhoneCodeDropdown(false);
                                   setPhoneCodeSearch("");
                                 }}
-                                className="w-full text-left px-3 py-2 text-xs text-zinc-900 dark:text-zinc-300 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors font-bold flex items-center gap-2 cursor-pointer border-b border-zinc-100 dark:border-zinc-800/40"
+                                className="w-full text-left px-3 py-2 text-xs text-zinc-900 dark:text-zinc-300 font-medium flex items-center gap-2 cursor-pointer border-b border-zinc-50 dark:border-zinc-800/40 last:border-0"
                               >
                                 <span className="text-sm shrink-0">{c.flag}</span>
                                 <span className="truncate flex-1">{c.name}</span>
-                                <span className="text-zinc-500 dark:text-zinc-400 shrink-0">{c.code}</span>
+                                <span className="text-zinc-400 dark:text-zinc-500 shrink-0">{c.code}</span>
                               </button>
                             ))
                           ) : (
-                            <div className="p-3 text-xs text-zinc-500 dark:text-zinc-400 font-bold text-center">
+                            <div className="p-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium text-center">
                               No countries found
                             </div>
                           )}
@@ -626,7 +626,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   />
                   <label className="brutalist-label">Nationality</label>
                   {showNationalityDropdown && filteredNationalities.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border-3 border-black dark:border-white z-50 shadow-2xl max-h-40 overflow-y-auto no-scrollbar pointer-events-auto no-custom-cursor">
+                    <div className="absolute left-0 right-0 mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl z-50 shadow-xl max-h-40 overflow-y-auto no-scrollbar pointer-events-auto no-custom-cursor">
                       {filteredNationalities.map((nat) => (
                         <button
                           key={nat}
@@ -636,7 +636,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                             setNationalitySearch(nat);
                             setShowNationalityDropdown(false);
                           }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-900 dark:text-zinc-300 hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors font-bold cursor-pointer"
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-900 dark:text-zinc-300 font-medium cursor-pointer border-b border-zinc-50 dark:border-zinc-800/40 last:border-0"
                         >
                           {nat}
                         </button>
@@ -667,7 +667,7 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                   </button>
                   <label className="brutalist-label">Destination Country</label>
                   {showDestinationDropdown && (
-                    <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border-3 border-black dark:border-white z-50 shadow-2xl max-h-[252px] overflow-y-auto no-scrollbar pointer-events-auto no-custom-cursor">
+                    <div className="absolute left-0 right-0 mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl z-50 shadow-xl max-h-[252px] overflow-y-auto no-scrollbar pointer-events-auto no-custom-cursor">
                       {COUNTRIES.map((c) => (
                         <button
                           key={c.slug}
@@ -676,10 +676,10 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                             setFormData({ ...formData, destination: c.slug });
                             setShowDestinationDropdown(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-colors cursor-pointer ${
+                          className={`w-full text-left px-4 py-2.5 text-sm font-medium cursor-pointer border-b border-zinc-50 dark:border-zinc-800/40 last:border-0 ${
                             formData.destination === c.slug
-                              ? "bg-[#C99537] text-white"
-                              : "text-zinc-900 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5"
+                              ? "bg-[#C99537]/10 text-[#C99537] font-semibold"
+                              : "text-zinc-900 dark:text-zinc-300"
                           }`}
                         >
                           {c.name}
@@ -709,10 +709,10 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
 
               <div className="space-y-2.5 mt-4">
                 {[
-                  { id: "complete", name: "Complete Visa Service", price: "£175", desc: "End-to-end guidance, slot tracking, and bookings." },
-                  { id: "documentation", name: "Documentation Service", price: "£95", desc: "Checklist, document review, and file drafting." },
-                  { id: "appointment", name: "Appointment Booking Service", price: "£95", desc: "Secures biometrics slots and completes forms." },
-                  { id: "help", name: "Help Me Choose / Consultation", price: "Free", desc: "Speak to a visa officer first to assess eligibility." }
+                  { id: "complete", name: "Complete Visa Service", price: "£175", desc: "End-to-end guidance, slot tracking, and bookings.", bg: "bg-blue-50 dark:bg-blue-950/40", border: "border-blue-300 dark:border-blue-700", selectedBg: "bg-blue-100 dark:bg-blue-900/60", selectedBorder: "border-blue-500 dark:border-blue-400" },
+                  { id: "documentation", name: "Documentation Service", price: "£95", desc: "Checklist, document review, and file drafting.", bg: "bg-purple-50 dark:bg-purple-950/40", border: "border-purple-200 dark:border-purple-800", selectedBg: "bg-purple-100 dark:bg-purple-900/60", selectedBorder: "border-purple-500 dark:border-purple-400" },
+                  { id: "appointment", name: "Appointment Booking Service", price: "£95", desc: "Secures biometrics slots and completes forms.", bg: "bg-teal-50 dark:bg-teal-950/40", border: "border-teal-200 dark:border-teal-800", selectedBg: "bg-teal-100 dark:bg-teal-900/60", selectedBorder: "border-teal-500 dark:border-teal-400" },
+                  { id: "help", name: "Help Me Choose / Consultation", price: "Free", desc: "Speak to a visa expert first to assess eligibility.", bg: "bg-zinc-100 dark:bg-zinc-800/40", border: "border-zinc-300 dark:border-zinc-700", selectedBg: "bg-zinc-200 dark:bg-zinc-700/60", selectedBorder: "border-zinc-500 dark:border-zinc-400" }
                 ].map((plan) => {
                   const fullPlanName = `${plan.name} (${plan.price})`;
                   const isSelected = formData.plan === fullPlanName || formData.plan.startsWith(plan.name);
@@ -721,18 +721,18 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                       key={plan.id}
                       type="button"
                       onClick={() => setFormData({ ...formData, plan: fullPlanName })}
-                      className={`w-full p-3 text-left border-2 transition-all flex justify-between items-center cursor-pointer group rounded-xl no-custom-cursor ${
+                      className={`w-full p-3 text-left border-2 flex justify-between items-center cursor-pointer rounded-xl no-custom-cursor transition-colors duration-150 ${
                         isSelected
-                          ? "border-[#C99537] bg-amber-500/10 dark:bg-amber-500/20 shadow-[2px_2px_0_#C99537] dark:shadow-[2px_2px_0_#C99537]"
-                          : "border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/30 hover:border-[#C99537] hover:bg-[#C99537]/5"
+                          ? `${plan.selectedBg} ${plan.selectedBorder} ring-2 ring-offset-1 ring-offset-white dark:ring-offset-zinc-950 ring-current`
+                          : `${plan.bg} ${plan.border}`
                       }`}
                     >
                       <div className="text-left pointer-events-none">
                         <h4 className="font-sans font-bold text-xs sm:text-sm text-zinc-900 dark:text-white flex items-center gap-1.5 pointer-events-none">
                           {plan.name}
                           {isSelected && (
-                            <span className="text-[9px] bg-primary text-zinc-950 px-1 py-0.2 font-sans font-extrabold uppercase rounded-none tracking-wider pointer-events-none">
-                              Selected
+                            <span className="text-[9px] bg-primary text-zinc-950 px-1.5 py-0.5 font-sans font-extrabold uppercase rounded-sm tracking-wider pointer-events-none">
+                              ✓ Selected
                             </span>
                           )}
                         </h4>
@@ -763,21 +763,26 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                 <label className="block text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-3">
                   Schengen visas issued in the past 4 years
                 </label>
-                <div className="grid grid-cols-2 gap-4">
-                  {["None", "1", "2", "3+"].map((num) => {
+<div className="grid grid-cols-2 gap-3">
+                  {[
+                    { num: "None", label: "No Prior Visas", bg: "bg-slate-100 dark:bg-slate-800/60", border: "border-slate-300 dark:border-slate-600", selBg: "bg-slate-600 dark:bg-slate-500", selText: "text-white" },
+                    { num: "1",    label: "1 Visa",          bg: "bg-amber-50 dark:bg-amber-900/30",  border: "border-amber-300 dark:border-amber-700", selBg: "bg-amber-500 dark:bg-amber-600", selText: "text-white" },
+                    { num: "2",    label: "2 Visas",         bg: "bg-orange-50 dark:bg-orange-900/30",border: "border-orange-300 dark:border-orange-700",selBg: "bg-orange-500 dark:bg-orange-600",selText: "text-white" },
+                    { num: "3+",   label: "3+ Visas",        bg: "bg-emerald-50 dark:bg-emerald-900/30",border: "border-emerald-300 dark:border-emerald-700",selBg: "bg-emerald-600 dark:bg-emerald-500",selText: "text-white" }
+                  ].map(({ num, label, bg, border, selBg, selText }) => {
                     const isSelected = formData.priorVisas === num;
                     return (
                       <button
                         key={num}
                         type="button"
                         onClick={() => setFormData({ ...formData, priorVisas: num })}
-                        className={`py-4 rounded-xl border text-sm font-sans font-medium cursor-pointer no-custom-cursor transition-all ${
+                        className={`py-4 rounded-xl border-2 text-sm font-sans font-semibold cursor-pointer no-custom-cursor transition-colors duration-150 ${
                           isSelected
-                            ? "bg-primary border-primary text-white font-semibold"
-                            : "bg-zinc-100 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 text-zinc-650 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:text-zinc-900 dark:hover:text-white"
+                            ? `${selBg} border-transparent ${selText}`
+                            : `${bg} ${border} text-zinc-700 dark:text-zinc-300`
                         }`}
                       >
-                        {num === "None" ? "No Prior Visas" : `${num} Visa${num !== "1" ? "s" : ""}`}
+                        {label}
                       </button>
                     );
                   })}
@@ -837,12 +842,18 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
                         key={ch.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, channel: ch.value })}
-                        className={`py-3 px-2 rounded-lg border text-xs font-sans font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer no-custom-cursor ${
+                        className={`py-3 px-2 rounded-lg border-2 text-xs font-sans font-bold flex flex-col items-center justify-center gap-1.5 cursor-pointer no-custom-cursor transition-colors duration-150 ${
                           isSelected
                             ? isWhatsApp
-                              ? "bg-emerald-600 border-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)] animate-pulse"
-                              : "bg-primary border-primary text-white"
-                            : "bg-zinc-100 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 text-zinc-650 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:text-zinc-900 dark:hover:text-white"
+                              ? "bg-emerald-600 border-emerald-500 text-white"
+                              : ch.value === "Call"
+                                ? "bg-blue-600 border-blue-500 text-white"
+                                : "bg-violet-600 border-violet-500 text-white"
+                            : isWhatsApp
+                              ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300"
+                              : ch.value === "Call"
+                                ? "bg-blue-50 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-300"
+                                : "bg-violet-50 dark:bg-violet-950/40 border-violet-300 dark:border-violet-800 text-violet-800 dark:text-violet-300"
                         }`}
                       >
                         <div className="w-5 h-5 flex items-center justify-center pointer-events-none">{ch.icon}</div>
@@ -907,24 +918,20 @@ export function TypeformForm({ defaultDestination = "france" }: TypeformFormProp
               )}
 
               {step < 5 ? (
-                <CoolMode>
-                  <ThemeButton
-                    type="button"
-                    onClick={nextStep}
-                    disabled={isSubmitting}
-                  >
-                    Continue
-                  </ThemeButton>
-                </CoolMode>
+                <ThemeButton
+                  type="button"
+                  onClick={nextStep}
+                  disabled={isSubmitting}
+                >
+                  Continue
+                </ThemeButton>
               ) : (
-                <CoolMode>
-                  <ThemeButton
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Booking..." : "Book My Consultation"}
-                  </ThemeButton>
-                </CoolMode>
+                <ThemeButton
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Booking..." : "Book My Consultation"}
+                </ThemeButton>
               )}
             </div>
             

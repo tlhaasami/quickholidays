@@ -4,8 +4,6 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { DockWrapper } from "@/components/DockWrapper";
-import { GlobalCoolMode } from "@/components/GlobalCoolMode";
-import { PromoBanner } from "@/components/PromoBanner";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -63,9 +61,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen pt-8">
-        <PromoBanner />
-        <GlobalCoolMode />
+      <body className="bg-surface-ivory text-ink font-sans antialiased min-h-screen">
         <Navbar />
         <main>{children}</main>
         <FloatingWhatsApp />

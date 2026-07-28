@@ -135,6 +135,91 @@ function DockItem({
         right: "absolute -right-2 w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-white/80",
     };
 
+    const glowActive = item.isActive || isHovered;
+
+    const theme = {
+        home: {
+            bg: "var(--glow-home-bg)",
+            border: "var(--glow-home-border)",
+            shadow: "var(--glow-home-shadow)",
+            textClass: "text-blue-600 dark:text-blue-400",
+            defaultBg: "var(--dock-home-bg)",
+            defaultBorder: "var(--dock-home-border)",
+            defaultText: "text-blue-600/75 dark:text-blue-400/80"
+        },
+        "schengen-visa": {
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
+        },
+        pricing: {
+            bg: "var(--glow-pricing-bg)",
+            border: "var(--glow-pricing-border)",
+            shadow: "var(--glow-pricing-shadow)",
+            textClass: "text-emerald-600 dark:text-emerald-400",
+            defaultBg: "var(--dock-pricing-bg)",
+            defaultBorder: "var(--dock-pricing-border)",
+            defaultText: "text-emerald-600/75 dark:text-emerald-400/80"
+        },
+        "how-it-works": {
+            bg: "var(--glow-how-it-works-bg)",
+            border: "var(--glow-how-it-works-border)",
+            shadow: "var(--glow-how-it-works-shadow)",
+            textClass: "text-indigo-650 dark:text-indigo-400",
+            defaultBg: "var(--dock-how-it-works-bg)",
+            defaultBorder: "var(--dock-how-it-works-border)",
+            defaultText: "text-indigo-650/75 dark:text-indigo-400/80"
+        },
+        faq: {
+            bg: "var(--glow-faq-bg)",
+            border: "var(--glow-faq-border)",
+            shadow: "var(--glow-faq-shadow)",
+            textClass: "text-purple-600 dark:text-purple-400",
+            defaultBg: "var(--dock-faq-bg)",
+            defaultBorder: "var(--dock-faq-border)",
+            defaultText: "text-purple-600/75 dark:text-purple-400/80"
+        },
+        reviews: {
+            bg: "var(--glow-reviews-bg)",
+            border: "var(--glow-reviews-border)",
+            shadow: "var(--glow-reviews-shadow)",
+            textClass: "text-orange-600 dark:text-orange-400",
+            defaultBg: "var(--dock-reviews-bg)",
+            defaultBorder: "var(--dock-reviews-border)",
+            defaultText: "text-orange-600/75 dark:text-orange-400/80"
+        },
+        "about-us": {
+            bg: "var(--glow-about-us-bg)",
+            border: "var(--glow-about-us-border)",
+            shadow: "var(--glow-about-us-shadow)",
+            textClass: "text-teal-650 dark:text-teal-400",
+            defaultBg: "var(--dock-about-us-bg)",
+            defaultBorder: "var(--dock-about-us-border)",
+            defaultText: "text-teal-650/75 dark:text-teal-400/80"
+        },
+        "contact-us": {
+            bg: "var(--glow-contact-us-bg)",
+            border: "var(--glow-contact-us-border)",
+            shadow: "var(--glow-contact-us-shadow)",
+            textClass: "text-rose-600 dark:text-rose-450",
+            defaultBg: "var(--dock-contact-us-bg)",
+            defaultBorder: "var(--dock-contact-us-border)",
+            defaultText: "text-rose-600/75 dark:text-rose-450/80"
+        }
+    }[item.id as keyof typeof theme] || {
+        bg: "transparent",
+        border: "transparent",
+        shadow: "none",
+        textClass: "",
+        defaultBg: "transparent",
+        defaultBorder: "transparent",
+        defaultText: ""
+    };
+
     return (
         <motion.button
             ref={ref}
@@ -161,7 +246,7 @@ function DockItem({
                                 ? "bg-white dark:bg-zinc-950 border-2 border-zinc-950 dark:border-white"
                                 : design === "neon"
                                     ? "bg-zinc-950 border-2 border-[#C99537] shadow-[0_0_10px_rgba(201,149,55,0.2)]"
-                                    : "bg-gradient-to-b from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-lg shadow-black/10 dark:shadow-black/30"
+                                    : "border-transparent bg-none"
                         ),
                     "transition-all duration-200",
                     item.className
@@ -169,17 +254,22 @@ function DockItem({
                 style={{
                     paddingLeft: paddingX,
                     paddingRight: paddingX,
+                    background: item.id !== "theme-toggle" ? (glowActive ? theme.bg : theme.defaultBg) : undefined,
+                    borderColor: item.id !== "theme-toggle" ? (glowActive ? theme.border : theme.defaultBorder) : undefined,
                     boxShadow: item.id === "theme-toggle" || design === "brutalist" || design === "neon"
                         ? "none"
-                        : (isHovered
-                            ? "0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.5)"
-                            : "0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.3)"),
+                        : (glowActive
+                            ? `0 0 18px ${theme.shadow}, 0 4px 12px rgba(0,0,0,0.06)`
+                            : "none"),
                 }}
             >
                 {/* Icon */}
                 <motion.div 
                     style={{ width: iconWrapperSize, height: iconWrapperSize }}
-                    className="flex items-center justify-center text-neutral-700 dark:text-white shrink-0"
+                    className={cn(
+                        "flex items-center justify-center shrink-0 transition-colors duration-200",
+                        item.id !== "theme-toggle" ? (glowActive ? theme.textClass : theme.defaultText) : "text-neutral-700 dark:text-white"
+                    )}
                 >
                     {item.icon}
                 </motion.div>
@@ -188,7 +278,10 @@ function DockItem({
                 {item.id !== "theme-toggle" && (
                     <motion.span 
                         style={{ fontSize: fontSize }}
-                        className="font-sans font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 whitespace-nowrap select-none pointer-events-none"
+                        className={cn(
+                            "font-sans font-bold uppercase tracking-wider whitespace-nowrap select-none pointer-events-none transition-colors duration-200",
+                            glowActive ? theme.textClass : theme.defaultText
+                        )}
                     >
                         {item.label}
                     </motion.span>
@@ -216,8 +309,8 @@ function DockItem({
                         className="absolute inset-0 pointer-events-none"
                         style={{
                             background:
-                                "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, transparent 50%, transparent 100%)",
-                            opacity: isHovered ? 0.9 : 0.5,
+                                "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.2) 35%, transparent 70%)",
+                            opacity: isHovered ? 0.95 : 0.65,
                         }}
                     />
                 )}
@@ -254,43 +347,16 @@ function DockItem({
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         className={cn(activeIndicatorStyles[position])}
+                        style={{
+                            backgroundColor: theme.border,
+                            boxShadow: `0 0 8px ${theme.border}`
+                        }}
                     />
                 )}
             </AnimatePresence>
 
-            {/* Tooltip */}
-            <AnimatePresence>
-                {showLabels && isHovered && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className={cn(
-                            tooltipPositionStyles[position],
-                            "px-3 py-1.5",
-                            design === "brutalist" ? "rounded-none border-2 border-zinc-950 bg-white dark:bg-zinc-900" : "rounded-lg bg-white dark:bg-neutral-900/95 border border-neutral-200 dark:border-white/10",
-                            "backdrop-blur-sm",
-                            "text-neutral-800 dark:text-white text-sm font-medium whitespace-nowrap",
-                            design === "brutalist" 
-                                ? "shadow-[2px_2px_0_#000] dark:shadow-[2px_2px_0_#fff]"
-                                : "shadow-xl shadow-black/10 dark:shadow-black/20",
-                            "pointer-events-none z-50 font-sans"
-                        )}
-                    >
-                        {item.label}
-                        {/* Tooltip arrow */}
-                        <div
-                            className={cn(
-                                tooltipArrowStyles[position],
-                                design === "brutalist" 
-                                    ? "bg-white dark:bg-zinc-900 border-r border-b border-zinc-950 dark:border-white" 
-                                    : "bg-white dark:bg-neutral-900/95 border-neutral-200 dark:border-white/10"
-                            )}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
+
 
             {/* Hover glow */}
             {design !== "brutalist" && (

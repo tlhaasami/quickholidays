@@ -33,20 +33,20 @@ export function generateMasterCoverLetterText(data: Record<string, string>): str
   // Combine academic & employer details if both exist
   const schoolName = data.emp_school_name || "";
   const employerName = data.emp_employer_name || "";
-  const institution = data.institution_or_employer || [schoolName, employerName].filter(Boolean).join(" & ") || "[Employer / University]";
+  const institution = data.institution_or_employer || [schoolName, employerName].filter(Boolean).join(" and ") || "[Employer / University]";
 
   const occupation = data.emp_occupation || "";
   const jobTitle = data.emp_job_title || "";
   const role = data.job_title_or_degree || [occupation, jobTitle].filter(Boolean).join(" / ") || "[Job Title / Degree]";
 
-  const salaryStatus = data.salary_or_status_details || (employerName || schoolName ? `Official support & status evidence from ${employerName || schoolName} attached` : "[Salary / Support Proof]");
-  const outboundFlight = data.flight_pnr_outbound || "[Outbound Flight & PNR]";
-  const inboundFlight = data.flight_pnr_inbound || "[Inbound Flight & PNR]";
+  const salaryStatus = data.salary_or_status_details || (employerName || schoolName ? `Official support and status evidence from ${employerName || schoolName} attached` : "[Salary / Support Proof]");
+  const outboundFlight = data.flight_pnr_outbound || "[Outbound Flight and PNR]";
+  const inboundFlight = data.flight_pnr_inbound || "[Inbound Flight and PNR]";
   
   const hotelParts = [data.accommodation_hotel_name || data.acc_hotel_name, data.acc_street, data.acc_city, data.acc_country].filter(Boolean);
   const hotel = data.hotel_booking_details || (hotelParts.length > 0 ? hotelParts.join(", ") : "[Hotel reference]");
-  const bankSummary = data.bank_summary || "[Financial Funds & Bank Summary]";
-  const itinerary = data.daily_itinerary_summary || `Day 1 (${startDate}): Arrival, Check-in & Evening Walk in Historic Center.\nDay 2: Sightseeing, Cultural Landmarks & City Excursions.\nDay 3: Local Museums & Leisure Exploration.\nDay 4 (${endDate}): Hotel Check-out, Transfer to Airport & Return Flight to UK.`;
+  const bankSummary = data.bank_summary || "[Financial Funds and Bank Summary]";
+  const itinerary = data.daily_itinerary_summary || `Day 1 (${startDate}): Arrival, Check-in and Evening Walk in Historic Center.\nDay 2: Sightseeing, Cultural Landmarks and City Excursions.\nDay 3: Local Museums and Leisure Exploration.\nDay 4 (${endDate}): Hotel Check-out, Transfer to Airport and Return Flight to UK.`;
   const multiEntry = data.multiple_entry_request || "";
   const priorVisas = data.prior_visa_history || data.visa_issued_last_59_months || "";
 
@@ -70,11 +70,11 @@ Dear Sir/Madam,
 
 I am writing this cover letter to formally submit my application for a short-stay Schengen Tourist Visa (Type C) to visit ${destination} from ${startDate} to ${endDate}.
 
-1. PERSONAL BACKGROUND & UK LEGAL ANCHOR
+1. PERSONAL BACKGROUND and UK LEGAL ANCHOR
 I am an international national legally residing in the United Kingdom under valid UK Immigration Status (Share Code: ${shareCode}, expiry date: ${shareCodeExp}).
 My primary legal and social anchor in the UK is as a ${role} at ${institution}. ${salaryStatus}. My commitments and lawful status in the UK ensure my mandatory return immediately following the conclusion of this holiday.
 
-2. FLIGHT & ACCOMMODATION LOGISTICS
+2. FLIGHT and ACCOMMODATION LOGISTICS
 My round-trip travel arrangements and accommodation bookings are fully confirmed:
 - Outbound Transit: ${outboundFlight}
 - Inbound Transit: ${inboundFlight}
@@ -84,30 +84,51 @@ My round-trip travel arrangements and accommodation bookings are fully confirmed
 Below is my planned daily itinerary for the duration of my stay:
 ${itinerary}
 
-4. FINANCIAL SUBSISTENCE & PROOF OF FUNDS
+4. FINANCIAL SUBSISTENCE and PROOF OF FUNDS
 This vacation is entirely self-funded through my personal savings and earnings. Enclosed are ${bankSummary}, demonstrating sufficient financial means to meet all expenses during my stay.
 `;
 
   if (multiEntry.trim() || priorVisas.trim()) {
-    body += `\n5. REQUEST FOR MULTIPLE-ENTRY VISA & PRIOR VISA HISTORY\nI respectfully request favorable consideration for a Multiple-Entry Visa. ${multiEntry ? multiEntry + '. ' : ''}${priorVisas ? `Prior Travel History: ${priorVisas}.` : ''}\n`;
-  }
+    body += `\n5. REQUEST FOR MULTIPLE-ENTRY VISA and PRIOR VISA HISTORY
+I respectfully request favorable consideration for a Multiple-Entry Visa. ${multiEntry ? multiEntry + '. ' : ''}${priorVisas ? `Prior Travel History: ${priorVisas}.` : ''}
 
-  body += `
 6. ENCLOSED SUPPORTING DOCUMENTATION CHECKLIST
 - Completed and signed Schengen Visa Application Form.
-- Valid Passport & UK Share Code verification document.
+- Valid Passport and UK Share Code verification document.
 - Official UK Status / Ties Evidence (${institution} Support / Employment Letter).
 - Confirmed Round-Trip Flight Reservation e-tickets.
 - Confirmed Hotel Accommodation Booking Confirmation.
-- Certified Bank Statements & Payslips for the last 3 months.
+- Certified Bank Statements and Payslips for the last 3 months.
 - Schengen Travel Health Insurance Policy (€30,000 emergency medical coverage).
 
-7. FORMAL GUARANTEE OF COMPLIANCE & RETURN TO THE UK
+7. FORMAL GUARANTEE OF COMPLIANCE and RETURN TO THE UK
 I hereby guarantee to strictly abide by all immigration laws and public directives of the Schengen zone. I assure you that I will depart the Schengen area on or before ${endDate} and return directly to the United Kingdom.
 
 Thank you very much for your time, diligence, and favorable consideration of my application.
 
 Yours faithfully,
+`;
+  } else {
+    body += `
+6. ENCLOSED SUPPORTING DOCUMENTATION CHECKLIST
+- Completed and signed Schengen Visa Application Form.
+- Valid Passport and UK Share Code verification document.
+- Official UK Status / Ties Evidence (${institution} Support / Employment Letter).
+- Confirmed Round-Trip Flight Reservation e-tickets.
+- Confirmed Hotel Accommodation Booking Confirmation.
+- Certified Bank Statements and Payslips for the last 3 months.
+- Schengen Travel Health Insurance Policy (€30,000 emergency medical coverage).
+
+7. FORMAL GUARANTEE OF COMPLIANCE and RETURN TO THE UK
+I hereby guarantee to strictly abide by all immigration laws and public directives of the Schengen zone. I assure you that I will depart the Schengen area on or before ${endDate} and return directly to the United Kingdom.
+
+Thank you very much for your time, diligence, and favorable consideration of my application.
+
+Yours faithfully,
+`;
+  }
+
+  body += `
 
 _______________________________________
 ${name}
@@ -155,7 +176,7 @@ export function generateLaTeXCoverLetterCode(data: Record<string, string>): stri
 
   const schoolName = data.emp_school_name || "";
   const employerName = data.emp_employer_name || "";
-  const rawInst = data.institution_or_employer || [schoolName, employerName].filter(Boolean).join(" & ");
+  const rawInst = data.institution_or_employer || [schoolName, employerName].filter(Boolean).join(" and ");
   const institution = rawInst ? escapeLaTeX(rawInst) : "[Employer / University]";
 
   const occupation = data.emp_occupation || "";
@@ -163,14 +184,14 @@ export function generateLaTeXCoverLetterCode(data: Record<string, string>): stri
   const rawRole = data.job_title_or_degree || [occupation, jobTitle].filter(Boolean).join(" / ");
   const role = rawRole ? escapeLaTeX(rawRole) : "[Job Title / Degree]";
 
-  const salaryStatus = data.salary_or_status_details ? escapeLaTeX(data.salary_or_status_details) : (employerName || schoolName ? escapeLaTeX(`Official support & status evidence from ${employerName || schoolName} attached`) : "[Salary / Support Proof]");
-  const outboundFlight = data.flight_pnr_outbound ? escapeLaTeX(data.flight_pnr_outbound) : "[Outbound Flight & PNR]";
-  const inboundFlight = data.flight_pnr_inbound ? escapeLaTeX(data.flight_pnr_inbound) : "[Inbound Flight & PNR]";
+  const salaryStatus = data.salary_or_status_details ? escapeLaTeX(data.salary_or_status_details) : (employerName || schoolName ? escapeLaTeX(`Official support and status evidence from ${employerName || schoolName} attached`) : "[Salary / Support Proof]");
+  const outboundFlight = data.flight_pnr_outbound ? escapeLaTeX(data.flight_pnr_outbound) : "[Outbound Flight and PNR]";
+  const inboundFlight = data.flight_pnr_inbound ? escapeLaTeX(data.flight_pnr_inbound) : "[Inbound Flight and PNR]";
 
   const hotelParts = [data.accommodation_hotel_name || data.acc_hotel_name, data.acc_street, data.acc_city, data.acc_country].filter(Boolean);
   const rawHotel = data.hotel_booking_details || (hotelParts.length > 0 ? hotelParts.join(", ") : "");
   const hotel = rawHotel ? escapeLaTeX(rawHotel) : "[Hotel reference]";
-  const bankSummary = data.bank_summary ? escapeLaTeX(data.bank_summary) : "[Financial Funds & Bank Summary]";
+  const bankSummary = data.bank_summary ? escapeLaTeX(data.bank_summary) : "[Financial Funds and Bank Summary]";
 
   return `\\documentclass[11pt,a4paper]{article}
 \\usepackage[utf8]{inputenc}

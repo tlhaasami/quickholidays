@@ -13,11 +13,10 @@ import { ThemeButton } from "@/components/ThemeButton";
 import { Tooltip } from "@/components/ui/tooltip-card";
 import Stack from "@/components/ui/stack";
 import InfiniteMenu from "@/components/ui/infinite-menu";
-import DomeGallery from "@/components/ui/dome-gallery/DomeGallery";
-import { GALLERY_IMAGES } from "@/constants/galleryImages";
+
 
 import { trackContact } from "@/lib/analytics";
-import { CoolMode } from "@/components/ui/cool-mode";
+
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
@@ -153,15 +152,8 @@ export default function Hero() {
   }, [searchQuery]);
 
   useEffect(() => {
-    // Deferred video source loading until after hero elements and images complete loading
-    const loadDeferredVideo = () => {
-      setVideoSrc("/videos/bg-video.webm");
-    };
-
-    if (document.readyState === "complete") {
-      const timer = setTimeout(loadDeferredVideo, 800);
-      return () => clearTimeout(timer);
-    }
+    // Load video immediately on mount — plays as soon as browser can
+    setVideoSrc("/videos/bg-video.webm");
   }, []);
 
   // Preload all flag images — show Stack only once every flag is ready
@@ -426,16 +418,12 @@ export default function Hero() {
               }}
               className="flex flex-col sm:flex-row flex-wrap gap-4 items-start mt-2"
             >
-              <CoolMode>
-                <ThemeButton href="/contact-us" size="sm">
-                  Book a Consultation
-                </ThemeButton>
-              </CoolMode>
-              <CoolMode>
-                <ThemeButton href="/how-it-works" size="sm">
-                  See how it works
-                </ThemeButton>
-              </CoolMode>
+              <ThemeButton href="/contact-us" size="sm">
+                Book a Consultation
+              </ThemeButton>
+              <ThemeButton href="/how-it-works" size="sm">
+                See how it works
+              </ThemeButton>
 
             </motion.div>
           </motion.div>
@@ -487,20 +475,50 @@ export default function Hero() {
                     })}
                   />
                   
-                  {/* Instructional helper labels */}
-                  <div className="flex items-center justify-between gap-2 mt-4 px-1 text-[11px] uppercase tracking-widest font-extrabold font-sans pointer-events-auto">
-                    <span 
-                      className="flex items-center gap-1.5 select-none text-black"
-                      style={{ color: "#000000", textShadow: "0 1px 2px rgba(255, 255, 255, 0.9)" }}
+                  {/* Creative instructional labels */}
+                  <div className="flex items-center justify-between gap-3 mt-4 px-0.5 pointer-events-auto">
+                    {/* Swipe hint — frosted glass pill with bouncing arrows */}
+                    <div
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-full select-none"
+                      style={{
+                        background: "rgba(255,255,255,0.18)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        border: "1px solid rgba(255,255,255,0.35)",
+                        boxShadow: "0 2px 12px rgba(0,0,0,0.25)"
+                      }}
                     >
-                      ← Swipe to see →
-                    </span>
+                      <motion.span
+                        animate={{ x: [-3, 0, -3] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                        className="text-white text-xs leading-none"
+                      >←</motion.span>
+                      <span className="text-white text-[10px] font-bold uppercase tracking-widest whitespace-nowrap" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>
+                        Swipe to explore
+                      </span>
+                      <motion.span
+                        animate={{ x: [3, 0, 3] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                        className="text-white text-xs leading-none"
+                      >→</motion.span>
+                    </div>
+
+                    {/* See all countries — gold accent pill button */}
                     <button
                       onClick={() => setIsModalOpen(true)}
-                      className="text-black hover:text-zinc-800 hover:underline active:scale-95 transition-all duration-200 cursor-pointer font-extrabold"
-                      style={{ color: "#000000", textShadow: "0 1px 2px rgba(255, 255, 255, 0.9)" }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full cursor-pointer active:scale-95 transition-transform duration-150"
+                      style={{
+                        background: "rgba(201,149,55,0.92)",
+                        border: "1px solid rgba(255,255,255,0.3)",
+                        boxShadow: "0 2px 12px rgba(201,149,55,0.45)"
+                      }}
                     >
-                      See all countries
+                      <svg className="w-3 h-3 text-zinc-950 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                      </svg>
+                      <span className="text-zinc-950 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                        All Countries
+                      </span>
                     </button>
                   </div>
                 </motion.div>
@@ -611,7 +629,7 @@ export default function Hero() {
           >
             <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest block">UK Registered Company</span>
             <h2 className="font-serif text-3xl sm:text-4xl font-medium text-zinc-900 dark:text-white tracking-tight">
-              Registered & verified at Companies House.
+              Registered and verified at Companies House.
             </h2>
             <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
               We operate with complete corporate transparency. Quick Holidays Ltd is officially registered in England and Wales under Company Number <strong>{siteConfig.companyNumber}</strong>. You can verify our active business registration details, filing history, and company records directly on the UK government registry.
@@ -796,32 +814,7 @@ export default function Hero() {
 
       </section>
 
-      {/* 2.6b Discover Countries Section */}
-      <section id="discover-countries" className="relative w-full py-24 bg-zinc-50 dark:bg-zinc-950/20 z-20 border-t border-b border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
-        <div className="max-w-7xl mx-auto text-center px-8 sm:px-16 mb-12">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
-          >
-            Globe Dome <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>Gallery</Highlighter>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-2xl mx-auto"
-          >
-            Explore Schengen destinations on our interactive 3D globe. The gallery spins continuously—drag to rotate manually, and click any landscape to zoom in.
-          </motion.p>
-        </div>
-        <div className="w-full h-[500px] md:h-[650px] relative overflow-hidden">
-          <DomeGallery images={GALLERY_IMAGES} />
-        </div>
-      </section>
+      {/* 2.6b Discover Countries Section — removed */}
 
       {/* 2.7 Reviews Section */}
       <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">

@@ -8,7 +8,7 @@ export interface CoverLetterField {
 
 export const coverLetterSections = [
   {
-    title: "1. Applicant Profile & UK Legal Status",
+    title: "1. Applicant Profile and UK Legal Status",
     fields: [
       { id: "full_name", label: "Full Name (as per Passport)", placeholder: "e.g. Rigved Anant KASHIKAR", category: "applicant", required: true },
       { id: "passport_number", label: "Passport Number", placeholder: "e.g. P9280608", category: "applicant", required: true },
@@ -31,7 +31,7 @@ export const coverLetterSections = [
     ]
   },
   {
-    title: "3. UK Economic & Social Anchor (Ties to the UK)",
+    title: "3. UK Economic and Social Anchor (Ties to the UK)",
     fields: [
       { id: "uk_anchor_type", label: "Anchor Type", placeholder: "Employed / Student / Self-Employed", category: "uk_tie", required: true },
       { id: "institution_or_employer", label: "Employer or University Name", placeholder: "e.g. University of Hertfordshire / Sainsbury's", category: "uk_tie", required: true },
@@ -40,20 +40,20 @@ export const coverLetterSections = [
     ]
   },
   {
-    title: "4. Travel Logistics & Accommodation",
+    title: "4. Travel Logistics and Accommodation",
     fields: [
       { id: "trip_start_date", label: "Trip Start Date", placeholder: "e.g. 26/08/2026", category: "trip", required: true },
       { id: "trip_end_date", label: "Trip End Date", placeholder: "e.g. 30/08/2026", category: "trip", required: true },
-      { id: "flight_pnr_outbound", label: "Outbound Flight & PNR", placeholder: "e.g. London (LHR) to Athens (ATH) • BA850 • Ref: Z8AKNX", category: "trip", required: true },
-      { id: "flight_pnr_inbound", label: "Inbound Flight & PNR", placeholder: "e.g. Athens (ATH) to London (LHR) • BA927 • Ref: Z8FZ2V", category: "trip", required: true },
-      { id: "hotel_booking_details", label: "Hotel Name & Booking Reference", placeholder: "e.g. Raise Boutique Rooms, Athens • Confirmation: 2516629906", category: "trip", required: true },
+      { id: "flight_pnr_outbound", label: "Outbound Flight and PNR", placeholder: "e.g. London (LHR) to Athens (ATH) • BA850 • Ref: Z8AKNX", category: "trip", required: true },
+      { id: "flight_pnr_inbound", label: "Inbound Flight and PNR", placeholder: "e.g. Athens (ATH) to London (LHR) • BA927 • Ref: Z8FZ2V", category: "trip", required: true },
+      { id: "hotel_booking_details", label: "Hotel Name and Booking Reference", placeholder: "e.g. Raise Boutique Rooms, Athens • Confirmation: 2516629906", category: "trip", required: true },
       { id: "bank_summary", label: "Financial Funds Summary", placeholder: "e.g. £4,200 average liquid balance in Lloyds Bank (3 months statements)", category: "trip", required: true },
     ]
   },
   {
-    title: "5. Optional Special Requests & Travel History",
+    title: "5. Optional Special Requests and Travel History",
     fields: [
-      { id: "daily_itinerary_summary", label: "Day-by-Day Travel Plan", placeholder: "Day 1: Arrival & Old Town; Day 2: Acropolis; Day 3: Museum...", category: "documents" },
+      { id: "daily_itinerary_summary", label: "Day-by-Day Travel Plan", placeholder: "Day 1: Arrival and Old Town; Day 2: Acropolis; Day 3: Museum...", category: "documents" },
       { id: "multiple_entry_request", label: "Multi-Entry Request (Optional)", placeholder: "Requesting 1-year multiple entry due to planned trip to Swiss Alps in Dec", category: "documents" },
       { id: "prior_visa_history", label: "Prior Visa History (Optional)", placeholder: "Previous Schengen Visa 2024, UK Residence Permit RW0959086", category: "documents" },
     ]
@@ -71,15 +71,15 @@ STRICT FORMATTING & ATS COMPLIANCE RULES:
 - ATS-FRIENDLY TYPOGRAPHY & SPACING: Ensure clean line height, standard business letter headers, 1-inch margins, and structured uppercase/bold headers.
 - NO UNNECESSARY FLUFF: Omit conversational musings (e.g. do not say "I saw animations of this city"). Focus strictly on facts, legal ties, confirmed bookings, and clear itinerary.
 - SINGLE MASTER MODULAR TEMPLATE: Use the following mandatory section order:
-  1. Applicant Contact Header & Target Embassy Address
+  1. Applicant Contact Header and Target Embassy Address
   2. Subject Line (APPLICATION FOR SCHENGEN TOURIST VISA TO [COUNTRY] ([DATES]))
-  3. Purpose of Visit & UK Legal Anchor (Share Code, Passport, UK Employment/Academic ties proving return)
-  4. Confirmed Flight & Accommodation Summary Table / Bullet points
+  3. Purpose of Visit and UK Legal Anchor (Share Code, Passport, UK Employment/Academic ties proving return)
+  4. Confirmed Flight and Accommodation Summary Table / Bullet points
   5. Chronological Day-by-Day Travel Itinerary
-  6. Financial Subsistence & Bank Summary
-  7. [Conditional] Request for Multiple-Entry Visa & Travel History (only if requested)
+  6. Financial Subsistence and Bank Summary
+  7. [Conditional] Request for Multiple-Entry Visa and Travel History (only if requested)
   8. Enclosed Document Checklist
-  9. Formal Guarantee of Compliance & Return to UK + Sign-off
+  9. Formal Guarantee of Compliance and Return to UK + Sign-off
 
 Return ONLY the complete, ready-to-print, ATS-friendly cover letter text or a JSON object with a "cover_letter_text" key.
 
