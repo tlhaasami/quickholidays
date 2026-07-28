@@ -152,9 +152,22 @@ export default function Hero() {
   }, [searchQuery]);
 
   useEffect(() => {
-    // Load video immediately on mount — plays as soon as browser can
-    setVideoSrc("/videos/bg-video.webm");
-  }, []);
+    if (!flagsLoaded) return;
+
+    const loadVideo = () => {
+      const timer = setTimeout(() => {
+        setVideoSrc("/videos/bg-video.webm");
+      }, 1000);
+      return () => clearTimeout(timer);
+    };
+
+    if (document.readyState === "complete") {
+      return loadVideo();
+    } else {
+      window.addEventListener("load", loadVideo);
+      return () => window.removeEventListener("load", loadVideo);
+    }
+  }, [flagsLoaded]);
 
   // Preload all flag images — show Stack only once every flag is ready
   useEffect(() => {
