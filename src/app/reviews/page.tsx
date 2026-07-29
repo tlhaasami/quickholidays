@@ -2,41 +2,101 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import Link from "next/link";
 import { ThemeButton } from "@/components/ThemeButton";
 import { Highlighter } from "@/components/ui/highlighter";
-import { WobbleCard } from "@/components/ui/wobble-card";
 
-interface ReviewItem {
-  name: string;
-  city: string;
-  country: string;
-  outcome: string;
-  rating: number;
-  text: string;
-  date: string;
+function VideoCard({ video }: { video: any }) {
+  const elementId = `reviews-yt-player-${video.id}`;
+  return (
+    <div className="relative aspect-[9/16] w-full max-w-[240px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden group">
+      {/* Video Iframe Player Container with Top Cropping */}
+      <div className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] overflow-hidden z-10">
+        <iframe
+          id={elementId}
+          src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1&controls=1`}
+          title={`${video.name} review`}
+          className="w-full h-full object-cover border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    </div>
+  );
 }
 
-import reviewsDataRaw from "@/data/reviews.json";
-
 export default function Reviews() {
-  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [videoReviews, setVideoReviews] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const reviewsData: ReviewItem[] = (reviewsDataRaw as any[]).map(rev => ({
-    name: rev.name,
-    city: "UK Resident",
-    country: rev.country || "Schengen Visa",
-    outcome: "Visa Granted",
-    rating: rev.rating || 5,
-    date: rev.date,
-    text: rev.text
-  }));
+  // Fetch reviews dynamically from the Postgres database
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch("/api/video-reviews");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.reviews) {
+            setVideoReviews(data.reviews);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load reviews from API:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, []);
 
-  const displayedReviews = reviewsData.slice(0, visibleCount);
+  // Detect mobile viewport
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Handle postMessage API to sync and pause overlapping videos
+  useEffect(() => {
+    const handleYoutubeMessage = (e: MessageEvent) => {
+      if (typeof e.origin === "string" && e.origin.includes("youtube.com")) {
+        try {
+          const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+          if (data.event === "onStateChange" && data.info === 1) {
+            const iframes = document.querySelectorAll("iframe");
+            let playingIframeId: string | null = null;
+            
+            iframes.forEach((iframe) => {
+              if (iframe.contentWindow === e.source) {
+                playingIframeId = iframe.id;
+              }
+            });
+
+            if (playingIframeId) {
+              iframes.forEach((iframe) => {
+                if (iframe.id !== playingIframeId && iframe.id.includes("reviews-yt-player")) {
+                  iframe.contentWindow?.postMessage(
+                    JSON.stringify({ event: "command", func: "pauseVideo", args: "" }),
+                    "*"
+                  );
+                }
+              });
+            }
+          }
+        } catch (err) {}
+      }
+    };
+
+    window.addEventListener("message", handleYoutubeMessage);
+    return () => window.removeEventListener("message", handleYoutubeMessage);
+  }, []);
 
   // Injects Google Review schemas for SEO optimization
-  const jsonLdSchema = reviewsData.map((rev) => ({
+  const jsonLdSchema = videoReviews.map((rev) => ({
     "@context": "https://schema.org",
     "@type": "Review",
     "itemReviewed": {
@@ -53,23 +113,26 @@ export default function Reviews() {
     },
     "reviewRating": {
       "@type": "Rating",
-      "ratingValue": rev.rating.toString(),
+      "ratingValue": "5",
       "bestRating": "5"
     },
     "author": {
       "@type": "Person",
       "name": rev.name
     },
-    "reviewBody": rev.text,
+    "reviewBody": rev.caption,
     "publisher": {
       "@type": "Organization",
       "name": "Quick Holidays"
     }
   }));
 
+  const itemsPerPage = isMobile ? 1 : 3;
+  const maxIndex = Math.max(0, videoReviews.length - itemsPerPage);
+
   return (
     <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-32 pb-24 px-8 sm:px-16 md:px-24 transition-colors duration-300">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         
         {/* Schema Script Injection */}
         {jsonLdSchema.map((schema, idx) => (
@@ -81,7 +144,7 @@ export default function Reviews() {
         ))}
 
         {/* Intro */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-16">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -94,124 +157,63 @@ export default function Reviews() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-light max-w-xl mx-auto mb-10"
+            className="font-sans text-base sm:text-lg text-zinc-650 dark:text-zinc-400 font-light max-w-xl mx-auto"
           >
-            Read what UK resident permit holders say about our service and our Accountability Promise.
+            Watch what UK resident permit holders say about their Schengen visa experiences with us.
           </motion.p>
-
-
         </div>
 
-        {/* Reviews Grid - Desktop (hidden md:grid) */}
-        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-16">
-          {displayedReviews.map((rev, idx) => (
-            <WobbleCard
-              key={idx}
-              containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md h-full flex flex-col"
-              className="p-8 flex flex-col justify-between h-full cursor-pointer"
-            >
-              <div className="flex flex-col h-full justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center gap-1 text-primary text-sm">
-                      {Array.from({ length: rev.rating }).map((_, i) => (
-                        <span key={i}>★</span>
-                      ))}
-                    </div>
-                    <span className="text-zinc-550 font-sans text-xs">{rev.date}</span>
-                  </div>
-                  <p className="text-zinc-700 dark:text-zinc-200 font-sans text-sm sm:text-base font-light leading-relaxed mb-6">
-                    "{rev.text}"
-                  </p>
-                </div>
-
-                <div className="flex justify-between items-center border-t border-zinc-200 dark:border-white/5 pt-4 mt-auto">
-                  <div>
-                    <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white">{rev.name}</h4>
-                    <span className="font-sans text-xs text-zinc-550">{rev.city} • </span>
-                    <span className="font-sans text-xs text-primary">{rev.country}</span>
-                  </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider font-sans bg-emerald-600/10 text-emerald-450 dark:text-emerald-450 px-2 py-1 rounded border border-emerald-500/10">
-                    {rev.outcome}
-                  </span>
-                </div>
-              </div>
-            </WobbleCard>
-          ))}
-        </div>
-
-        {/* Reviews Carousel - Mobile (block md:hidden) */}
-        <div className="block md:hidden text-left mb-16">
-          <div className="min-h-[260px]">
-            {displayedReviews.map((rev, idx) => {
-              if (idx !== activeReviewIndex) return null;
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <WobbleCard
-                    containerClassName="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/10 shadow-md flex flex-col"
-                    className="p-8 flex flex-col justify-between"
-                  >
-                    <div className="flex flex-col text-left">
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-1 text-primary text-sm">
-                          {Array.from({ length: rev.rating }).map((_, i) => (
-                            <span key={i}>★</span>
-                          ))}
-                        </div>
-                        <span className="text-zinc-555 font-sans text-xs">{rev.date}</span>
-                      </div>
-                      <p className="text-zinc-700 dark:text-zinc-200 font-sans text-sm font-light leading-relaxed mb-6">
-                        "{rev.text}"
-                      </p>
-
-                      <div className="flex justify-between items-center border-t border-zinc-200 dark:border-white/5 pt-4 mt-2">
-                        <div>
-                          <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white">{rev.name}</h4>
-                          <span className="font-sans text-xs text-zinc-550">{rev.city} • </span>
-                          <span className="font-sans text-xs text-primary">{rev.country}</span>
-                        </div>
-                        <span className="text-[10px] uppercase font-bold tracking-wider font-sans bg-emerald-600/10 text-emerald-450 dark:text-emerald-450 px-2 py-1 rounded border border-emerald-500/10">
-                          {rev.outcome}
-                        </span>
-                      </div>
-                    </div>
-                  </WobbleCard>
-                </motion.div>
-              );
-            })}
+        {loading ? (
+          <div className="text-center py-20 font-sans text-sm text-zinc-500">
+            Loading video reviews database...
           </div>
-
-          {/* Slider Dots indicators */}
-          <div className="flex justify-center items-center gap-2 mt-6">
-            {displayedReviews.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveReviewIndex(idx)}
-                className={`transition-all duration-300 h-2 cursor-pointer ${
-                  activeReviewIndex === idx
-                    ? "w-6 rounded-full bg-[#C99537]"
-                    : "w-2 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:bg-[#C99537]"
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
+        ) : videoReviews.length === 0 ? (
+          <div className="text-center py-20 font-sans text-sm text-zinc-500">
+            No video reviews found.
           </div>
-        </div>
-
-        {/* Load More Button */}
-        {visibleCount < reviewsData.length && (
-          <div className="text-center mb-16">
+        ) : (
+          <div className="flex items-center justify-center gap-4 sm:gap-6 max-w-5xl mx-auto mb-20">
+            {/* Prev Arrow */}
             <button
-              onClick={() => setVisibleCount((prev) => prev + 12)}
-              className="px-6 py-3 font-sans font-bold text-xs uppercase tracking-wider rounded-lg border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-150 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+              disabled={currentIndex === 0}
+              className="p-3 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-md z-30 shrink-0 cursor-pointer"
+              aria-label="Previous review"
             >
-              Load More Reviews ({reviewsData.length - visibleCount} remaining)
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            {/* Viewport content */}
+            <div className="w-full overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translate3d(-${currentIndex * (isMobile ? 100 : 33.3333)}%, 0, 0)` }}
+              >
+                {videoReviews.map((video) => (
+                  <div 
+                    key={video.id}
+                    className="shrink-0 w-full md:w-1/3 px-3 flex justify-center"
+                  >
+                    <VideoCard video={video} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Next Arrow */}
+            <button
+              onClick={() => {
+                setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+              }}
+              disabled={currentIndex >= maxIndex}
+              className="p-3 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-md z-30 shrink-0 cursor-pointer"
+              aria-label="Next review"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
             </button>
           </div>
         )}
