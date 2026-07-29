@@ -9,45 +9,6 @@ import { useSiteConfig } from "@/hooks/useSiteConfig";
 export default function AboutUs() {
   const siteConfig = useSiteConfig();
 
-  const team = [
-    {
-      name: "Sophia",
-      role: "Senior Visa Consultant",
-      description: "Specializes in complex student and skilled worker applications. Praised by clients for her patience and responsiveness.",
-      quote: "Sophia was patient and understanding with all my queries."
-    },
-    {
-      name: "Nile",
-      role: "Biometrics and Slot Specialist",
-      description: "Manages appointment tracking and consulate schedules. Known for sticking with clients through biometrics day.",
-      quote: "Nile was with me even on the day of my biometrics."
-    },
-    {
-      name: "Emma",
-      role: "Document Audit Coordinator",
-      description: "Directs file preparation, checklists, and application drafts. Client review verdict: 'Emma needs a raise!'",
-      quote: " seamless process, staff were supportive. Emma needs a raise!"
-    },
-    {
-      name: "Anaya",
-      role: "Schengen Slot Tracker",
-      description: "Monitors TLScontact and VFS Global portals. Secured appointments in under 7 days for prior-refusal cases.",
-      quote: "Anaya was great help, got my appointment within a week!"
-    },
-    {
-      name: "Jenny",
-      role: "Family Visa Specialist",
-      description: "Coordinates multi-applicant cases for families, spouses, and dependents. Ensures zero document checks are missed.",
-      quote: "Jenny handled all the documentation smoothly and made it stress-free."
-    },
-    {
-      name: "Lisa",
-      role: "Customer Success Lead",
-      description: "Ensures every client gets a clear go/no-go assessment during their free consultation.",
-      quote: "I am very happy with your service, really appreciate it, Lisa."
-    }
-  ];
-
   return (
     <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-20 pb-32 px-6 sm:px-12 md:px-24 transition-colors duration-300">
       <div className="max-w-5xl mx-auto text-left">
@@ -150,50 +111,7 @@ export default function AboutUs() {
           </ul>
         </div>
 
-        {/* Team Section */}
-        <div className="mb-20">
-          <h2 className="font-serif text-2xl sm:text-3xl text-zinc-900 dark:text-white font-medium mb-3">
-            Meet the team
-          </h2>
-          <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed mb-8 max-w-2xl">
-            You'll work with a named consultant from consultation to passport return — not a support ticket system. Here are the people named by our clients:
-          </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {team.map((member) => (
-              <div 
-                key={member.name} 
-                className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    {/* Circle avatar placeholder with initials */}
-                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-serif text-sm font-bold border border-primary/20">
-                      {member.name[0]}
-                    </div>
-                    <div>
-                      <h4 className="font-serif text-base font-semibold text-zinc-900 dark:text-white leading-tight">
-                        {member.name}
-                      </h4>
-                      <span className="text-[9px] font-sans text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mt-0.5">
-                        {member.role}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="font-sans text-xs text-zinc-650 dark:text-zinc-400 font-light leading-relaxed mb-4">
-                    {member.description}
-                  </p>
-                </div>
-                
-                <div className="border-t border-zinc-200 dark:border-white/5 pt-3 mt-2">
-                  <span className="text-xs font-sans italic text-zinc-650 dark:text-zinc-300 block leading-relaxed">
-                    &ldquo;{member.quote}&rdquo;
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+
 
         {/* Verification Link */}
         <motion.div 
