@@ -17,7 +17,7 @@ export default function RefundPolicy() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl font-medium tracking-tight text-zinc-900 dark:text-white mb-2"
           >
-            Refund & Cancellation Policy
+            Refund and Cancellation Policy
           </motion.h1>
           <span className="text-zinc-500 font-sans text-xs uppercase tracking-wider block">
             Plain English Draft • Last Reviewed: 2026-07-23
@@ -54,7 +54,10 @@ export default function RefundPolicy() {
           <section className="space-y-3">
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">4. Our Accountability Promise</h3>
             <p>
-              If your application is refused because of a documented error on our side — a mistake in your application, a missed document we were responsible for checking, a deadline we caused you to miss — we refund our full service fee in full (Exclude paid appointment and insurance fees). We will tell you plainly whether the error was ours; you will not have to fight us for it.
+              If your application is refused because of a documented error on our side — a mistake in your application, a missed document we were responsible for checking, a deadline we caused you to miss — we refund our full service fee in full (excluding paid third-party appointment and insurance fees). We will tell you plainly whether the error was ours; you will not have to fight us for it.
+            </p>
+            <p>
+              If your visa is refused by the embassy due to ordinary consulate discretion (where no error was made by either you or us), we stand by you. We will compile, audit, and submit your reapplication for a flat <strong>50% discount</strong> (half-fee) on our standard service pricing.
             </p>
             <div className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 p-4 rounded-lg mt-2 space-y-2 text-xs sm:text-sm">
               <strong className="text-primary block">What the promise doesn't cover:</strong>

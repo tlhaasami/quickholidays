@@ -42,7 +42,7 @@ export default function ServiceTerms() {
             <p>
               Our fees are for professional document preparation work performed, not for the final outcome of your application. Payment of deposits and balances follows the timeline specified in our{" "}
               <Link href="/refund-policy" className="text-primary hover:text-zinc-900 dark:hover:text-white underline transition-colors">
-                Refund & Cancellation Policy
+                Refund and Cancellation Policy
               </Link>.
             </p>
           </section>
@@ -86,7 +86,7 @@ export default function ServiceTerms() {
         {/* Footer actions */}
         <div className="border-t border-zinc-200 dark:border-white/10 pt-8 mt-12 flex justify-between items-center text-xs font-sans">
           <Link href="/refund-policy" className="text-primary hover:text-zinc-900 dark:hover:text-white underline transition-colors">
-            Refund & Cancellation Policy
+            Refund and Cancellation Policy
           </Link>
           <Link href="/privacy-policy" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white underline transition-colors">
             Privacy Policy

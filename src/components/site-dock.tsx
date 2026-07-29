@@ -9,6 +9,7 @@ import {
   IconStar,
   IconUsers,
   IconWorld,
+  IconCircleCheck,
 } from "@tabler/icons-react";
 
 const links = [
@@ -21,6 +22,11 @@ const links = [
     title: "Schengen Visa",
     icon: <IconWorld className="h-full w-full text-primary" />,
     href: "/schengen-visa",
+  },
+  {
+    title: "Schengen Ready?",
+    icon: <IconCircleCheck className="h-full w-full text-primary" />,
+    href: "/schengen-ready",
   },
   {
     title: "How It Works",

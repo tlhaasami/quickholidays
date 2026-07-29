@@ -14,7 +14,7 @@ export default function Sitemap() {
     { name: "Reviews", href: "/reviews" },
     { name: "About Us", href: "/about-us" },
     { name: "Book Consultation", href: "/contact-us" },
-    { name: "Refund & Cancellation Policy", href: "/refund-policy" },
+    { name: "Refund and Cancellation Policy", href: "/refund-policy" },
     { name: "Service Terms", href: "/service-terms" },
     { name: "Insurance Disclaimer", href: "/travel-insurance-disclaimer" },
     { name: "Privacy Policy", href: "/privacy-policy" }

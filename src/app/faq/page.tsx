@@ -82,7 +82,7 @@ export default function FAQ() {
         },
         {
           q: "Can you help me get flight and hotel bookings?",
-          a: "Yes, we help compile reservation itineraries (refundable flights and pay-at-property hotels) which are fully compliant with embassy guidelines. This ensures you do not buy non-refundable tickets before your visa is in hand."
+          a: "We show you exactly which refundable flights and free-cancellation hotels satisfy the embassy for your travel dates and destination. You book them yourself and pay the airline and hotel directly — we never handle your booking money, so you stay in control of your funds."
         },
         {
           q: "Will the embassy keep my passport?",

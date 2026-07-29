@@ -156,6 +156,15 @@ function DockItem({
             defaultBorder: "var(--dock-schengen-visa-border)",
             defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
         },
+        "schengen-ready": {
+            bg: "var(--glow-schengen-visa-bg)",
+            border: "var(--glow-schengen-visa-border)",
+            shadow: "var(--glow-schengen-visa-shadow)",
+            textClass: "text-[#C99537] dark:text-amber-400",
+            defaultBg: "var(--dock-schengen-visa-bg)",
+            defaultBorder: "var(--dock-schengen-visa-border)",
+            defaultText: "text-[#C99537]/75 dark:text-amber-400/80"
+        },
         pricing: {
             bg: "var(--glow-schengen-visa-bg)",
             border: "var(--glow-schengen-visa-border)",

@@ -50,7 +50,52 @@ export default function SchengenVisaHub() {
           </motion.p>
         </div>
 
-        {/* 1. QuickVisa Assurance Process Block (2.5) */}
+        {/* Commitments Section */}
+        <div className="mb-24 px-8 sm:px-16 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            {[
+              {
+                title: "An honest verdict first",
+                desc: "We tell you if you're ready before you spend anything. No false promises."
+              },
+              {
+                title: "One named consultant",
+                desc: "The same person from consultation to passport return — not a ticket queue."
+              },
+              {
+                title: "Checklist in 24 hours",
+                desc: "Built specifically for your nationality, your UK visa type, and your situation."
+              },
+              {
+                title: "We own our mistakes",
+                desc: "If an embassy refusal is our fault, we refund your consulting fees in full. In writing."
+              }
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 flex flex-col justify-between"
+              >
+                <div>
+                  <span className="text-primary font-sans text-[10px] font-bold uppercase tracking-wider block mb-2">
+                    0{idx + 1}. Commitment
+                  </span>
+                  <h3 className="font-serif text-base font-semibold text-zinc-900 dark:text-white mb-2 leading-tight">
+                    {item.title}
+                  </h3>
+                  <p className="font-sans text-xs text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* 1. How It Works Block */}
         <div className="mb-24 text-center px-8 sm:px-16 max-w-7xl mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -59,7 +104,7 @@ export default function SchengenVisaHub() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            The QuickVisa <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>Assurance Process.</Highlighter>
+            How it <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>works.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -68,7 +113,7 @@ export default function SchengenVisaHub() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-sans text-base sm:text-lg text-zinc-600 dark:text-zinc-455 font-light max-w-2xl mx-auto mb-16"
           >
-            Our systematic approach to auditing files, preparing applications, and booking appointments.
+            Four steps. You'll know what happens at each one, and what it costs, before you start.
           </motion.p>
           
           <VerticalAccordion />

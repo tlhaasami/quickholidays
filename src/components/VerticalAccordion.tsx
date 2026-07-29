@@ -208,7 +208,7 @@ const items = [
     title: "02. Documentation",
     Icon: IconFiles,
     imgSrc: "/images/step2_documentation.webp",
-    description: "Your checklist, cover letter, and application forms — built for your situation. We help you find the cheapest refundable flight and hotel options, booked and paid directly by you. Everything reviewed before submission.",
+    description: "Your checklist, cover letter, and application forms — built for your situation. We show you exactly which refundable flights and free-cancellation hotels satisfy the embassy, booked and paid directly by you so you stay in control of your money.",
   },
   {
     id: 3,

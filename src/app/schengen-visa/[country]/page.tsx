@@ -90,7 +90,7 @@ export default async function CountryPage({
                   "Visa Application Forms: Completed for you to ensure zero errors.",
                   "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
                   "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
-                  "Flights and Hotels guidance: We help you find the cheapest refundable options — booked and paid directly by you. Not included in our fee.",
+                  "Flights & Hotels guidance: We guide you to the exact refundable flights and free-cancellation hotels that satisfy the embassy — booked and paid directly by you so you stay in control.",
                   "Tracked to Decision Day: Continuous monitoring of your application status."
                 ],
                 footerNote: "One price. Every step covered.",
@@ -108,7 +108,7 @@ export default async function CountryPage({
                   "Document Checklist: Built precisely for your personal and financial profile.",
                   "Professional Cover Letter: Expertly written for you.",
                   "Travel Insurance: Sorted for your exact travel dates.",
-                  "Flights and Hotels guidance: We help identify cheapest refundable options — booked and paid directly by you."
+                  "Flights & Hotels guidance: We guide you to compliant refundable options — booked and paid directly by you."
                 ],
                 notIncluded: [
                   "Appointment booking & confirmation",

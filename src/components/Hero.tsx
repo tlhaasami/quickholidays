@@ -383,6 +383,17 @@ export default function Hero() {
             }}
             className={`w-full lg:max-w-xl flex flex-col gap-4 pointer-events-auto`}
           >
+            {/* Subtitle */}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 10 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+              }}
+              className="text-primary font-sans text-xs sm:text-sm font-bold uppercase tracking-widest block"
+            >
+              {siteConfig.heroSubtitle} &bull; From &pound;45
+            </motion.div>
+
             {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
             <motion.div
               variants={{
@@ -429,15 +440,33 @@ export default function Hero() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className="flex flex-col sm:flex-row flex-wrap gap-4 items-start mt-2"
+              className="flex flex-col gap-4 mt-2 items-start"
             >
-              <ThemeButton href="/contact-us" size="sm">
-                Book a Consultation
-              </ThemeButton>
-              <ThemeButton href="/how-it-works" size="sm">
-                See how it works
-              </ThemeButton>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-start w-full">
+                <ThemeButton href="/schengen-ready" size="sm">
+                  Check if you're Schengen Ready — free
+                </ThemeButton>
+                <ThemeButton href="/pricing" size="sm">
+                  See what it costs
+                </ThemeButton>
+              </div>
 
+              {/* Timeline Guarantees */}
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm sm:text-base font-sans text-white/95 select-none pointer-events-none mt-4 font-normal">
+                <span className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  Custom checklist in 24h
+                </span>
+                <span className="hidden sm:inline w-2 h-2 rounded-full bg-zinc-700" />
+                <span className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  Appointment hunt in 48h
+                </span>
+              </div>
             </motion.div>
           </motion.div>
 
@@ -542,6 +571,62 @@ export default function Hero() {
         </div>
       </section>
 
+      {/* Honesty Promise Section */}
+      <section id="honesty-promise" className="relative w-full py-24 px-8 sm:px-16 md:px-24 bg-zinc-50 dark:bg-zinc-950/40 text-zinc-900 dark:text-white z-20 overflow-hidden border-t border-b border-zinc-200 dark:border-white/5 transition-colors duration-300">
+        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-primary font-sans text-xs font-bold uppercase tracking-widest block mb-4"
+          >
+            The Honesty Guarantee
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-zinc-900 dark:text-white mb-6 leading-tight"
+          >
+            We'll tell you if<br />
+            <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
+              you're not ready.
+            </Highlighter>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="font-sans text-base sm:text-lg text-zinc-700 dark:text-zinc-300 font-light leading-relaxed mb-8 max-w-2xl"
+          >
+            Most visa agencies will take your consulting fees and submit anyway, knowing your application faces a high risk of refusal. We don't. If your profile is missing key criteria, we will tell you directly during your free consultation — and we'll outline exactly what you need to fix first.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="inline-flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-full px-5 py-2 mb-8 text-xs font-sans font-medium text-primary"
+          >
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span>Last quarter, we advised 14% of applicants to wait or resolve files before submitting.</span>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <ThemeButton href="/contact-us">
+              Get an Honest Assessment — Free
+            </ThemeButton>
+          </motion.div>
+        </div>
+      </section>
+
       {/* 2. Stat Counters Section (7.2) - Now 2nd Section */}
       <section id="stat-counters" className="relative w-full min-h-screen lg:h-screen flex items-center justify-center py-20 px-8 sm:px-16 md:px-24 bg-white dark:bg-black text-zinc-900 dark:text-white z-20 overflow-hidden border-t border-zinc-200 dark:border-white/5 transition-colors duration-300">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full max-w-7xl mx-auto">
@@ -597,20 +682,20 @@ export default function Hero() {
             {/* Experience Counter */}
             <div className="border-l-2 border-primary/40 pl-6 py-2 transition-all duration-500 hover:border-primary">
               <div className="text-5xl sm:text-6xl font-sans font-extrabold text-primary tracking-tight mb-2">
-                <AnimatedCounter value={5} suffix=" YEARS+" />
+                <AnimatedCounter value={2} suffix=" YEARS" />
               </div>
               <div className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm font-light italic">
-                Serving UK-based applicants since 2021.
+                Serving UK-based non-UK nationals since 2024.
               </div>
             </div>
 
             {/* Clients Served Counter */}
             <div className="border-l-2 border-primary/40 pl-6 py-2 transition-all duration-500 hover:border-primary">
               <div className="text-5xl sm:text-6xl font-sans font-extrabold text-primary tracking-tight mb-2">
-                <AnimatedCounter value={2600} suffix=" CLIENTS+" />
+                <AnimatedCounter value={245} suffix="+" />
               </div>
               <div className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm font-light italic">
-                Applications handled 2021–2026.
+                Verified client reviews from UK residents.
               </div>
             </div>
 
@@ -620,7 +705,7 @@ export default function Hero() {
                 <AnimatedCounter value={97} suffix="%" />
               </div>
               <div className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm font-light italic">
-                Approvals across all applications submitted 2021–2026.
+                Approvals across all applications submitted 2024–2026.
               </div>
             </div>
           </motion.div>
@@ -628,8 +713,34 @@ export default function Hero() {
         </div>
       </section>
 
+      {/* Schengen Ready Promo Section */}
+      <section id="schengen-ready-promo" className="relative w-full py-24 px-8 sm:px-16 md:px-24 bg-zinc-50 dark:bg-zinc-950/40 text-zinc-900 dark:text-white z-20 overflow-hidden border-t border-b border-zinc-200 dark:border-white/5 transition-colors duration-300">
+        <div className="max-w-3xl mx-auto flex flex-col items-center text-center space-y-6">
+          <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest block">
+            Self-Assessment Quiz
+          </span>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-zinc-900 dark:text-white leading-tight">
+            Test your visa eligibility<br />
+            <Highlighter action="underline" color="#CCA352" strokeWidth={2.5} isView={true}>
+              before you apply.
+            </Highlighter>
+          </h2>
+          <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed max-w-2xl">
+            Don't leave your holiday to chance. Schengen embassies reject thousands of UK-based applications for easily avoidable mistakes in BRP validity, passport issue dates, and bank balances.
+          </p>
+          <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light leading-relaxed max-w-2xl">
+            Our instant assessment tool audits your profile against strict consulate rules in 60 seconds — completely free, no details required.
+          </p>
+          <div className="pt-4">
+            <ThemeButton href="/schengen-ready">
+              Check My Schengen Readiness — Free
+            </ThemeButton>
+          </div>
+        </div>
+      </section>
+
       {/* 2.3 Proof & Verification Section */}
-      <section id="proof-strip" className="relative w-full py-20 border-t border-b border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 text-zinc-800 dark:text-white z-20 transition-colors duration-300">
+      <section id="proof-strip" className="relative w-full py-20 border-b border-zinc-200 dark:border-white/5 bg-white dark:bg-black text-zinc-900 dark:text-white z-20 transition-colors duration-300">
         <div className="max-w-7xl w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column: Details */}
           <motion.div
@@ -685,7 +796,7 @@ export default function Hero() {
       </section>
 
       {/* 2.4 Accountability Promise Section (About Us) - Includes 3D Marquee at the bottom */}
-      <section id="about-us" className="relative w-full bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
+      <section id="about-us" className="relative w-full bg-zinc-50 dark:bg-zinc-950/40 z-20 border-t border-b border-zinc-200 dark:border-white/5 flex flex-col justify-between overflow-hidden transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-8 py-24 text-center flex flex-col items-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -721,7 +832,7 @@ export default function Hero() {
             >
               <span className="underline decoration-dotted decoration-primary/40 cursor-help font-semibold hover:text-primary transition-colors text-zinc-900 dark:text-zinc-100">refund our service fee</span>
             </Tooltip>{" "}
-            — in full, excluding appointment, insurance and other charges. That promise is in writing, in our refund policy, for every client.
+            — in full. And if your application is refused through ordinary embassy discretion (no error on either side), we will prepare and submit your reapplication for a flat <strong className="text-primary font-semibold">50% discount (half-fee)</strong>. Both promises are in writing, in our refund policy.
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -791,7 +902,7 @@ export default function Hero() {
       </section>
 
       {/* 2.6 Country Grid Section */}
-      <section id="schengen-visa" className="relative w-full py-24 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="schengen-visa" className="relative w-full py-24 bg-zinc-50 dark:bg-zinc-950/40 z-20 border-t border-b border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center px-8 sm:px-16 mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -829,7 +940,7 @@ export default function Hero() {
       {/* 2.6b Discover Countries Section — removed */}
 
       {/* 2.7 Reviews Section */}
-      <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-zinc-50 dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
+      <section id="reviews" className="relative w-full py-24 px-8 sm:px-16 bg-white dark:bg-black z-20 border-t border-b border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -854,19 +965,19 @@ export default function Hero() {
           <div className="hidden md:grid grid-cols-3 gap-8 text-left mb-12">
             {[
               {
-                name: "Amara O.",
+                name: "Natasha K.",
                 country: "France Visa",
-                text: "They managed to find a France appointment in London within 4 days. Absolutely saved my summer holiday. The checklist was extremely precise.",
+                text: "I was refused a Schengen visa previously, but Nile was a great help. He was with me throughout, even on the day of my biometrics until I finished completely. Highly recommended.",
               },
               {
-                name: "Dmitry K.",
+                name: "KJ Ldn",
+                country: "Schengen Visa",
+                text: "My consultant Anaya was a great help with my application. Got my appointment within a week and received my passport back with my visa. Service was amazing.",
+              },
+              {
+                name: "Nadeeka W.",
                 country: "Spain Visa",
-                text: "Highly recommend the Accountability Promise. It gives you absolute peace of mind knowing they back their check. Got my 2-year multiple entry visa.",
-              },
-              {
-                name: "Priyah S.",
-                country: "Germany Visa",
-                text: "Very professional from start to finish. Everything handled online, and they accompanied me right until my VFS appointment day. Excellent service.",
+                text: "Quick Holidays provided excellent support. A special thanks to Jenny for her professional service. She handled all the documentation smoothly and made the entire process stress-free.",
               }
             ].map((rev, idx) => (
               <WobbleCard
@@ -898,19 +1009,19 @@ export default function Hero() {
             <div className="min-h-[220px]">
               {[
                 {
-                  name: "Amara O.",
+                  name: "Natasha K.",
                   country: "France Visa",
-                  text: "They managed to find a France appointment in London within 4 days. Absolutely saved my summer holiday. The checklist was extremely precise.",
+                  text: "I was refused a Schengen visa previously, but Nile was a great help. He was with me throughout, even on the day of my biometrics until I finished completely. Highly recommended.",
                 },
                 {
-                  name: "Dmitry K.",
+                  name: "KJ Ldn",
+                  country: "Schengen Visa",
+                  text: "My consultant Anaya was a great help with my application. Got my appointment within a week and received my passport back with my visa. Service was amazing.",
+                },
+                {
+                  name: "Nadeeka W.",
                   country: "Spain Visa",
-                  text: "Highly recommend the Accountability Promise. It gives you absolute peace of mind knowing they back their check. Got my 2-year multiple entry visa.",
-                },
-                {
-                  name: "Priyah S.",
-                  country: "Germany Visa",
-                  text: "Very professional from start to finish. Everything handled online, and they accompanied me right until my VFS appointment day. Excellent service.",
+                  text: "Quick Holidays provided excellent support. A special thanks to Jenny for her professional service. She handled all the documentation smoothly and made the entire process stress-free.",
                 }
               ].map((rev, idx) => {
                 if (idx !== activeReviewIndex) return null;
@@ -976,7 +1087,7 @@ export default function Hero() {
       </section>
 
       {/* 2.8 Consultation Form Section */}
-      <section id="contact-us" className="relative w-full py-24 px-6 sm:px-16 bg-white dark:bg-black z-20 border-t border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300 flex flex-col items-center justify-center">
+      <section id="contact-us" className="relative w-full py-24 px-6 sm:px-16 bg-zinc-50 dark:bg-zinc-950/40 z-20 border-t border-b border-zinc-200 dark:border-white/5 text-zinc-900 dark:text-white transition-colors duration-300 flex flex-col items-center justify-center">
         <div className="max-w-6xl w-full text-left mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -1068,6 +1179,10 @@ export default function Hero() {
               {
                 q: "What is your Accountability Promise refund policy?",
                 a: "Our promise is simple: if we make a mistake on your document compilation or checking that directly leads to a visa rejection, we refund our service fee in full. Third-party costs like VFS appointment bookings, embassy visa fees, and travel insurance cannot be refunded."
+              },
+              {
+                q: "I was refused a Schengen visa recently. Can I reapply with you?",
+                a: "Yes! A previous refusal does not permanently block you from getting a visa. You must analyze the exact refusal reason code, address the document gap, and submit a custom rebuttal cover letter. Read our dedicated Schengen Visa Reapplication Guide (under /refused-before) to learn exactly how to rebuild your case."
               }
             ].map((faq, idx) => (
               <AccordionItem
@@ -1119,10 +1234,11 @@ export default function Hero() {
           <div className="flex flex-col gap-6 text-left items-start">
             <h4 className="font-sans text-xs font-bold uppercase tracking-widest text-primary">Policies</h4>
             <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400 items-start">
-              <Link href="/refund-policy" className="hover:text-primary dark:hover:text-white transition-colors">Refund & Cancellation Policy</Link>
+              <Link href="/refund-policy" className="hover:text-primary dark:hover:text-white transition-colors">Refund and Cancellation Policy</Link>
               <Link href="/terms" className="hover:text-primary dark:hover:text-white transition-colors">Service Terms</Link>
               <Link href="/insurance-disclaimer" className="hover:text-primary dark:hover:text-white transition-colors">Insurance Disclaimer</Link>
               <Link href="/privacy-policy" className="hover:text-primary dark:hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="/refused-before" className="hover:text-primary dark:hover:text-white transition-colors">Refused Before? Guide</Link>
               <Link href="/sitemap" className="hover:text-primary dark:hover:text-white transition-colors">Sitemap</Link>
             </div>
           </div>

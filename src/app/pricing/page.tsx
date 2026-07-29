@@ -8,75 +8,67 @@ import { ThemeButton } from "@/components/ThemeButton";
 export default function Pricing() {
   const tiers = [
     {
+      name: "Documentation Templates",
+      price: "£45",
+      period: "per applicant",
+      description: "Your self-service starter. Get custom checklists, professional cover letter templates, and travel insurance guidelines. You compile and submit everything yourself.",
+      features: [
+        "Custom checklists: Built for your nationality and UK visa type.",
+        "Cover letter template: Pre-written structures for your itinerary.",
+        "Insurance guide: Compliant Schengen coverage guidelines.",
+        "Self-submitted: You handle appointments and VFS/TLS yourself."
+      ],
+      buttonText: "Get Templates & Checklists",
+      buttonHref: "/contact-us?plan=templates",
+      popular: false
+    },
+    {
+      name: "Custom Documentation Audit",
+      originalPrice: "£145",
+      price: "£95",
+      period: "per applicant",
+      description: "Expert checking and drafting. We audit your bank statements, employer letter, and drafts, and compile your final cover letter to ensure absolute accuracy before you submit.",
+      features: [
+        "Everything in Documentation Templates.",
+        "Full Document Audit: 1-on-1 review of bank statements & files.",
+        "Custom Cover Letter: Written from scratch by your consultant.",
+        "Form Review: We check your application draft for common errors."
+      ],
+      notIncluded: [
+        "Appointment booking & confirmation",
+        "Daily slot tracking on TLS/VFS portals",
+        "Complete visa form draft completion"
+      ],
+      buttonText: "Book Documentation Audit",
+      buttonHref: "/contact-us?plan=documentation",
+      popular: false
+    },
+    {
       name: "Complete Visa Service",
       originalPrice: "£270",
       price: "£175",
       period: "per applicant",
-      description: "Everything handled. Start to finish. Nothing left for you to figure out. This is our premium, end-to-end service designed for maximum peace of mind. We take over the entire process so you can focus on planning your trip, knowing every detail is managed by professionals.",
+      depositNote: "£45 case deposit to start • £130 balance after slot is secured",
+      description: "End-to-end management. Start to finish. We handle document checking, complete your application forms, compile your cover letter, track and book your TLS/VFS appointment slot, and monitor your case.",
       features: [
-        "Consultation: Cost, checklist, and timeline assessment provided before you pay.",
-        "Custom Document Checklist: Built perfectly for your exact situation and profile.",
-        "Professional Cover Letter: Written for you to present a compelling and accurate itinerary to the embassy.",
-        "Visa Application Forms: Completed for you to ensure zero errors.",
-        "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
-        "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
-        "Flights and Hotels guidance: We help you find the cheapest refundable options — booked and paid directly by you. Not included in our fee.",
-        "Tracked to Decision Day: Continuous monitoring of your application status."
+        "Everything in Custom Documentation Audit.",
+        "£45 Case Deposit: Pay only a deposit to open your case file.",
+        "£130 Balance: Due only after we secure your VFS/TLS appointment.",
+        "Appointment Booking: Continuous TLS/VFS portal slot tracking.",
+        "Visa Form Completion: We draft and complete the forms for you.",
+        "Decision Tracked: Daily case monitoring until passport return."
       ],
       footerNote: "One price. Every step covered.",
       buttonText: "Book Complete Service",
       buttonHref: "/contact-us?plan=complete",
       popular: true
-    },
-    {
-      name: "Documentation Service",
-      originalPrice: "£145",
-      price: "£95",
-      period: "per applicant",
-      description: "Your paperwork, done right — you handle the appointment yourself. This package is ideal if you already have an appointment booked or prefer to manage the portal yourself, but want the assurance that your file is flawless.",
-      features: [
-        "Document Checklist: Built precisely for your personal and financial profile.",
-        "Professional Cover Letter: Expertly written for you.",
-        "Travel Insurance: Sorted for your exact travel dates.",
-        "Flights and Hotels guidance: We help identify cheapest refundable options — booked and paid directly by you."
-      ],
-      notIncluded: [
-        "Appointment booking & confirmation",
-        "Visa application form completion",
-        "Tracked to Decision Day status monitoring",
-        "Consultation timeline assessment before you pay"
-      ],
-      buttonText: "Book Documentation Service",
-      buttonHref: "/contact-us?plan=documentation",
-      popular: false
-    },
-    {
-      name: "Appointment Booking Service",
-      originalPrice: "£145",
-      price: "£95",
-      period: "per applicant",
-      description: "Already have your documents ready? This is for you. Appointment slots disappear in seconds. With this service, our processing team uses their continuous monitoring systems to secure your spot without the headache.",
-      features: [
-        "Appointment Booking: Secured and confirmed at your preferred centre.",
-        "Visa Application Form: Completed for you accurately."
-      ],
-      notIncluded: [
-        "Custom Document Checklist",
-        "Professional Cover Letter",
-        "Travel Insurance sorted",
-        "Flights and Hotels guidance",
-        "Tracked to Decision Day status monitoring"
-      ],
-      buttonText: "Book Appointment Booking",
-      buttonHref: "/contact-us?plan=appointment",
-      popular: false
-    },
+    }
   ];
 
   return (
     <div className="bg-white dark:bg-black min-h-screen text-zinc-950 dark:text-white pt-20 pb-36 px-8 sm:px-16 md:px-24 transition-colors duration-300">
       <div className="max-w-6xl mx-auto text-center">
-        <div className="mb-10">
+        <div className="mb-16">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -126,6 +118,13 @@ export default function Pricing() {
                 <p className="font-sans text-zinc-500 dark:text-zinc-400 text-xs mb-6 font-light">
                   {tier.description}
                 </p>
+
+                {tier.depositNote && (
+                  <div className="bg-primary/10 border border-primary/20 text-primary text-[11px] font-sans font-semibold px-3 py-1.5 rounded-lg mb-6 leading-normal">
+                    {tier.depositNote}
+                  </div>
+                )}
+
                 <div className="flex items-baseline gap-1.5 mb-6">
                   {tier.originalPrice && (
                     <span className="line-through text-zinc-400 dark:text-zinc-500 text-lg sm:text-xl font-normal mr-1">
@@ -139,6 +138,7 @@ export default function Pricing() {
                     / {tier.period}
                   </span>
                 </div>
+                
                 <ul className="space-y-3.5 mb-6">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm font-light text-zinc-700 dark:text-zinc-300">
@@ -178,6 +178,58 @@ export default function Pricing() {
             </motion.div>
           ))}
         </div>
+
+        {/* Third-Party Fees Disclaimer */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mt-20 max-w-4xl mx-auto p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-white/5 text-left"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="space-y-3 max-w-xl">
+              <span className="text-primary font-sans text-xs font-bold uppercase tracking-widest block">
+                Required External Costs
+              </span>
+              <h3 className="font-serif text-2xl font-medium text-zinc-900 dark:text-white tracking-tight">
+                Third-Party & Embassy Fees
+              </h3>
+              <p className="font-sans text-sm text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
+                The fees paid to consulates and booking centers are set by regulation and are separate from our service pricing. We never markup these fees — you pay them directly:
+              </p>
+              <ul className="space-y-2 text-xs font-sans text-zinc-600 dark:text-zinc-400 font-light">
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                  <span><strong>Embassy Visa Fee:</strong> €90 (~£78) for adults, €45 (~£39) for children aged 6-12, free for under 6. Paid directly at VFS or TLS.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                  <span><strong>Outsourcing center fee:</strong> Charged by VFS Global or TLScontact during slot confirmation. Typically £30 to £45.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                  <span><strong>Flight & Hotel bookings:</strong> Paid directly by you to the airline/hotel so you stay in full control.</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="p-6 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 flex flex-col justify-center items-start shrink-0 md:w-64">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1">
+                Accountability Promise
+              </span>
+              <span className="font-serif text-base font-semibold text-zinc-900 dark:text-white mb-2 leading-tight">
+                Mistake refund policy
+              </span>
+              <p className="font-sans text-[11px] text-zinc-600 dark:text-zinc-400 font-light leading-relaxed mb-4">
+                If a visa refusal is caused by an administrative checklist check omission on our end, we refund your consulting fees in full.
+              </p>
+              <a href="/refund-policy" className="text-xs text-primary font-semibold hover:underline font-sans">
+                Read Refund Policy →
+              </a>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
