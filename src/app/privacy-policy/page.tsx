@@ -68,7 +68,7 @@ export default function PrivacyPolicy() {
           <section className="space-y-3">
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">6. Your rights</h3>
             <p>
-              You have the right to access, correct, or request deletion of your personal data, or file a complaint with the UK Information Commissioner's Office (ICO). Our ICO registration reference will be published here once our registration is confirmed. For requests, contact us at{" "}
+              You have the right to access, correct, or request deletion of your personal data. For requests, contact us at{" "}
               <a href="mailto:info@quickholidays.co.uk" className="text-primary hover:text-zinc-900 dark:hover:text-white underline">
                 info@quickholidays.co.uk
               </a>.

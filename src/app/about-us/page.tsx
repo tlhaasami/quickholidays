@@ -42,10 +42,16 @@ export default function AboutUs() {
           className="p-8 sm:p-12 text-zinc-700 dark:text-zinc-250 font-serif text-lg sm:text-xl leading-relaxed space-y-6"
         >
           <p>
-            Our founder, Ali, came to the UK on a skilled worker visa. The first time he applied for a Schengen visa, he was refused because of a minor document check omission by a high-priced agency that vanished as soon as the rejection letter arrived. He lost his booking deposit, his vacation was cancelled, and he had no recourse.
+            Our founder, Ali, saw a Schengen visa industry that had lost people's trust. Too many applicants were paying for promises instead of genuine guidance. 
           </p>
           <p>
-            It felt incredibly frustrating and unfair. You spend months planning a holiday, pay high upfront consulting fees, only to be left in the dark when something goes wrong. We built <span className="text-primary font-semibold">Quick Holidays</span> to change this.
+            He built Quick Holidays around one simple principle: 
+          </p>
+          <p>  
+            Honesty. Clarity. Transparency.
+          </p>
+          <p> 
+            Everything else comes after that.
           </p>
           <p className="font-sans text-sm sm:text-base italic text-zinc-500 dark:text-zinc-400 font-light">
             "No consultancy can sell you a guaranteed visa; anyone who says otherwise is lying to you. We focus on absolute document accuracy, constant monitoring for appointment slots, and real accountability."

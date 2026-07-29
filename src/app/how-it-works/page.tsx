@@ -16,7 +16,7 @@ export default function HowItWorks() {
     {
       num: "02",
       title: "Deposit and Documentation",
-      description: "Paying the deposit opens your case file. We construct your custom document checklist, prepare your cover letters, compile your official application forms, and find flight/hotel reservations where possible. Every document is reviewed before submission."
+      description: "Paying the deposit opens your case file. We construct your custom document checklist, prepare your cover letters, and compile your official application forms. Every document is reviewed before submission."
     },
     {
       num: "03",

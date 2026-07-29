@@ -647,8 +647,8 @@ export default function SchengenReadyTool() {
                   </>
                 ) : (
                   <>
-                    <ThemeButton href="/contact-us?plan=templates">
-                      Get Templates (£45)
+                    <ThemeButton href="/contact-us?plan=documentation">
+                      Get Documentation Service (£95)
                     </ThemeButton>
                     <ThemeButton href="/contact-us?plan=complete">
                       Book Full Service (£175)

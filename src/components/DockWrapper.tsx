@@ -247,12 +247,7 @@ export function DockWrapper() {
           return;
         }
 
-        const isHomePage = path === "/";
-        if (isHomePage) {
-          setShowDock(window.scrollY > 80);
-        } else {
-          setShowDock(true);
-        }
+        setShowDock(true);
       }
     };
 

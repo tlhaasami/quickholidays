@@ -67,6 +67,10 @@ export const HERO_CONFIG = {
   // Paragraph width configuration
   paragraphMaxWidth: "max-w-lg",  // Bounds: max-w-md, max-w-lg, max-w-xl, max-w-2xl
   containerMaxWidth: "max-w-3xl",  // Overall container max-width bounds
+
+  // Text Shadow configurations for readability over background images/videos
+  subtitleTextShadow: "0 2px 8px rgba(0, 0, 0, 0.95)",
+  descriptionTextShadow: "0 2px 10px rgba(0, 0, 0, 0.95)",
 };
 
 // Navigation Links for site pages

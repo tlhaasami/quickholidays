@@ -16,57 +16,70 @@ export default function Pricing() {
 
   const tiers = [
     {
-      name: "Documentation Templates",
-      price: "£45",
-      period: "per applicant",
-      description: "Your self-service starter. Get custom checklists, professional cover letter templates, and travel insurance guidelines. You compile and submit everything yourself.",
-      features: [
-        "Custom checklists: Built for your nationality and UK visa type.",
-        "Cover letter template: Pre-written structures for your itinerary.",
-        "Insurance guide: Compliant Schengen coverage guidelines.",
-        "Self-submitted: You handle appointments and VFS/TLS yourself."
-      ],
-      buttonText: "Get Templates & Checklists",
-      buttonHref: "/contact-us?plan=templates",
-      popular: false
-    },
-    {
-      name: "Custom Documentation Audit",
-      originalPrice: "£145",
-      price: "£95",
-      period: "per applicant",
-      description: "Expert checking and drafting. We audit your bank statements, employer letter, and drafts, and compile your final cover letter to ensure absolute accuracy before you submit.",
-      features: [
-        "Everything in Documentation Templates.",
-        "Full Document Audit: 1-on-1 review of bank statements & files.",
-        "Custom Cover Letter: Written from scratch by your consultant.",
-        "Form Review: We check your application draft for common errors."
-      ],
-      notIncluded: [
-        "Appointment booking & confirmation",
-        "Daily slot tracking on TLS/VFS portals",
-        "Complete visa form draft completion"
-      ],
-      buttonText: "Book Documentation Audit",
-      buttonHref: "/contact-us?plan=documentation",
-      popular: false
-    },
-    {
       name: "Complete Visa Service",
       originalPrice: "£270",
       price: "£175",
       period: "per applicant",
-      description: "End-to-end management. Start to finish. We handle document checking, complete your application forms, compile your cover letter, track and book your TLS/VFS appointment slot, and monitor your case.",
+      depositNote: "£45 case deposit to start • £130 balance after slot is secured",
+      description: "Everything handled. Start to finish. Nothing left for you to figure out. This is our premium, end-to-end service designed for maximum peace of mind. We take over the entire process so you can focus on planning your trip, knowing every detail is managed by professionals.",
       features: [
-        "Everything in Custom Documentation Audit.",
-        "Appointment Booking: Continuous TLS/VFS portal slot tracking.",
-        "Visa Form Completion: We draft and complete the forms for you.",
-        "Decision Tracked: Daily case monitoring until passport return."
+        "Consultation: Cost, checklist, and timeline assessment provided before you pay.",
+        "Custom Document Checklist: Built perfectly for your exact situation and profile.",
+        "Professional Cover Letter: Written for you to present a compelling and accurate itinerary to the embassy.",
+        "Visa Application Forms: Completed for you to ensure zero errors.",
+        "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
+        "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
+        "Flight & Hotel: Guidance on compliant options (booking costs paid by you directly).",
+        "Tracked to Decision Day: Continuous monitoring of your application status."
       ],
       footerNote: "One price. Every step covered.",
       buttonText: "Book Complete Service",
       buttonHref: "/contact-us?plan=complete",
       popular: true
+    },
+    {
+      name: "Documentation Service",
+      originalPrice: "£145",
+      price: "£95",
+      period: "per applicant",
+      description: "Your paperwork, done right — you handle the appointment yourself. This package is ideal if you already have an appointment booked or prefer to manage the portal yourself, but want the assurance that your file is flawless.",
+      features: [
+        "Document Checklist: Built precisely for your personal and financial profile.",
+        "Professional Cover Letter: Expertly written for you.",
+        "Travel Insurance: Sorted for your exact travel dates.",
+        "Flight & Hotel: Guidance on compliant options (booking costs paid by you directly)."
+      ],
+      notIncluded: [
+        "Appointment booking & confirmation",
+        "Visa application form completion",
+        "Tracked to Decision Day status monitoring",
+        "Pre-payment eligibility consultation"
+      ],
+      buttonText: "Book Documentation Service",
+      buttonHref: "/contact-us?plan=documentation",
+      popular: false
+    },
+    {
+      name: "Appointment Booking Service",
+      originalPrice: "£145",
+      price: "£95",
+      period: "per applicant",
+      description: "Already have your documents ready? This is for you. Appointment slots disappear in seconds. With this service, our processing team uses their continuous monitoring systems to secure your spot without the headache.",
+      features: [
+        "Appointment Booking: Secured and confirmed at your preferred centre.",
+        "Visa Application Form: Completed for you accurately."
+      ],
+      notIncluded: [
+        "Custom Document Checklist",
+        "Professional Cover Letter",
+        "Travel Insurance sorted",
+        "Flight & Hotel booking guidance",
+        "Tracked to Decision Day status monitoring",
+        "Pre-payment eligibility consultation"
+      ],
+      buttonText: "Book Appointment Booking",
+      buttonHref: "/contact-us?plan=appointment",
+      popular: false
     }
   ];
 
@@ -226,10 +239,6 @@ export default function Pricing() {
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
                   <span><strong>Outsourcing center fee:</strong> Charged by VFS Global or TLScontact during slot confirmation. Typically £30 to £45.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
-                  <span><strong>Flight & Hotel bookings:</strong> Paid directly by you to the airline/hotel so you stay in full control.</span>
                 </li>
               </ul>
             </div>

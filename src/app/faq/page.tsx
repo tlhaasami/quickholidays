@@ -74,7 +74,7 @@ export default function FAQ() {
         },
         {
           q: "What is included in the Complete Visa Service fee?",
-          a: "Our Complete Visa Service (£175 total; split as a £45 case deposit to open your file and a £130 balance paid after your slot is confirmed) includes: (1) Free consultation and checklist assessment, (2) A custom document checklist tailored to your profile, (3) A professional cover letter written for you, (4) Fully completed official application forms, (5) Travel insurance sorted to meet Schengen rules, (6) Automated slot tracking and appointment booking, (7) Flight and hotel reservation guidance, and (8) Case tracking to Decision Day."
+          a: "Our Complete Visa Service (£175 total; split as a £45 case deposit to open your file and a £130 balance paid after your slot is confirmed) includes: (1) Free consultation and checklist assessment, (2) A custom document checklist tailored to your profile, (3) A professional cover letter written for you, (4) Fully completed official application forms, (5) Travel insurance sorted to meet Schengen rules, (6) Automated slot tracking and appointment booking, and (7) Case tracking to Decision Day."
         },
         {
           q: "How does the Accountability Promise refund process work?",
@@ -88,10 +88,6 @@ export default function FAQ() {
         {
           q: "What are the core documents required for a Schengen visa?",
           a: "Common requirements include: (1) UK Resident Permit (BRP) valid for 3+ months beyond your return date, (2) Travel insurance, (3) Employment details (payslips, tax return, employer letter), (4) UK bank statements (showing sufficient funds to cover your trip), (5) Flights and hotel reservations, and (6) A detailed cover letter. Your custom checklist will outline these based on your exact situation."
-        },
-        {
-          q: "Can you help me get flight and hotel bookings?",
-          a: "We show you exactly which refundable flights and free-cancellation hotels satisfy the embassy for your travel dates and destination. You book them yourself and pay the airline and hotel directly — we never handle your booking money, so you stay in control of your funds."
         },
         {
           q: "Will the embassy keep my passport?",

@@ -476,6 +476,7 @@ export default function Hero() {
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
               }}
               className="text-primary font-sans text-xs sm:text-sm font-bold uppercase tracking-widest block"
+              style={{ textShadow: HERO_CONFIG.subtitleTextShadow }}
             >
               {siteConfig.heroSubtitle}
             </motion.div>
@@ -516,7 +517,7 @@ export default function Hero() {
               className={HERO_CONFIG.paragraphMaxWidth}
             >
               <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
-                style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
+                style={{ textShadow: HERO_CONFIG.descriptionTextShadow }}>
                 {siteConfig.heroDescription}
               </p>
             </motion.div>
