@@ -4,10 +4,11 @@ import React from "react";
 import { motion } from "motion/react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
+import Link from "next/link";
 
 interface FAQItem {
   q: string;
-  a: string;
+  a: React.ReactNode;
 }
 
 interface FAQCategory {
@@ -61,7 +62,15 @@ export default function FAQ() {
       items: [
         {
           q: "What is the breakdown of Schengen visa fees?",
-          a: "A standard application incurs: (1) Embassy fee (set at €90 for adults by EU law), (2) Outsourcing partner booking fee (typically £30–£45 paid directly to VFS/TLS), and (3) Our fixed consultancy service fee. We do not bundle these fees to hide margins; everything is transparently itemized."
+          a: (
+            <span>
+              A standard application incurs: (1) Embassy fee (set at €90 for adults by EU law, paid in person at the embassy or visa center during your appointment), (2) Outsourcing partner booking fee (typically £30–£45 paid directly to VFS/TLS during confirmation), and (3) Our fixed consultancy service fee (see our full{" "}
+              <Link href="/pricing" className="text-primary hover:underline">
+                pricing structures
+              </Link>
+              ). We do not bundle these fees; everything is transparently itemized so you know exactly what is paid to whom.
+            </span>
+          )
         },
         {
           q: "What is included in the Complete Visa Service fee?",

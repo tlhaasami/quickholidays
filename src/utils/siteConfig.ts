@@ -14,7 +14,7 @@ export interface SiteConfig {
 export const defaultSiteConfig: SiteConfig = {
   heroTitle: "Quick Holidays",
   heroSubtitle: "Schengen Visa Consulting",
-  heroDescription: "If you're living in the UK on a BRP, student, spouse or work visa, applying for a Schengen visa shouldn't feel like a test you might fail. We'll tell you honestly whether you're ready, exactly what it costs, and exactly how long it takes — before you pay us anything. From £45.",
+  heroDescription: "If you're living in the UK on a BRP, student, spouse or work visa, applying for a Schengen visa shouldn't feel like a test you might fail. We'll tell you honestly whether you're ready, exactly what it costs, and exactly how long it takes — before you pay us anything.",
   phone: "+44 800 058 4673",
   whatsappUrl: "https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application.",
   address: "Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ",
@@ -33,6 +33,15 @@ export function getSiteConfig(): SiteConfig {
       "heroTitle", "heroSubtitle", "heroDescription", "phone", "whatsappUrl", "address", "companyNumber", "promoText"
     ];
     
+    // Always clear stale address if it doesn't match current default
+    try {
+      const savedAddress = localStorage.getItem("site_address");
+      const validAddressFragment = "Innovation Park";
+      if (savedAddress && !savedAddress.includes(validAddressFragment)) {
+        localStorage.removeItem("site_address");
+      }
+    } catch (e) {}
+
     let hasSaved = false;
     for (const key of keys) {
       const val = localStorage.getItem(`site_${key}`);

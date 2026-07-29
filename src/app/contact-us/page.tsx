@@ -28,9 +28,24 @@ export default function ContactUs() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light"
+          className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light mb-2"
         >
           Tell us about your Schengen trip. We'll tell you exactly what it takes — the cost, the documents, and a realistic timeline.
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
+          className="font-sans text-xs text-zinc-500 dark:text-zinc-400 font-light"
+        >
+          Have an issue or complaint? Call our escalation line directly at{" "}
+          <a href="tel:+448000584673" className="text-primary hover:underline font-semibold">
+            +44 800 058 4673 (Option 3)
+          </a>{" "}
+          or email{" "}
+          <a href="mailto:complaints@quickholidays.co.uk" className="text-primary hover:underline font-semibold">
+            complaints@quickholidays.co.uk
+          </a>.
         </motion.p>
       </div>
 

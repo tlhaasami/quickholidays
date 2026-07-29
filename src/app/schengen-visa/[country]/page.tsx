@@ -25,6 +25,24 @@ export async function generateMetadata({
   return {
     title: `${name} Schengen Visa from the UK — Fees & How It Works | Quick Holidays`,
     description: `${name} short-stay visa for non-UK nationals living in the UK: embassy fee, our process, and honest timelines.`,
+    openGraph: {
+      title: `${name} Schengen Visa from the UK — Fees & How It Works | Quick Holidays`,
+      description: `${name} short-stay visa for non-UK nationals living in the UK: embassy fee, our process, and honest timelines.`,
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: `${name} Schengen Visa - Quick Holidays`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} Schengen Visa from the UK | Quick Holidays`,
+      description: `${name} short-stay visa for non-UK nationals living in the UK: embassy fee, our process, and honest timelines.`,
+      images: ["/og-image.jpg"],
+    },
   };
 }
 
@@ -78,68 +96,57 @@ export default async function CountryPage({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch w-full text-left">
             {[
               {
+                name: "Documentation Templates",
+                price: "£45",
+                period: "per applicant",
+                description: "Your self-service starter. Get custom checklists, professional cover letter templates, and travel insurance guidelines. You compile and submit everything yourself.",
+                features: [
+                  "Custom checklists: Built for your nationality and UK visa type.",
+                  "Cover letter template: Pre-written structures for your itinerary.",
+                  "Insurance guide: Compliant Schengen coverage guidelines.",
+                  "Self-submitted: You handle appointments and VFS/TLS yourself."
+                ],
+                buttonText: "Get Templates & Checklists",
+                buttonHref: `/contact-us?plan=templates&destination=${match.slug}`,
+                popular: false
+              },
+              {
+                name: "Custom Documentation Audit",
+                originalPrice: "£145",
+                price: "£95",
+                period: "per applicant",
+                description: "Expert checking and drafting. We audit your bank statements, employer letter, and drafts, and compile your final cover letter to ensure absolute accuracy before you submit.",
+                features: [
+                  "Everything in Documentation Templates.",
+                  "Full Document Audit: 1-on-1 review of bank statements & files.",
+                  "Custom Cover Letter: Written from scratch by your consultant.",
+                  "Form Review: We check your application draft for common errors."
+                ],
+                notIncluded: [
+                  "Appointment booking & confirmation",
+                  "Daily slot tracking on TLS/VFS portals",
+                  "Complete visa form draft completion"
+                ],
+                buttonText: "Book Documentation Audit",
+                buttonHref: `/contact-us?plan=documentation&destination=${match.slug}`,
+                popular: false
+              },
+              {
                 name: "Complete Visa Service",
                 originalPrice: "£270",
                 price: "£175",
                 period: "per applicant",
-                description: "Everything handled. Start to finish. Nothing left for you to figure out. This is our premium, end-to-end service designed for maximum peace of mind.",
+                description: "End-to-end management. Start to finish. We handle document checking, complete your application forms, compile your cover letter, track and book your TLS/VFS appointment slot, and monitor your case.",
                 features: [
-                  "Consultation: Cost, checklist, and timeline assessment provided before you pay.",
-                  "Custom Document Checklist: Built perfectly for your exact situation and profile.",
-                  "Professional Cover Letter: Written for you to present a compelling and accurate itinerary to the embassy.",
-                  "Visa Application Forms: Completed for you to ensure zero errors.",
-                  "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
-                  "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
-                  "Flights & Hotels guidance: We guide you to the exact refundable flights and free-cancellation hotels that satisfy the embassy — booked and paid directly by you so you stay in control.",
-                  "Tracked to Decision Day: Continuous monitoring of your application status."
+                  "Everything in Custom Documentation Audit.",
+                  "Appointment Booking: Continuous TLS/VFS portal slot tracking.",
+                  "Visa Form Completion: We draft and complete the forms for you.",
+                  "Decision Tracked: Daily case monitoring until passport return."
                 ],
                 footerNote: "One price. Every step covered.",
                 buttonText: "Book Complete Service",
                 buttonHref: `/contact-us?plan=complete&destination=${match.slug}`,
                 popular: true
-              },
-              {
-                name: "Documentation Service",
-                originalPrice: "£145",
-                price: "£95",
-                period: "per applicant",
-                description: "Your paperwork, done right — you handle the appointment yourself. Perfect if you already have an appointment booked.",
-                features: [
-                  "Document Checklist: Built precisely for your personal and financial profile.",
-                  "Professional Cover Letter: Expertly written for you.",
-                  "Travel Insurance: Sorted for your exact travel dates.",
-                  "Flights & Hotels guidance: We guide you to compliant refundable options — booked and paid directly by you."
-                ],
-                notIncluded: [
-                  "Appointment booking & confirmation",
-                  "Visa application form completion",
-                  "Tracked to Decision Day status monitoring",
-                  "Consultation timeline assessment before you pay"
-                ],
-                buttonText: "Book Documentation",
-                buttonHref: `/contact-us?plan=documentation&destination=${match.slug}`,
-                popular: false
-              },
-              {
-                name: "Appointment Booking Service",
-                originalPrice: "£145",
-                price: "£95",
-                period: "per applicant",
-                description: "Already have your documents ready? We secure your biometrics appointment and complete your application form.",
-                features: [
-                  "Appointment Booking: Secured and confirmed at your preferred centre.",
-                  "Visa Application Form: Completed for you accurately."
-                ],
-                notIncluded: [
-                  "Custom Document Checklist",
-                  "Professional Cover Letter",
-                  "Travel Insurance sorted",
-                  "Flights and Hotels guidance",
-                  "Tracked to Decision Day status monitoring"
-                ],
-                buttonText: "Book Appointment",
-                buttonHref: `/contact-us?plan=appointment&destination=${match.slug}`,
-                popular: false
               }
             ].map((tier) => (
               <div
@@ -191,7 +198,7 @@ export default async function CountryPage({
                       <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-2">What is NOT Included:</span>
                       <ul className="space-y-2">
                         {tier.notIncluded.map((item) => (
-                          <li key={item} className="flex items-center gap-2 text-xs text-zinc-505 dark:text-zinc-400 line-through">
+                          <li key={item} className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 line-through">
                             <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-red-500 shrink-0">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
                             </svg>
@@ -214,6 +221,20 @@ export default async function CountryPage({
                 </Link>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Mandatory Embassy Fees Block */}
+        <div className="bg-amber-500/5 border border-primary/20 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="space-y-1.5 max-w-2xl text-left">
+            <h4 className="font-serif text-lg font-semibold text-zinc-900 dark:text-white">Mandatory Embassy Visa Fees</h4>
+            <p className="font-sans text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
+              In addition to our service fees, all Schengen embassies charge a mandatory visa fee. The standard fee is <strong>€90 (approx. £78)</strong> for adults and <strong>€45 (approx. £39)</strong> for children aged 6–12 (free for children under 6). This is paid directly to the embassy visa application center (VFS/TLS) at your biometrics appointment.
+            </p>
+          </div>
+          <div className="bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl text-center shrink-0 self-start sm:self-center">
+            <span className="block text-[10px] uppercase font-bold tracking-wider text-primary">Standard Fee</span>
+            <span className="font-serif text-2xl font-bold text-primary">€90 / €45</span>
           </div>
         </div>
 
@@ -254,7 +275,7 @@ export default async function CountryPage({
             <div className="border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/40 p-6 rounded-xl">
               <h4 className="font-sans font-bold text-sm text-zinc-900 dark:text-white mb-2">Can you help with flights and hotels?</h4>
               <p className="font-sans text-zinc-650 dark:text-zinc-400 text-xs sm:text-sm font-light leading-relaxed">
-                Yes, we construct compliant flight itineraries and hotel bookings (refundable/pay-at-property) so you do not buy real tickets before obtaining approval.
+                We assist you by constructing compliant flight itineraries and hotel reservations. You book and pay for them directly using our compliant guidelines, so you do not need to buy non-refundable tickets before approval.
               </p>
             </div>
           </div>

@@ -14,7 +14,7 @@ export default function SchengenVisaHub() {
     return COUNTRIES.map((c) => {
       return {
         image: c.flag,
-        link: `/contact-us?destination=${c.slug}`,
+        link: `/schengen-visa/${c.slug}`,
         title: c.name,
         description: COUNTRY_NICHES[c.name] || `Official Schengen visa application guide and document check for ${c.name} travelers residing in the UK.`,
       };
@@ -63,8 +63,8 @@ export default function SchengenVisaHub() {
                 desc: "The same person from consultation to passport return — not a ticket queue."
               },
               {
-                title: "Checklist in 24 hours",
-                desc: "Built specifically for your nationality, your UK visa type, and your situation."
+                title: "Transparent pricing",
+                desc: "Every cost is itemised — our fee, the embassy fee, and the VFS/TLS fee. No surprises."
               },
               {
                 title: "We own our mistakes",

@@ -1,11 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "motion/react";
 import { Highlighter } from "@/components/ui/highlighter";
 import { ThemeButton } from "@/components/ThemeButton";
 
 export default function Pricing() {
+  useEffect(() => {
+    document.title = "Service Pricing & Fees | Quick Holidays";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute("content", "View transparent pricing structures for Schengen visa document checking, VFS/TLS slot booking, and full end-to-end consulting.");
+    }
+  }, []);
+
   const tiers = [
     {
       name: "Documentation Templates",
@@ -48,12 +56,9 @@ export default function Pricing() {
       originalPrice: "£270",
       price: "£175",
       period: "per applicant",
-      depositNote: "£45 case deposit to start • £130 balance after slot is secured",
       description: "End-to-end management. Start to finish. We handle document checking, complete your application forms, compile your cover letter, track and book your TLS/VFS appointment slot, and monitor your case.",
       features: [
         "Everything in Custom Documentation Audit.",
-        "£45 Case Deposit: Pay only a deposit to open your case file.",
-        "£130 Balance: Due only after we secure your VFS/TLS appointment.",
         "Appointment Booking: Continuous TLS/VFS portal slot tracking.",
         "Visa Form Completion: We draft and complete the forms for you.",
         "Decision Tracked: Daily case monitoring until passport return."
@@ -92,6 +97,27 @@ export default function Pricing() {
           </motion.p>
         </div>
 
+        {/* Initial Deposit Notice */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="inline-flex items-center gap-3 bg-primary/8 border border-primary/25 rounded-2xl px-6 py-4 mb-12 text-left max-w-xl mx-auto"
+        >
+          <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+              <path d="M12 16v-4M12 8h.01" />
+            </svg>
+          </div>
+          <div>
+            <p className="font-sans text-xs font-bold text-primary uppercase tracking-wider mb-0.5">How payment works</p>
+            <p className="font-sans text-sm text-zinc-700 dark:text-zinc-300 font-light leading-snug">
+              The <span className="font-semibold text-zinc-900 dark:text-white">Complete Visa Service</span> starts with a <span className="font-semibold text-zinc-900 dark:text-white">£45 initial deposit</span> to open your case file — the remaining £130 balance is only collected once your appointment slot is confirmed.
+            </p>
+          </div>
+        </motion.div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch max-w-7xl mx-auto text-left">
           {tiers.map((tier, idx) => (
             <motion.div
@@ -118,12 +144,6 @@ export default function Pricing() {
                 <p className="font-sans text-zinc-500 dark:text-zinc-400 text-xs mb-6 font-light">
                   {tier.description}
                 </p>
-
-                {tier.depositNote && (
-                  <div className="bg-primary/10 border border-primary/20 text-primary text-[11px] font-sans font-semibold px-3 py-1.5 rounded-lg mb-6 leading-normal">
-                    {tier.depositNote}
-                  </div>
-                )}
 
                 <div className="flex items-baseline gap-1.5 mb-6">
                   {tier.originalPrice && (

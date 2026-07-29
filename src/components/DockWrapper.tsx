@@ -344,7 +344,7 @@ export function DockWrapper() {
     },
     {
       id: "schengen-ready",
-      label: "Schengen Ready Check",
+      label: "Eligibility Check",
       icon: <DockIconChecklist className="w-[24px] h-[24px]" />,
       isActive: pathname === "/schengen-ready",
       onClick: () => router.push("/schengen-ready"),

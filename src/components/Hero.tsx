@@ -164,6 +164,14 @@ export default function Hero() {
   const [flagsLoaded, setFlagsLoaded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [visasApproved, setVisasApproved] = useState(1482);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisasApproved((prev) => prev + (Math.random() > 0.85 ? 1 : 0));
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredCountries = useMemo(() => {
     return COUNTRIES.filter((c) =>
@@ -359,7 +367,7 @@ export default function Hero() {
   const sections = [
     { id: "proof-strip", label: "7.3 Proof Strip" },
     { id: "about-us", label: "7.4 Accountability Promise" },
-    { id: "how-it-works", label: "7.5 QuickVisa Assurance Process" },
+    { id: "how-it-works", label: "7.5 How It Works" },
     { id: "schengen-visa", label: "7.6 Country Grid" },
     { id: "reviews", label: "7.7 Reviews" },
     { id: "contact-us", label: "7.8 Consultation Form" },
@@ -469,7 +477,7 @@ export default function Hero() {
               }}
               className="text-primary font-sans text-xs sm:text-sm font-bold uppercase tracking-widest block"
             >
-              {siteConfig.heroSubtitle} &bull; From &pound;45
+              {siteConfig.heroSubtitle}
             </motion.div>
 
             {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
@@ -529,20 +537,20 @@ export default function Hero() {
                 </ThemeButton>
               </div>
 
-              {/* Timeline Guarantees */}
+              {/* Trust Signals */}
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm sm:text-base font-sans text-white/95 select-none pointer-events-none mt-4 font-normal">
                 <span className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
-                  Custom checklist in 24h
+                  Free eligibility check
                 </span>
                 <span className="hidden sm:inline w-2 h-2 rounded-full bg-zinc-700" />
                 <span className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
-                  Appointment hunt in 48h
+                  No hidden fees
                 </span>
               </div>
             </motion.div>
@@ -594,35 +602,8 @@ export default function Hero() {
                     })}
                   />
                   
-                  {/* Creative instructional labels */}
-                  <div className="flex items-center justify-between gap-3 mt-4 px-0.5 pointer-events-auto">
-                    {/* Swipe hint — frosted glass pill with bouncing arrows */}
-                    <div
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-full select-none"
-                      style={{
-                        background: "rgba(255,255,255,0.18)",
-                        backdropFilter: "blur(10px)",
-                        WebkitBackdropFilter: "blur(10px)",
-                        border: "1px solid rgba(255,255,255,0.35)",
-                        boxShadow: "0 2px 12px rgba(0,0,0,0.25)"
-                      }}
-                    >
-                      <motion.span
-                        animate={{ x: [-3, 0, -3] }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                        className="text-white text-xs leading-none"
-                      >←</motion.span>
-                      <span className="text-white text-[10px] font-bold uppercase tracking-widest whitespace-nowrap" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>
-                        Swipe to explore
-                      </span>
-                      <motion.span
-                        animate={{ x: [3, 0, 3] }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                        className="text-white text-xs leading-none"
-                      >→</motion.span>
-                    </div>
-
-                    {/* See all countries — gold accent pill button */}
+                  {/* See all countries — gold accent pill button */}
+                  <div className="flex items-center justify-end mt-4 px-0.5 pointer-events-auto">
                     <button
                       onClick={() => setIsModalOpen(true)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full cursor-pointer active:scale-95 transition-transform duration-150"
@@ -757,13 +738,13 @@ export default function Hero() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
             className="flex flex-col gap-12 justify-center lg:pl-12"
           >
-            {/* Experience Counter */}
+            {/* Visas Approved Counter */}
             <div className="border-l-2 border-primary/40 pl-6 py-2 transition-all duration-500 hover:border-primary">
               <div className="text-5xl sm:text-6xl font-sans font-extrabold text-primary tracking-tight mb-2">
-                <AnimatedCounter value={2} suffix=" YEARS" />
+                <AnimatedCounter value={visasApproved} suffix="" />
               </div>
               <div className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm font-light italic">
-                Serving UK-based non-UK nationals since 2024.
+                Visas successfully approved for clients.
               </div>
             </div>
 
@@ -910,7 +891,7 @@ export default function Hero() {
             >
               <span className="underline decoration-dotted decoration-primary/40 cursor-help font-semibold hover:text-primary transition-colors text-zinc-900 dark:text-zinc-100">refund our service fee</span>
             </Tooltip>{" "}
-            — in full. And if your application is refused through ordinary embassy discretion (no error on either side), we will prepare and submit your reapplication for a flat <strong className="text-primary font-semibold">50% discount (half-fee)</strong>. Both promises are in writing, in our refund policy.
+            — in full. This promise is in writing, in our refund policy.
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -957,7 +938,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl font-medium mb-4 text-zinc-900 dark:text-white tracking-tight"
           >
-            QuickVisa <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>Assurance Process.</Highlighter>
+            How it <Highlighter action="underline" color="#C99537" strokeWidth={2.5} isView={true}>works.</Highlighter>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -1190,6 +1171,10 @@ export default function Hero() {
                 a: "Processing times vary by embassy, usually taking between 15 to 45 calendar days after your biometrics appointment. However, finding appointment slots can sometimes take additional time, which is why we recommend starting the process 6-8 weeks before your travel."
               },
               {
+                q: "What are the total costs for a Schengen visa?",
+                a: "There are three separate costs: (1) Our consulting service fee — see our full pricing page at /pricing for the three tiers (Templates £45, Document Audit £95, Complete Service £175). (2) The mandatory embassy visa fee of €90 for adults / €45 for children aged 6–12, paid directly to the embassy at your biometrics appointment. (3) A VFS/TLS visa centre booking fee of approximately £30–£45, paid directly to the appointment centre. We never bundle these — every cost is itemised so you know exactly what is paid to whom."
+              },
+              {
                 q: "What is your Accountability Promise refund policy?",
                 a: "Our promise is simple: if we make a mistake on your document compilation or checking that directly leads to a visa rejection, we refund our service fee in full. Third-party costs like VFS appointment bookings, embassy visa fees, and travel insurance cannot be refunded."
               },
@@ -1237,9 +1222,13 @@ export default function Hero() {
             <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400 items-start">
               <Link href="/" className="hover:text-primary dark:hover:text-white transition-colors">Home</Link>
               <Link href="/schengen-visa" className="hover:text-primary dark:hover:text-white transition-colors">Schengen Visa</Link>
+              <Link href="/schengen-ready" className="hover:text-primary dark:hover:text-white transition-colors">Schengen Ready Check</Link>
+              <Link href="/pricing" className="hover:text-primary dark:hover:text-white transition-colors">Pricing</Link>
               <Link href="/how-it-works" className="hover:text-primary dark:hover:text-white transition-colors">How It Works</Link>
               <Link href="/reviews" className="hover:text-primary dark:hover:text-white transition-colors">Reviews</Link>
-              <Link href="/contact-us" className="hover:text-primary dark:hover:text-white transition-colors">Book Consultation</Link>
+              <Link href="/faq" className="hover:text-primary dark:hover:text-white transition-colors">FAQ</Link>
+              <Link href="/about-us" className="hover:text-primary dark:hover:text-white transition-colors">About Us</Link>
+              <Link href="/contact-us" className="hover:text-primary dark:hover:text-white transition-colors">Contact Us</Link>
             </div>
           </div>
 
@@ -1247,9 +1236,9 @@ export default function Hero() {
           <div className="flex flex-col gap-6 text-left items-start">
             <h4 className="font-sans text-xs font-bold uppercase tracking-widest text-primary">Policies</h4>
             <div className="flex flex-col gap-3 font-sans text-sm font-light text-zinc-600 dark:text-zinc-400 items-start">
-              <Link href="/refund-policy" className="hover:text-primary dark:hover:text-white transition-colors">Refund and Cancellation Policy</Link>
-              <Link href="/terms" className="hover:text-primary dark:hover:text-white transition-colors">Service Terms</Link>
-              <Link href="/insurance-disclaimer" className="hover:text-primary dark:hover:text-white transition-colors">Insurance Disclaimer</Link>
+              <Link href="/refund-policy" className="hover:text-primary dark:hover:text-white transition-colors">Refund Policy</Link>
+              <Link href="/service-terms" className="hover:text-primary dark:hover:text-white transition-colors">Service Terms</Link>
+              <Link href="/travel-insurance-disclaimer" className="hover:text-primary dark:hover:text-white transition-colors">Insurance Disclaimer</Link>
               <Link href="/privacy-policy" className="hover:text-primary dark:hover:text-white transition-colors">Privacy Policy</Link>
               <Link href="/refused-before" className="hover:text-primary dark:hover:text-white transition-colors">Refused Before? Guide</Link>
               <Link href="/sitemap" className="hover:text-primary dark:hover:text-white transition-colors">Sitemap</Link>
@@ -1277,6 +1266,17 @@ export default function Hero() {
                 <div className="flex flex-col items-start">
                   <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Phone</span>
                   <a href={`tel:${siteConfig.phone.replace(/\s+/g, "")}`} className="hover:text-primary dark:hover:text-white transition-colors">{siteConfig.phone}</a>
+                </div>
+              </div>
+              <div className="flex flex-row items-start text-left gap-3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-primary mt-1 shrink-0">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                <div className="flex flex-col items-start">
+                  <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Escalation & Complaints</span>
+                  <a href="tel:+448000584673" className="hover:text-primary dark:hover:text-white transition-colors">+44 800 058 4673 (Opt 3)</a>
                 </div>
               </div>
               <div className="flex flex-row items-start text-left gap-3">

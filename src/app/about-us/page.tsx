@@ -42,7 +42,7 @@ export default function AboutUs() {
           className="p-8 sm:p-12 text-zinc-700 dark:text-zinc-250 font-serif text-lg sm:text-xl leading-relaxed space-y-6"
         >
           <p>
-            Our founder, Talha, came to the UK on a skilled worker visa. The first time he applied for a Schengen visa, he was refused because of a minor document check omission by a high-priced agency that vanished as soon as the rejection letter arrived. He lost his booking deposit, his vacation was cancelled, and he had no recourse.
+            Our founder, Ali, came to the UK on a skilled worker visa. The first time he applied for a Schengen visa, he was refused because of a minor document check omission by a high-priced agency that vanished as soon as the rejection letter arrived. He lost his booking deposit, his vacation was cancelled, and he had no recourse.
           </p>
           <p>
             It felt incredibly frustrating and unfair. You spend months planning a holiday, pay high upfront consulting fees, only to be left in the dark when something goes wrong. We built <span className="text-primary font-semibold">Quick Holidays</span> to change this.

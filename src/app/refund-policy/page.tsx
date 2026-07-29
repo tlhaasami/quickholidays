@@ -45,20 +45,25 @@ export default function RefundPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">3. Embassy fees</h3>
+            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">3. Statutory Cancellation Right</h3>
+            <p>
+              Under UK consumer law, you have a statutory right to cancel your agreement with us within 14 days of booking. However, because our service begins immediately upon payment of your deposit (we immediately start building your checklist and tracking appointment slots), you agree to waive your 14-day cancellation right in exchange for immediate service delivery. If you cancel after work has started, you will not receive a refund for services already performed.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">4. Embassy fees</h3>
             <p>
               Embassy and visa-centre fees are paid to the embassy, not to us. They are outside our control and are not refundable by us under any circumstances.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">4. Our Accountability Promise</h3>
+            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">5. Our Accountability Promise</h3>
             <p>
               If your application is refused because of a documented error on our side — a mistake in your application, a missed document we were responsible for checking, a deadline we caused you to miss — we refund our full service fee in full (excluding paid third-party appointment and insurance fees). We will tell you plainly whether the error was ours; you will not have to fight us for it.
             </p>
-            <p>
-              If your visa is refused by the embassy due to ordinary consulate discretion (where no error was made by either you or us), we stand by you. We will compile, audit, and submit your reapplication for a flat <strong>50% discount</strong> (half-fee) on our standard service pricing.
-            </p>
+
             <div className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 p-4 rounded-lg mt-2 space-y-2 text-xs sm:text-sm">
               <strong className="text-primary block">What the promise doesn't cover:</strong>
               <ul className="list-disc list-inside text-zinc-600 dark:text-zinc-400 space-y-1">
@@ -73,7 +78,7 @@ export default function RefundPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">5. Refund handling</h3>
+            <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">6. Refund handling</h3>
             <p>
               Approved refunds are paid to your original payment method within 7 days of confirming the refund agreement.
             </p>

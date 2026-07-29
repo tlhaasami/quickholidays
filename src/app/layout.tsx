@@ -26,6 +26,28 @@ export const metadata: Metadata = {
     shortcut: "/logos/logo.svg",
     apple: "/logos/logo.svg",
   },
+  openGraph: {
+    title: "Quick Holidays Ltd | Schengen Visa Specialists",
+    description: "Get your Schengen visa handled properly with clear costs, honest advice, and our full Accountability Promise.",
+    url: "https://www.quickholidays.co.uk",
+    siteName: "Quick Holidays",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Quick Holidays - Schengen Visa Specialists for UK Residents",
+      },
+    ],
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Quick Holidays Ltd | Schengen Visa Specialists",
+    description: "Get your Schengen visa handled properly with clear costs, honest advice, and our full Accountability Promise.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({

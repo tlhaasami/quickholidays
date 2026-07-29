@@ -1,12 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "motion/react";
 import { Highlighter } from "@/components/ui/highlighter";
 import { ThemeButton } from "@/components/ThemeButton";
 import Link from "next/link";
 
 export default function RefusedBeforePage() {
+  useEffect(() => {
+    document.title = "Schengen Visa Reapplication Guide | Quick Holidays";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute("content", "Step-by-step reapplication strategy for Schengen visa refusals. Learn how to address rejection reason codes and draft rebuttals.");
+    }
+  }, []);
+
   const refusalReasons = [
     {
       code: "Reason 2",
@@ -65,74 +73,11 @@ export default function RefusedBeforePage() {
           </p>
         </div>
 
-        {/* Reapplication Strategy Summary Card */}
-        <div className="p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 shadow-xl text-left space-y-6">
-          <h3 className="font-serif text-xl font-semibold text-zinc-900 dark:text-white">Our 50% Reapplication Discount</h3>
-          <p className="font-sans text-sm text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
-            We stand behind our work. If you applied using our full consulting service and face a refusal due to ordinary embassy discretion, we will prepare and submit your complete reapplication at a <strong>50% flat discount</strong>. If the refusal was caused by our administrative oversight, we will refund your fee in full.
-          </p>
-        </div>
-
-        {/* Decoding Refusal Reasons */}
-        <div className="space-y-8">
-          <div className="text-left">
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-zinc-900 dark:text-white tracking-tight">
-              1. Decode your refusal letter
-            </h2>
-            <p className="font-sans text-sm text-zinc-500 dark:text-zinc-400 font-light mt-1">
-              Check the standard EU rejection form you received. You will find checkmarks next to specific reason codes:
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {refusalReasons.map((reason) => (
-              <div 
-                key={reason.code}
-                className="p-6 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-200 dark:border-white/5 text-left space-y-4 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="bg-primary/10 border border-primary/20 text-primary text-[10px] font-sans font-bold uppercase tracking-wider py-1 px-3 rounded-full">
-                    {reason.code}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-serif text-lg font-semibold text-zinc-900 dark:text-white">
-                    {reason.title}
-                  </h4>
-                  <p className="font-sans text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
-                    {reason.description}
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-zinc-200/50 dark:border-white/5">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-red-500 block">Common Causes:</span>
-                    <ul className="space-y-1.5">
-                      {reason.causes.map((c, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-zinc-650 dark:text-zinc-400 font-light">
-                          <span className="text-red-500 shrink-0">&#8226;</span>
-                          <span>{c}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-emerald-500 block">How to Fix:</span>
-                    <p className="text-xs text-zinc-700 dark:text-zinc-300 font-light leading-relaxed">
-                      {reason.solution}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Step-by-Step Reapplication Process */}
         <div className="space-y-8 text-left">
           <div>
             <h2 className="font-serif text-2xl sm:text-3xl font-medium text-zinc-900 dark:text-white tracking-tight">
-              2. The Reapplication Roadmap
+              Reapplication Roadmap
             </h2>
             <p className="font-sans text-sm text-zinc-500 dark:text-zinc-400 font-light mt-1">
               Follow these three crucial steps to rebuild your application successfully:

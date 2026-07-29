@@ -74,6 +74,13 @@ const StrokeContactIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const StrokeChecklistIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="m9 11 3 3L22 4" />
+    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+  </svg>
+);
+
 const StrokeBotIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 8V4H8M12 8v4M12 12H8m4 0h4m-4 8v-4m0-4V8h.01" />
@@ -86,6 +93,7 @@ const StrokeBotIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const MOBILE_NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Schengen Visa", href: "/schengen-visa" },
+  { name: "Eligibility Check", href: "/schengen-ready" },
   { name: "Pricing", href: "/pricing" },
   { name: "How It Works", href: "/how-it-works" },
   { name: "FAQ", href: "/faq" },
@@ -173,6 +181,8 @@ export function Navbar() {
         return <StrokeHomeIcon className={iconClass} />;
       case "/schengen-visa":
         return <StrokePassportIcon className={iconClass} />;
+      case "/schengen-ready":
+        return <StrokeChecklistIcon className={iconClass} />;
       case "/pricing":
         return <StrokePricingIcon className={iconClass} />;
       case "/how-it-works":

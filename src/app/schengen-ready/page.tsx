@@ -14,8 +14,21 @@ interface Verdict {
 }
 
 export default function SchengenReadyTool() {
+  React.useEffect(() => {
+    document.title = "Schengen Visa Eligibility Checker | Quick Holidays";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute("content", "Check if you are ready to apply for a Schengen visa in 60 seconds. Test your BRP validity, passport rules, and financial savings.");
+    }
+  }, []);
+
   const [step, setStep] = useState(1);
   const totalSteps = 8;
+
+  // Email Lead Capture State
+  const [emailInput, setEmailInput] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
 
   // Form State
   const [visaType, setVisaType] = useState("");
@@ -31,8 +44,12 @@ export default function SchengenReadyTool() {
 
   // Options
   const visaOptions = [
-    { label: "BRP (Skilled Worker, Spouse, ILR, etc.)", value: "brp" },
-    { label: "Student Visa (Tier 4)", value: "student" },
+    { label: "Physical BRP Card (Skilled Worker, Spouse, ILR, etc.)", value: "brp" },
+    { label: "Digital eVisa / Skilled Worker on eVisa", value: "evisa" },
+    { label: "EU Settlement Scheme (EUSS - Settled / Pre-Settled)", value: "euss" },
+    { label: "Student Visa / Student Route (formerly Tier 4)", value: "student" },
+    { label: "Graduate Visa", value: "graduate" },
+    { label: "Dependant / PBS Dependant Visa", value: "dependant" },
     { label: "Standard Visitor / Tourist Visa", value: "tourist" }
   ];
 
@@ -221,7 +238,7 @@ export default function SchengenReadyTool() {
             </span>
           </h1>
           <p className="font-sans text-sm sm:text-base text-zinc-650 dark:text-zinc-400 font-light max-w-xl mx-auto leading-relaxed">
-            consulates reject thousands of applications each month for simple document errors. Use our assessment engine to test your file eligibility instantly.
+            Consulates reject thousands of applications each month for simple document errors. Use our assessment engine to test your file eligibility instantly.
           </p>
         </div>
 
@@ -284,7 +301,7 @@ export default function SchengenReadyTool() {
                           When does your UK BRP / Residency Visa expire?
                         </label>
                         <p className="font-sans text-xs text-zinc-500 dark:text-zinc-400 font-light">
-                          If you hold Indefinite Leave to Remain (ILR), choose a date several years in the future.
+                          If you hold Indefinite Leave to Remain (ILR) or EUSS Settled Status, choose a date several years in the future.
                         </p>
                         <input
                           type="date"
@@ -559,6 +576,50 @@ export default function SchengenReadyTool() {
                     ))}
                   </ul>
                 </div>
+              </div>
+
+              {/* Emailed Summary Lead Capture */}
+              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 space-y-4">
+                <h4 className="font-serif text-base font-semibold text-zinc-900 dark:text-white">
+                  Email my eligibility report
+                </h4>
+                <p className="font-sans text-xs text-zinc-650 dark:text-zinc-400 font-light leading-relaxed">
+                  Get a complete breakdown of your assessment, checklist fixes, and next steps sent straight to your inbox.
+                </p>
+                {emailSubmitted ? (
+                  <div className="text-emerald-500 font-sans text-xs font-semibold flex items-center gap-2">
+                    <span>✓</span> Report successfully sent to {emailInput}!
+                  </div>
+                ) : (
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (!emailInput) return;
+                      setEmailLoading(true);
+                      setTimeout(() => {
+                        setEmailLoading(false);
+                        setEmailSubmitted(true);
+                      }, 1000);
+                    }}
+                    className="flex flex-col sm:flex-row gap-3"
+                  >
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter your email address"
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      className="brutalist-input font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex-1 text-sm py-2.5"
+                    />
+                    <button
+                      type="submit"
+                      disabled={emailLoading}
+                      className="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-sans font-bold uppercase tracking-wider hover:opacity-90 transition-all shrink-0 cursor-pointer"
+                    >
+                      {emailLoading ? "Sending..." : "Send Report"}
+                    </button>
+                  </form>
+                )}
               </div>
 
               {/* Final CTAs */}

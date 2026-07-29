@@ -109,14 +109,21 @@ export async function GET() {
       res = await client.query("SELECT * FROM video_reviews ORDER BY id ASC;");
     }
 
-    // Format output
-    const formatted = res.rows.map(row => ({
-      id: String(row.id),
-      name: row.name,
-      country: row.country,
-      youtubeId: row.youtube_id,
-      caption: row.caption
-    }));
+    // Format output, filtering out duplicates by youtubeId
+    const seen = new Set<string>();
+    const formatted: any[] = [];
+    for (const row of res.rows) {
+      if (!seen.has(row.youtube_id)) {
+        seen.add(row.youtube_id);
+        formatted.push({
+          id: String(row.id),
+          name: row.name,
+          country: row.country,
+          youtubeId: row.youtube_id,
+          caption: row.caption
+        });
+      }
+    }
 
     return NextResponse.json({ success: true, reviews: formatted });
   } catch (err: any) {

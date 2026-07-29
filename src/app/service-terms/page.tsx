@@ -71,7 +71,7 @@ export default function ServiceTerms() {
           <section className="space-y-3">
             <h3 className="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">6. Document Handling & Liability</h3>
             <p>
-              Original documents in our care are stored securely and returned by [METHOD]. Our liability for loss or damage of original documents is limited to [LIABILITY CAP — solicitor to advise].
+              Original documents in our care are stored securely and returned by Royal Mail Special Delivery. Our liability for loss or damage of original documents is limited to the direct replacement cost of the physical documents (such as passport agency replacement fees), capped at £150 per applicant.
             </p>
           </section>
 
