@@ -70,7 +70,7 @@ export default function SchengenReadyTool() {
 
   const calculateVerdict = (): Verdict => {
     const reasons: string[] = [];
-    const fixes: string[] = [];
+    const fixes: React.ReactNode[] = [];
     let isRed = false;
     let isYellow = false;
 
