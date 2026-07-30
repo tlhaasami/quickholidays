@@ -21,55 +21,12 @@ interface Conversation {
 }
 
 export function getDynamicCriticalFields(data: Record<string, string>): string[] {
-  const list = [
-    "personal_surname",
-    "personal_first_names",
-    "personal_dob",
-    "passport_number",
-    "passport_issue_date",
-    "passport_expiry_date",
-    "travel_destinations",
-    "travel_start_date",
-    "travel_return_date",
-    "address_street",
-    "address_postal_code",
-    "address_city",
-    "address_country",
-    "address_phone",
-    "address_email"
-  ];
-
-  // If UK Residency is BRP/visa (not citizen), uk_share_code is required
-  const nationality = (data.personal_nationality || "").toLowerCase();
-  const isUKCitizen = nationality.includes("british") || nationality.includes("united kingdom") || nationality.includes("uk");
-  if (!isUKCitizen) {
-    list.push("uk_share_code");
-  }
-
-  // Check employment status
-  const occupation = (data.emp_occupation || "").toLowerCase();
-  const hasEmployer = !!data.emp_employer_name || !!data.emp_job_title;
-  const isEmployed = occupation && !occupation.includes("student") && !occupation.includes("unemployed") && !occupation.includes("child") && !occupation.includes("minor") && !occupation.includes("retired");
-  
-  if (isEmployed || hasEmployer) {
-    list.push("emp_employer_name", "emp_job_title", "emp_street", "emp_postal_code", "emp_city", "emp_country");
-  } else if (occupation.includes("student") || !!data.emp_school_name) {
-    list.push("emp_school_name", "emp_street", "emp_postal_code", "emp_city", "emp_country");
-  }
-
-  // Check if minor
-  const dobStr = data.personal_dob;
-  if (dobStr) {
-    try {
-      const dob = new Date(dobStr);
-      const ageDiff = Date.now() - dob.getTime();
-      const age = ageDiff / (1000 * 60 * 60 * 24 * 365.25);
-      if (age < 18) {
-        list.push("minor_relation", "minor_surname", "minor_first_name", "minor_dob", "minor_nationality");
-      }
-    } catch (e) {}
-  }
-
+  const list: string[] = [];
+  visaSections.forEach(sec => {
+    sec.fields.forEach(field => {
+      list.push(field.id);
+    });
+  });
   return list;
 }
 
@@ -1813,11 +1770,9 @@ export default function AgentPortal() {
                         <div className="space-y-2.5 text-[11px] font-sans text-left">
                           {filteredFields.length > 0 ? (
                             filteredFields.map((field) => {
-                              const isCritical = dynamicCritical.includes(field.id);
-                              const isMissing = isCritical && !(tempParsedData[field.id] || "");
                               return (
                                 <div key={field.id} className="flex flex-col gap-1 text-left py-1.5 border-b border-zinc-100 dark:border-zinc-800/40 last:border-b-0">
-                                  <span className={`text-zinc-500 dark:text-zinc-400 font-bold uppercase text-[9px] tracking-wider shrink-0 ${isCritical ? "after:content-['*'] after:text-primary after:ml-0.5" : ""}`}>
+                                  <span className="text-zinc-500 dark:text-zinc-400 font-bold uppercase text-[9px] tracking-wider shrink-0">
                                     {field.label}:
                                   </span>
                                   <input
@@ -1829,8 +1784,8 @@ export default function AgentPortal() {
                                         [field.id]: e.target.value
                                       });
                                     }}
-                                    placeholder={isCritical ? "Required *" : "Optional"}
-                                    className={`bg-white dark:bg-zinc-900/60 border ${isMissing ? "border-amber-500/40 focus:border-amber-500" : "border-zinc-200 dark:border-zinc-800 focus:border-[#C99537]"} text-zinc-900 dark:text-white font-sans text-xs px-2.5 py-1.5 focus:outline-none w-full rounded-none no-custom-cursor`}
+                                    placeholder=""
+                                    className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 focus:border-[#C99537] text-zinc-900 dark:text-white font-sans text-xs px-2.5 py-1.5 focus:outline-none w-full rounded-none no-custom-cursor"
                                   />
                                 </div>
                               );
