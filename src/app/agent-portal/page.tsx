@@ -20,15 +20,58 @@ interface Conversation {
   assistantMsg: string;
 }
 
-const CRITICAL_FIELDS = [
-  "personal_surname",
-  "personal_first_names",
-  "personal_dob",
-  "passport_number",
-  "travel_destinations",
-  "travel_start_date",
-  "address_email"
-];
+export function getDynamicCriticalFields(data: Record<string, string>): string[] {
+  const list = [
+    "personal_surname",
+    "personal_first_names",
+    "personal_dob",
+    "passport_number",
+    "passport_issue_date",
+    "passport_expiry_date",
+    "travel_destinations",
+    "travel_start_date",
+    "travel_return_date",
+    "address_street",
+    "address_postal_code",
+    "address_city",
+    "address_country",
+    "address_phone",
+    "address_email"
+  ];
+
+  // If UK Residency is BRP/visa (not citizen), uk_share_code is required
+  const nationality = (data.personal_nationality || "").toLowerCase();
+  const isUKCitizen = nationality.includes("british") || nationality.includes("united kingdom") || nationality.includes("uk");
+  if (!isUKCitizen) {
+    list.push("uk_share_code");
+  }
+
+  // Check employment status
+  const occupation = (data.emp_occupation || "").toLowerCase();
+  const hasEmployer = !!data.emp_employer_name || !!data.emp_job_title;
+  const isEmployed = occupation && !occupation.includes("student") && !occupation.includes("unemployed") && !occupation.includes("child") && !occupation.includes("minor") && !occupation.includes("retired");
+  
+  if (isEmployed || hasEmployer) {
+    list.push("emp_employer_name", "emp_job_title", "emp_street", "emp_postal_code", "emp_city", "emp_country");
+  } else if (occupation.includes("student") || !!data.emp_school_name) {
+    list.push("emp_school_name", "emp_street", "emp_postal_code", "emp_city", "emp_country");
+  }
+
+  // Check if minor
+  const dobStr = data.personal_dob;
+  if (dobStr) {
+    try {
+      const dob = new Date(dobStr);
+      const ageDiff = Date.now() - dob.getTime();
+      const age = ageDiff / (1000 * 60 * 60 * 24 * 365.25);
+      if (age < 18) {
+        list.push("minor_relation", "minor_surname", "minor_first_name", "minor_dob", "minor_nationality");
+      }
+    } catch (e) {}
+  }
+
+  return list;
+}
 
 // Initialize default lead with all visa form fields set to empty strings
 const DEFAULT_LEAD: Record<string, string> = {};
@@ -455,11 +498,27 @@ export default function AgentPortal() {
     const docHasDark = document.documentElement.classList.contains("dark");
     setIsDark(theme === "dark" || (theme === null && docHasDark));
 
-    // Load dynamic accounts list for admin preview
+    // Load dynamic accounts list for admin preview and sync from server
     const accounts = localStorage.getItem("qh-agent-accounts");
     if (accounts) {
       setAdminAccounts(JSON.parse(accounts));
     }
+
+    const syncAccounts = async () => {
+      try {
+        const res = await fetch("/api/agent/auth");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.fullAccounts) {
+            setAdminAccounts(data.fullAccounts);
+            localStorage.setItem("qh-agent-accounts", JSON.stringify(data.fullAccounts));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to sync accounts from server:", err);
+      }
+    };
+    syncAccounts();
 
     // Load active histories from cache
     const stored = localStorage.getItem("qh-conversations");
@@ -505,7 +564,8 @@ export default function AgentPortal() {
   const handleSaveChanges = () => {
     if (!activeConvo) return;
     const newMissing: string[] = [];
-    CRITICAL_FIELDS.forEach(fId => {
+    const dynamicCritical = getDynamicCriticalFields(tempParsedData);
+    dynamicCritical.forEach(fId => {
       if (!tempParsedData[fId]) {
         newMissing.push(fId);
       }
@@ -527,7 +587,7 @@ export default function AgentPortal() {
   };
 
   // Admin Management handlers
-  const handleCreateAccount = (e: React.FormEvent) => {
+  const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanUser = newUsername.trim().toLowerCase();
     const cleanPass = newPassword.trim();
@@ -548,9 +608,25 @@ export default function AgentPortal() {
       return;
     }
 
+    try {
+      const res = await fetch("/api/agent/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "create_account", targetUser: cleanUser, newPassword: cleanPass })
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        setAdminError(errData.error || "Failed to create account on server.");
+        return;
+      }
+    } catch (err) {
+      setAdminError("Failed to communicate with server auth service.");
+      return;
+    }
+
     const updated = {
       ...adminAccounts,
-      [cleanUser]: { password: cleanPass, suspended: false }
+      [cleanUser]: { password: cleanPass, suspended: false, role: "agent" }
     };
     setAdminAccounts(updated);
     localStorage.setItem("qh-agent-accounts", JSON.stringify(updated));
@@ -560,11 +636,24 @@ export default function AgentPortal() {
     showToast(`Account "${cleanUser}" created successfully.`);
   };
 
-
-
-  const handleToggleSuspendAccount = (user: string) => {
+  const handleToggleSuspendAccount = async (user: string) => {
     const isCurrentlySuspended = adminAccounts[user].suspended;
     const nextSuspended = !isCurrentlySuspended;
+
+    try {
+      const res = await fetch("/api/agent/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_suspend", targetUser: user, suspendState: nextSuspended })
+      });
+      if (!res.ok) {
+        showToast("Failed to update suspension on server.", "error");
+        return;
+      }
+    } catch (err) {
+      showToast("Failed to communicate with server auth service.", "error");
+      return;
+    }
 
     const updated = {
       ...adminAccounts,
@@ -583,7 +672,7 @@ export default function AgentPortal() {
     }
   };
 
-  const handleDeleteAccount = (user: string) => {
+  const handleDeleteAccount = async (user: string) => {
     if (user === "admin" || user === "owner") {
       showToast("Cannot delete system administration accounts.", "error");
       return; // Safety check
@@ -594,6 +683,21 @@ export default function AgentPortal() {
     
     if (userInput !== confirmationCode) {
       showToast("Deletion cancelled: Confirmation mismatch.", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/agent/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_account", targetUser: user })
+      });
+      if (!res.ok) {
+        showToast("Failed to delete account on server.", "error");
+        return;
+      }
+    } catch (err) {
+      showToast("Failed to communicate with server auth service.", "error");
       return;
     }
 
@@ -625,7 +729,7 @@ export default function AgentPortal() {
     const newId = `convo_${Date.now()}`;
     
     // Copy all critical fields to missing list initially
-    const missing: string[] = [...CRITICAL_FIELDS];
+    const missing: string[] = getDynamicCriticalFields(DEFAULT_LEAD);
 
     const newConvo: Conversation = {
       id: newId,
@@ -687,7 +791,8 @@ export default function AgentPortal() {
 
     // Calculate initial missing fields validation
     const missing: string[] = [];
-    CRITICAL_FIELDS.forEach(field => {
+    const dynamicCritical = getDynamicCriticalFields(parsedData);
+    dynamicCritical.forEach(field => {
       if (!parsedData[field]) {
         missing.push(field);
       }
@@ -732,7 +837,7 @@ export default function AgentPortal() {
         agentUsername,
         messages: [],
         parsedData: { ...DEFAULT_LEAD },
-        missingFields: [...CRITICAL_FIELDS],
+        missingFields: getDynamicCriticalFields(DEFAULT_LEAD),
         assistantMsg: ""
       };
       listCopy = [newConvo];
@@ -1679,9 +1784,11 @@ export default function AgentPortal() {
                     const filledFieldsCount = sec.fields.filter(f => activeConvo.parsedData[f.id]).length;
                     const percentage = totalFieldsCount > 0 ? Math.round((filledFieldsCount / totalFieldsCount) * 100) : 0;
 
+                    const dynamicCritical = getDynamicCriticalFields(activeConvo.parsedData);
+
                     const filteredFields = sec.fields.filter(field => {
                       const val = activeConvo.parsedData[field.id] || "";
-                      const isCritical = CRITICAL_FIELDS.includes(field.id);
+                      const isCritical = dynamicCritical.includes(field.id);
                       
                       if (fieldFilter === "filled") {
                         return !!val;
@@ -1706,7 +1813,7 @@ export default function AgentPortal() {
                         <div className="space-y-2.5 text-[11px] font-sans text-left">
                           {filteredFields.length > 0 ? (
                             filteredFields.map((field) => {
-                              const isCritical = CRITICAL_FIELDS.includes(field.id);
+                              const isCritical = dynamicCritical.includes(field.id);
                               const isMissing = isCritical && !(tempParsedData[field.id] || "");
                               return (
                                 <div key={field.id} className="flex flex-col gap-1 text-left py-1.5 border-b border-zinc-100 dark:border-zinc-800/40 last:border-b-0">

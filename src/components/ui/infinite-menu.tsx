@@ -1214,6 +1214,7 @@ interface InfiniteMenuProps {
   flagSizeFactor?: number;
   borderColor?: string;
   borderWidth?: number;
+  onSelectDestination?: () => void;
 }
 
 const InfiniteMenu: FC<InfiniteMenuProps> = ({
@@ -1221,7 +1222,8 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
   scale = 1.0,
   flagSizeFactor = 0.28,
   borderColor = '#CCA352',
-  borderWidth = 12
+  borderWidth = 12,
+  onSelectDestination
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null) as MutableRefObject<HTMLCanvasElement | null>;
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
@@ -1372,12 +1374,16 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({
               z-10
               transition-all
               ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+              flex flex-col sm:flex-row items-center gap-3 sm:gap-4
               ${isMoving
-                ? 'bottom-[-60px] opacity-0 pointer-events-none duration-[100ms] -translate-x-1/2'
-                : 'bottom-8 sm:bottom-12 opacity-100 pointer-events-auto duration-[500ms] -translate-x-1/2'
+                ? 'bottom-[-120px] opacity-0 pointer-events-none duration-[100ms] -translate-x-1/2'
+                : 'bottom-4 sm:bottom-8 opacity-100 pointer-events-auto duration-[500ms] -translate-x-1/2'
               }
             `}
           >
+            <ThemeButton fullWidth={false} onClick={onSelectDestination}>
+              Select Your Destination
+            </ThemeButton>
             <ThemeButton fullWidth={false} onClick={handleButtonClick}>
               Book Visa Consultation
             </ThemeButton>

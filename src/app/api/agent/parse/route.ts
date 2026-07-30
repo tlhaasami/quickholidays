@@ -114,7 +114,13 @@ The schema you must output is:
     "minor_phone": string or null,
     "minor_email": string or null
   },
-  "missingFields": string[] (List of CRITICAL missing fields ONLY: personal_surname, personal_first_names, passport_number, travel_destinations, travel_start_date, travel_return_date, uk_share_code, address_street. Do NOT include optional fields like address_county, emp_street, emp_phone, emp_email, minor fields in missingFields),
+   "missingFields": string[] (List of empty fields that are critical for this profile:
+     - Basic critical fields: personal_surname, personal_first_names, personal_dob, passport_number, passport_issue_date, passport_expiry_date, travel_destinations, travel_start_date, travel_return_date, address_street, address_postal_code, address_city, address_country, address_phone, address_email.
+     - If UK Residency is not British / UK (e.g. BRP, work/student/spouse visa): uk_share_code is also critical.
+     - If Employed (occupation is not student/unemployed/child/retired): also include emp_employer_name, emp_job_title, emp_street, emp_postal_code, emp_city, emp_country.
+     - If Student: also include emp_school_name, emp_street, emp_postal_code, emp_city, emp_country.
+     - If Minor (under 18): also include minor_relation, minor_surname, minor_first_name, minor_dob, minor_nationality.
+     Do not list optional fields. Only list fields that are empty/null.),
   "message": string (A structured plain-text response in EXACTLY this format — no markdown symbols, no asterisks, no hashes:
 
 EXTRACTED DETAILS
@@ -122,7 +128,7 @@ EXTRACTED DETAILS
 
 REMAINING FIELDS NEEDED
 Please provide the following details to complete the application:
-(List ONLY CRITICAL missing fields necessary for visa application: Surname, First name, Passport Number, Destination Country, Travel Dates, UK Share Code, Street Address. One per line starting with a dash. Do NOT list optional fields like County, Employer Phone, or Employer Email if employment info is provided.)
+(List every critical missing field identified in missingFields above. One per line starting with a dash using its human-readable label from the mapping below.)
 
 Use this field ID to human-readable label mapping:
 personal_surname -> Surname (Family name)

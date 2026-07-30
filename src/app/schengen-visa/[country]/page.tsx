@@ -109,6 +109,7 @@ export default async function CountryPage({
                   "Visa Application Forms: Completed for you to ensure zero errors.",
                   "Travel Insurance: Sorted and guaranteed to meet Schengen requirements.",
                   "Appointment Booking & Confirmation: Your appointment is booked and confirmed, with your letter ready.",
+                  <span>Flight & Hotel: Guidance on cheapest options <strong className="text-primary font-semibold">(booking costs paid by you directly)</strong>.</span>,
                   "Tracked to Decision Day: Continuous monitoring of your application status."
                 ],
                 footerNote: "One price. Every step covered.",
@@ -125,11 +126,14 @@ export default async function CountryPage({
                 features: [
                   "Document Checklist: Built precisely for your personal and financial profile.",
                   "Professional Cover Letter: Expertly written for you.",
-                  "Travel Insurance: Sorted for your exact travel dates."
+                  "Travel Insurance: Sorted for your exact travel dates.",
+                  <span>Flight & Hotel: Guidance on cheapest options <strong className="text-primary font-semibold">(booking costs paid by you directly)</strong>.</span>
                 ],
                 notIncluded: [
-                  "Appointment booking",
-                  "Visa application form completion"
+                  "Appointment booking & confirmation",
+                  "Visa application form completion",
+                  "Tracked to Decision Day status monitoring",
+                  "Pre-payment eligibility consultation"
                 ],
                 buttonText: "Book Documentation Service",
                 buttonHref: `/contact-us?plan=documentation&destination=${match.slug}`,
@@ -149,7 +153,9 @@ export default async function CountryPage({
                   "Custom Document Checklist",
                   "Professional Cover Letter",
                   "Travel Insurance sorted",
-                  "Tracked to Decision Day status monitoring"
+                  "Flight & Hotel booking guidance",
+                  "Tracked to Decision Day status monitoring",
+                  "Pre-payment eligibility consultation"
                 ],
                 buttonText: "Book Appointment Booking",
                 buttonHref: `/contact-us?plan=appointment&destination=${match.slug}`,
@@ -197,8 +203,8 @@ export default async function CountryPage({
                     </span>
                   </div>
                   <ul className="space-y-2.5 mb-6">
-                    {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-xs font-light text-zinc-700 dark:text-zinc-300">
+                    {tier.features.map((feature, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-2 text-xs font-light text-zinc-700 dark:text-zinc-300">
                         <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-primary shrink-0 mt-0.5">
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
                         </svg>

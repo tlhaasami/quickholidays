@@ -102,6 +102,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Target account not found." }, { status: 404 });
     }
 
+    // 5. Admin / Owner Account Deletion
+    if (action === "delete_account") {
+      const targetClean = (targetUser || "").trim().toLowerCase();
+      if (targetClean === "admin" || targetClean === "owner") {
+        return NextResponse.json({ success: false, error: "Cannot delete system administration accounts." }, { status: 400 });
+      }
+      if (accounts[targetClean]) {
+        delete accounts[targetClean];
+        saveServerAccounts(accounts);
+        return NextResponse.json({ success: true, message: `Deleted account @${targetClean} server-wide!` });
+      }
+      return NextResponse.json({ success: false, error: "Target account not found." }, { status: 404 });
+    }
+
     return NextResponse.json({ success: false, error: "Invalid action" }, { status: 400 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err?.message || "Server authentication error" }, { status: 500 });

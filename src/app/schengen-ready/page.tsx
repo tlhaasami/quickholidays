@@ -38,6 +38,7 @@ export default function SchengenReadyTool() {
   const [bankBalance, setBankBalance] = useState("");
   const [employment, setEmployment] = useState("");
   const [destination, setDestination] = useState("France");
+  const [isDestOpen, setIsDestOpen] = useState(false);
   const [priorRefusal, setPriorRefusal] = useState("");
   const [travelDate, setTravelDate] = useState("");
   const [tripDuration, setTripDuration] = useState("7");
@@ -303,12 +304,22 @@ export default function SchengenReadyTool() {
                         <p className="font-sans text-xs text-zinc-500 dark:text-zinc-400 font-light">
                           If you hold Indefinite Leave to Remain (ILR) or EUSS Settled Status, choose a date several years in the future.
                         </p>
-                        <input
-                          type="date"
-                          value={brpExpiry}
-                          onChange={(e) => setBrpExpiry(e.target.value)}
-                          className="brutalist-input font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
-                        />
+                        <div className="relative w-full">
+                          <input
+                            type="date"
+                            value={brpExpiry}
+                            onChange={(e) => setBrpExpiry(e.target.value)}
+                            className="brutalist-input date-input-custom font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
+                          />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400 dark:text-white">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                              <line x1="16" y1="2" x2="16" y2="6" />
+                              <line x1="8" y1="2" x2="8" y2="6" />
+                              <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -320,21 +331,41 @@ export default function SchengenReadyTool() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <span className="text-xs font-sans font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">Issue Date:</span>
-                            <input
-                              type="date"
-                              value={passportIssue}
-                              onChange={(e) => setPassportIssue(e.target.value)}
-                              className="brutalist-input font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
-                            />
+                            <div className="relative w-full">
+                              <input
+                                type="date"
+                                value={passportIssue}
+                                onChange={(e) => setPassportIssue(e.target.value)}
+                                className="brutalist-input date-input-custom font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
+                              />
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400 dark:text-white">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                  <line x1="16" y1="2" x2="16" y2="6" />
+                                  <line x1="8" y1="2" x2="8" y2="6" />
+                                  <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
                           <div>
                             <span className="text-xs font-sans font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">Expiry Date:</span>
-                            <input
-                              type="date"
-                              value={passportExpiry}
-                              onChange={(e) => setPassportExpiry(e.target.value)}
-                              className="brutalist-input font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
-                            />
+                            <div className="relative w-full">
+                              <input
+                                type="date"
+                                value={passportExpiry}
+                                onChange={(e) => setPassportExpiry(e.target.value)}
+                                className="brutalist-input date-input-custom font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
+                              />
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400 dark:text-white">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                  <line x1="16" y1="2" x2="16" y2="6" />
+                                  <line x1="8" y1="2" x2="8" y2="6" />
+                                  <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -400,20 +431,53 @@ export default function SchengenReadyTool() {
                           Select the country you enter first or spend the most nights in.
                         </p>
                         <div className="relative">
-                          <select
-                            value={destination}
-                            onChange={(e) => setDestination(e.target.value)}
-                            className="brutalist-input appearance-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white pr-10 cursor-pointer font-sans"
+                          <button
+                            type="button"
+                            onClick={() => setIsDestOpen(!isDestOpen)}
+                            className="w-full brutalist-input font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex items-center justify-between cursor-pointer px-4 py-3 rounded-lg border border-zinc-200 dark:border-white/5 text-left outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
                           >
-                            {destinations.map((dest) => (
-                              <option key={dest} value={dest} className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white">{dest}</option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-500">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <span>{destination}</span>
+                            <svg
+                              className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${isDestOpen ? "rotate-180" : ""}`}
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              viewBox="0 0 24 24"
+                            >
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
-                          </div>
+                          </button>
+
+                          {isDestOpen && (
+                            <>
+                              <div
+                                className="fixed inset-0 z-10"
+                                onClick={() => setIsDestOpen(false)}
+                              />
+                              <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+                                {destinations.map((dest) => (
+                                  <button
+                                    key={dest}
+                                    type="button"
+                                    onClick={() => {
+                                      setDestination(dest);
+                                      setIsDestOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2.5 text-sm font-sans transition-colors flex justify-between items-center ${
+                                      destination === dest
+                                        ? "bg-primary/10 text-primary font-medium"
+                                        : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5"
+                                    }`}
+                                  >
+                                    <span>{dest}</span>
+                                    {destination === dest && (
+                                      <span className="text-primary font-bold text-xs">✓</span>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     )}
@@ -458,12 +522,22 @@ export default function SchengenReadyTool() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <span className="text-xs font-sans font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">Expected Travel Start Date:</span>
-                            <input
-                              type="date"
-                              value={travelDate}
-                              onChange={(e) => setTravelDate(e.target.value)}
-                              className="brutalist-input font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
-                            />
+                            <div className="relative w-full">
+                              <input
+                                type="date"
+                                value={travelDate}
+                                onChange={(e) => setTravelDate(e.target.value)}
+                                className="brutalist-input date-input-custom font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white cursor-pointer"
+                              />
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400 dark:text-white">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                  <line x1="16" y1="2" x2="16" y2="6" />
+                                  <line x1="8" y1="2" x2="8" y2="6" />
+                                  <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
                           <div>
                             <span className="text-xs font-sans font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">Number of Days:</span>

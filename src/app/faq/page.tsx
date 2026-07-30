@@ -9,6 +9,7 @@ import Link from "next/link";
 interface FAQItem {
   q: string;
   a: React.ReactNode;
+  schemaAnswer?: string;
 }
 
 interface FAQCategory {
@@ -64,17 +65,27 @@ export default function FAQ() {
           q: "What is the breakdown of Schengen visa fees?",
           a: (
             <span>
-              A standard application incurs: (1) Embassy fee (set at €90 for adults by EU law, paid in person at the embassy or visa center during your appointment), (2) Outsourcing partner booking fee (typically £30–£45 paid directly to VFS/TLS during confirmation), and (3) Our fixed consultancy service fee (see our full{" "}
+              A standard application incurs: (1) Embassy fee (set at €90 for adults by EU law, paid in person at the embassy or visa center during your appointment), and (2) Our fixed consultancy service fee (see our full{" "}
               <Link href="/pricing" className="text-primary hover:underline">
                 pricing structures
               </Link>
               ). We do not bundle these fees; everything is transparently itemized so you know exactly what is paid to whom.
             </span>
-          )
+          ),
+          schemaAnswer: "A standard application incurs: (1) Embassy fee (set at €90 for adults by EU law, paid in person at the embassy or visa center during your appointment), and (2) Our fixed consultancy service fee (see our full pricing structures). We do not bundle these fees; everything is transparently itemized so you know exactly what is paid to whom."
         },
         {
           q: "What is included in the Complete Visa Service fee?",
-          a: "Our Complete Visa Service (£175 total; split as a £45 case deposit to open your file and a £130 balance paid after your slot is confirmed) includes: (1) Free consultation and checklist assessment, (2) A custom document checklist tailored to your profile, (3) A professional cover letter written for you, (4) Fully completed official application forms, (5) Travel insurance sorted to meet Schengen rules, (6) Automated slot tracking and appointment booking, and (7) Case tracking to Decision Day."
+          a: (
+            <span>
+              Our Complete Visa Service (£175 total; split as a £45 case deposit to open your file and a £130 balance paid after your slot is confirmed) includes: (1) Free consultation and checklist assessment, (2) A custom document checklist tailored to your profile, (3) A professional cover letter written for you, (4) Fully completed official application forms, (5) Travel insurance sorted to meet Schengen rules, (6) Automated slot tracking and appointment booking, (7) Case tracking to Decision Day, and (8) Flight & Hotel guidance on cheapest options (
+              <strong className="text-primary font-bold">
+                booking costs paid by you directly
+              </strong>
+              ).
+            </span>
+          ),
+          schemaAnswer: "Our Complete Visa Service (£175 total; split as a £45 case deposit to open your file and a £130 balance paid after your slot is confirmed) includes: (1) Free consultation and checklist assessment, (2) A custom document checklist tailored to your profile, (3) A professional cover letter written for you, (4) Fully completed official application forms, (5) Travel insurance sorted to meet Schengen rules, (6) Automated slot tracking and appointment booking, (7) Case tracking to Decision Day, and (8) Flight & Hotel guidance on cheapest options (booking costs paid by you directly)."
         },
         {
           q: "How does the Accountability Promise refund process work?",
@@ -103,7 +114,7 @@ export default function FAQ() {
     "name": item.q,
     "acceptedAnswer": {
       "@type": "Answer",
-      "text": item.a
+      "text": item.schemaAnswer || (typeof item.a === "string" ? item.a : "")
     }
   }));
 

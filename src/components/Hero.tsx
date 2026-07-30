@@ -618,7 +618,7 @@ export default function Hero() {
                         <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                       </svg>
                       <span className="text-zinc-950 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        All Countries
+                        Choose Ur Destination
                       </span>
                     </button>
                   </div>
@@ -991,6 +991,7 @@ export default function Hero() {
               flagSizeFactor={INFINITE_MENU_CONFIG.flagSizeFactor}
               borderColor={INFINITE_MENU_CONFIG.borderColor}
               borderWidth={INFINITE_MENU_CONFIG.borderWidth}
+              onSelectDestination={() => setIsModalOpen(true)}
             />
           </div>
         </div>
