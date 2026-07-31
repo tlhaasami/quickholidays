@@ -9,7 +9,13 @@ if (!supabaseUrl) {
 }
 
 // Client for general public queries (uses Anon Key)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(
+  supabaseUrl || "https://dummy.supabase.co",
+  supabaseAnonKey || "dummy-key"
+);
 
-// Admin client for backend operations (uses Service Role Key to bypass RLS)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+// Admin client for backend operations (uses Service Role Key to bypass RLS, falls back to Anon key if empty during build)
+export const supabaseAdmin = createClient(
+  supabaseUrl || "https://dummy.supabase.co",
+  supabaseServiceKey || supabaseAnonKey || "dummy-key-for-build"
+);

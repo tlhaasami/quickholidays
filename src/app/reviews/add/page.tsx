@@ -145,22 +145,22 @@ export default function AddReviewPage() {
             {/* Section 2: Review Content */}
             <div className="space-y-4">
               <h3 className="text-xs font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                2. Testimonial Details
+                2. Testimonial Video Link
               </h3>
 
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                  YouTube Video Link / Shorts Link
+                  YouTube Video Link / Shorts Link or Direct URL
                 </label>
                 <input
                   type="text"
                   value={youtubeLink}
                   onChange={(e) => setYoutubeLink(e.target.value)}
-                  placeholder="https://youtube.com/shorts/..."
+                  placeholder="https://youtube.com/shorts/... or https://..."
                   className="w-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-sm px-4 py-3 rounded-xl focus:outline-none focus:border-[#C99537] transition-all"
                 />
                 <span className="text-[10px] text-zinc-500 font-sans block mt-1">
-                  Supports full URLs, shorts links, 11-char video IDs, or direct video file links (.mp4, .webm, .mov) from Supabase Storage.
+                  Supports YouTube links, Shorts, 11-char video IDs, or direct video file links (.mp4, .webm, .mov).
                 </span>
 
                 {/* Coordinated Live Preview & Suitability Guide */}
@@ -192,10 +192,10 @@ export default function AddReviewPage() {
                           {/* Suitability guidelines */}
                           <div className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
                             <p className="font-semibold text-zinc-900 dark:text-white">
-                              Direct Video Hosting (Zero Cost)
+                              Direct Video URL (Self-Hosted)
                             </p>
                             <p>
-                              ✅ <strong className="text-emerald-500 font-semibold">Safe & Permanent</strong>: Since this file is hosted in your Supabase Storage bucket, no external platforms can delete it.
+                              ✅ <strong className="text-emerald-500 font-semibold">Safe & Permanent</strong>: Hosting files directly on Supabase Storage prevents deletions by third-party platforms.
                             </p>
                             <p>
                               💡 <strong className="text-primary font-semibold">Portrait Format (9:16)</strong> is highly recommended to fill the vertical display container cleanly.
@@ -266,7 +266,6 @@ export default function AddReviewPage() {
                   );
                 })()}
               </div>
-
             </div>
 
             {/* Notification messages */}
@@ -314,3 +313,5 @@ export default function AddReviewPage() {
     </div>
   );
 }
+
+
