@@ -110,14 +110,14 @@ export function FloatingWhatsApp() {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute bottom-full left-0 mb-3.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-sans font-semibold tracking-wide px-4 py-2.5 rounded-xl border border-zinc-800 dark:border-zinc-200 shadow-xl w-[160px] sm:w-[220px] whitespace-normal leading-tight flex items-center justify-start gap-2"
+              className="absolute bottom-full left-0 mb-3.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[11px] font-sans font-semibold tracking-wide px-4 py-2.5 rounded-xl border border-zinc-800 dark:border-zinc-200 shadow-xl w-max whitespace-nowrap leading-tight flex items-center justify-start gap-2"
             >
               <div className="absolute top-full left-6 -mt-[5px] w-2 h-2 bg-zinc-950 dark:bg-white border-r border-b border-zinc-800 dark:border-zinc-200 transform rotate-45" />
               <span className="relative flex h-2 w-2 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
               </span>
-              <span>Emergency &amp; Complaints Hotline</span>
+              <span>Complaints Hotline</span>
             </motion.div>
           )}
         </AnimatePresence>

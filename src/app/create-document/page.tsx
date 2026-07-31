@@ -44,6 +44,109 @@ export default function CreateDocumentPage() {
 
   const [isAgent, setIsAgent] = useState(false);
 
+  // ── OCR Scanner states ──
+  const [selectedImageName, setSelectedImageName] = useState("");
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanStatus, setScanStatus] = useState("");
+  const [scanError, setScanError] = useState("");
+  const [scanSuccess, setScanSuccess] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
+    setSelectedImageName(file.name);
+    setIsScanning(true);
+    setScanError("");
+    setScanSuccess(false);
+    setScanStatus("Resizing image locally for fast transmission...");
+
+    // Read and scale image using Canvas
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        // Limit width/height to 1200px max while maintaining aspect ratio
+        const maxDim = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          setScanError("Failed to initialize client-side image canvas.");
+          setIsScanning(false);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        // Compress as jpeg quality 0.8 to keep size small (< 200KB)
+        const base64Image = canvas.toDataURL("image/jpeg", 0.8);
+
+        setScanStatus("Sending document to AI Vision Engine for OCR (takes 5-10s)...");
+
+        try {
+          const res = await fetch("/api/agent/parse-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64Image }),
+          });
+
+          const data = await res.json();
+          if (!res.ok || data.error) {
+            setScanError(data.error || "Failed to extract information from document.");
+            setIsScanning(false);
+            return;
+          }
+
+          // Pre-populate jsonInput
+          const prettyJson = JSON.stringify(data, null, 2);
+          setJsonInput(prettyJson);
+
+          // Populate parsedData
+          const merged: Record<string, string> = {};
+          for (const fieldId of allFieldIds) {
+            merged[fieldId] = String(data[fieldId] ?? "");
+          }
+          setParsedData(merged);
+          setScanSuccess(true);
+          
+          // Redirect to preview step after small delay
+          setTimeout(() => {
+            setStep(3);
+          }, 1500);
+
+        } catch (err) {
+          console.error(err);
+          setScanError("Network error. Failed to reach document OCR engine.");
+        } finally {
+          setIsScanning(false);
+          setScanStatus("");
+        }
+      };
+      img.onerror = () => {
+        setScanError("Invalid image file. Could not read image.");
+        setIsScanning(false);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      setScanError("Failed to read the local file.");
+      setIsScanning(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   useEffect(() => {
     setMounted(true);
     setIsAgent(isAgentAuthenticated());
@@ -279,6 +382,59 @@ export default function CreateDocumentPage() {
                   Agent Login →
                 </a>
               )}
+            </div>
+
+            {/* AI Document Scan OCR Card */}
+            <div className={CARD}>
+              <div className={`flex items-center justify-between px-6 py-4 border-b ${DIVIDER}`}>
+                <div>
+                  <h2 className={`text-lg font-bold ${HEADING}`}>📷 AI Passport / BRP Card Scanner</h2>
+                  <p className={`text-sm ${LABEL} mt-0.5`}>
+                    Upload a photo of the passport page or UK BRP card to automatically extract details and populate the application form.
+                  </p>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="relative border-2 border-dashed border-zinc-250 dark:border-zinc-800 hover:border-[#C99537] dark:hover:border-[#C99537] rounded-2xl p-6 text-center cursor-pointer transition-colors relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isScanning}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                  />
+                  <div className="space-y-2">
+                    <span className="text-3xl block">📷</span>
+                    <span className={`block text-xs font-semibold ${HEADING}`}>
+                      {selectedImageName ? selectedImageName : "Select or Drop Passport / BRP Image"}
+                    </span>
+                    <span className={`block text-[10px] ${LABEL}`}>
+                      Supports JPG, PNG, WebP. Resized and optimized automatically.
+                    </span>
+                  </div>
+                </div>
+
+                {isScanning && (
+                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/35 text-amber-600 dark:text-amber-400 text-xs font-sans flex items-center gap-2">
+                    <span className="animate-spin text-sm shrink-0">⏳</span>
+                    <span>{scanStatus}</span>
+                  </div>
+                )}
+
+                {scanError && (
+                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/35 text-red-500 text-xs font-sans flex items-center gap-2">
+                    <span className="shrink-0 font-bold">⚠️</span>
+                    <span>{scanError}</span>
+                  </div>
+                )}
+
+                {scanSuccess && (
+                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 text-xs font-sans flex items-center gap-2">
+                    <span className="shrink-0 font-bold">✓</span>
+                    <span>Extracted details successfully! Populating visa fields and advancing...</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className={CARD}>

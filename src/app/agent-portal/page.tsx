@@ -18,6 +18,9 @@ interface Conversation {
   parsedData: Record<string, string>;
   missingFields: string[];
   assistantMsg: string;
+  coverLetterText?: string;
+  coverLetterAiInput?: string;
+  coverLetterMessages?: Array<{ role: "user" | "assistant"; content: string; missingFields?: string[] }>;
 }
 
 export function getDynamicCriticalFields(data: Record<string, string>): string[] {
@@ -87,6 +90,19 @@ export default function AgentPortal() {
 
   // Temporary editing state for form fields
   const [tempParsedData, setTempParsedData] = useState<Record<string, string>>({});
+  
+  // ── OCR Scanner states ──
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanError, setScanError] = useState("");
+
+  // ── New Client Convo and Deletion Confirmation states ──
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [newConvoUsername, setNewConvoUsername] = useState("");
+  const [usernameModalError, setUsernameModalError] = useState("");
+  const [deleteConvoId, setDeleteConvoId] = useState<string | null>(null);
+  const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0);
+  const syncTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
+  const lastLoadedIdRef = useRef<string | null>(null);
   
   // Custom toast notifications
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -477,44 +493,98 @@ export default function AgentPortal() {
     };
     syncAccounts();
 
-    // Load active histories from cache
-    const stored = localStorage.getItem("qh-conversations");
-    if (stored) {
+    // Load active histories from DB instead of localStorage
+    const loadFromDb = async () => {
       try {
-        const parsedList: Conversation[] = JSON.parse(stored);
-        const now = Date.now();
-        // Keep only conversations younger than 1 day (86,400,000 milliseconds)
-        const validList = parsedList.filter(
-          (c) => now - c.timestamp < 86400000
-        );
-
-        // Update local storage if any expired ones were dropped
-        if (validList.length !== parsedList.length) {
-          localStorage.setItem("qh-conversations", JSON.stringify(validList));
-        }
-
-        setConversations(validList);
-        if (validList.length > 0) {
-          setActiveConvoId(validList[0].id);
+        const res = await fetch("/api/agent/forms");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          setConversations(data.data);
+          if (data.data.length > 0) {
+            setActiveConvoId(data.data[0].id);
+          }
         }
       } catch (err) {
-        console.error("Failed to parse cached conversations:", err);
+        console.error("Failed to load forms from DB:", err);
       }
-    }
+    };
+    loadFromDb();
 
     fetchFormEntries();
   }, [router]);
 
   const activeConvo = conversations.find((c) => c.id === activeConvoId);
 
-  // Synchronize temporary parsed data buffer
+  // Sync states on active conversation change
   useEffect(() => {
     if (activeConvo) {
       setTempParsedData({ ...activeConvo.parsedData });
+      setEmbeddedCoverLetterText(activeConvo.coverLetterText || "");
+      setCoverLetterAiInput(activeConvo.coverLetterAiInput || "");
+      setCoverLetterMessages(activeConvo.coverLetterMessages || [
+        {
+          role: "assistant",
+          content: "Hello! I am your AI Cover Letter Parser Assistant. Paste any client notes, passport details, travel dates, or share code text below to extract data and build the official Schengen cover letter."
+        }
+      ]);
     } else {
       setTempParsedData({});
+      setEmbeddedCoverLetterText("");
+      setCoverLetterAiInput("");
+      setCoverLetterMessages([]);
     }
-  }, [activeConvoId, conversations]);
+  }, [activeConvoId]);
+
+  // Synchronize cover letter details back to active conversation list
+  useEffect(() => {
+    if (!activeConvoId || !activeConvo) return;
+    
+    // If we just loaded a new convo, don't trigger sync to avoid overwriting with blank default states
+    if (lastLoadedIdRef.current !== activeConvoId) {
+      lastLoadedIdRef.current = activeConvoId;
+      return;
+    }
+
+    const hasDiff = 
+      embeddedCoverLetterText !== (activeConvo.coverLetterText || "") ||
+      coverLetterAiInput !== (activeConvo.coverLetterAiInput || "") ||
+      JSON.stringify(coverLetterMessages) !== JSON.stringify(activeConvo.coverLetterMessages || []);
+      
+    if (hasDiff) {
+      const updatedList = conversations.map(c => {
+        if (c.id === activeConvoId) {
+          return {
+            ...c,
+            coverLetterText: embeddedCoverLetterText,
+            coverLetterAiInput: coverLetterAiInput,
+            coverLetterMessages: coverLetterMessages
+          };
+        }
+        return c;
+      });
+      // Directly update local state list
+      setConversations(updatedList);
+      
+      // Sync to database debounced
+      if (syncTimeoutRef.current[activeConvoId]) {
+        clearTimeout(syncTimeoutRef.current[activeConvoId]);
+      }
+      syncTimeoutRef.current[activeConvoId] = setTimeout(async () => {
+        const targetConvo = updatedList.find(c => c.id === activeConvoId);
+        if (targetConvo) {
+          try {
+            await fetch("/api/agent/forms", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(targetConvo)
+            });
+          } catch (err) {
+            console.error("Failed to sync form to DB:", err);
+          }
+        }
+      }, 1000);
+    }
+  }, [embeddedCoverLetterText, coverLetterAiInput, coverLetterMessages, activeConvoId]);
 
   const hasUnsavedChanges = activeConvo && JSON.stringify(tempParsedData) !== JSON.stringify(activeConvo.parsedData);
 
@@ -668,10 +738,46 @@ export default function AgentPortal() {
     showToast(`Account "${user}" has been removed.`);
   };
 
-  // Save changes to localStorage
+  // Save changes to database (debounced for updates, immediate for deletes)
   const saveConversations = (list: Conversation[]) => {
     setConversations(list);
-    localStorage.setItem("qh-conversations", JSON.stringify(list));
+
+    // 1. Check for deleted conversations
+    const deleted = conversations.filter(c => !list.some(l => l.id === c.id));
+    deleted.forEach(async (d) => {
+      try {
+        await fetch(`/api/agent/forms?id=${encodeURIComponent(d.id)}`, {
+          method: "DELETE"
+        });
+      } catch (err) {
+        console.error("Failed to delete form from DB:", err);
+      }
+    });
+
+    // 2. Check for added or updated conversations
+    list.forEach((item) => {
+      const existing = conversations.find(c => c.id === item.id);
+      const isNew = !existing;
+      const isChanged = existing && JSON.stringify(existing) !== JSON.stringify(item);
+
+      if (isNew || isChanged) {
+        if (syncTimeoutRef.current[item.id]) {
+          clearTimeout(syncTimeoutRef.current[item.id]);
+        }
+
+        syncTimeoutRef.current[item.id] = setTimeout(async () => {
+          try {
+            await fetch("/api/agent/forms", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(item)
+            });
+          } catch (err) {
+            console.error("Failed to save form to DB:", err);
+          }
+        }, 1000);
+      }
+    });
   };
 
   // Scroll to bottom of chat
@@ -679,17 +785,31 @@ export default function AgentPortal() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeConvoId, conversations, isSubmitting]);
 
-
-
-  // New Convo trigger
+  // Trigger unique username assignment modal
   const handleNewConvo = () => {
-    const newId = `convo_${Date.now()}`;
-    
-    // Copy all critical fields to missing list initially
-    const missing: string[] = getDynamicCriticalFields(DEFAULT_LEAD);
+    setNewConvoUsername("");
+    setUsernameModalError("");
+    setShowUsernameModal(true);
+  };
 
+  // Submit handler for creating a new form session
+  const handleCreateNewClientConvo = (e: React.FormEvent) => {
+    e.preventDefault();
+    const username = newConvoUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (!username) {
+      setUsernameModalError("Please enter a valid alphanumeric username (underscores allowed).");
+      return;
+    }
+
+    const exists = conversations.some(c => c.id.toLowerCase() === username.toLowerCase());
+    if (exists) {
+      setUsernameModalError("This client username is already taken. Please choose another one.");
+      return;
+    }
+
+    const missing = getDynamicCriticalFields(DEFAULT_LEAD);
     const newConvo: Conversation = {
-      id: newId,
+      id: username,
       timestamp: Date.now(),
       agentUsername,
       messages: [
@@ -700,37 +820,72 @@ export default function AgentPortal() {
       ],
       parsedData: { ...DEFAULT_LEAD },
       missingFields: missing,
-      assistantMsg: "Paste client details to begin."
+      assistantMsg: "Paste client details to begin.",
+      coverLetterText: "",
+      coverLetterAiInput: "",
+      coverLetterMessages: [
+        {
+          role: "assistant",
+          content: "Hello! I am your AI Cover Letter Parser Assistant. Paste any client notes, passport details, travel dates, or share code text below to extract data and build the official Schengen cover letter."
+        }
+      ]
     };
 
     const updated = [newConvo, ...conversations];
     saveConversations(updated);
-    setActiveConvoId(newId);
-    setInputText("");
+    setActiveConvoId(username);
+    setNewConvoUsername("");
+    setUsernameModalError("");
+    setShowUsernameModal(false);
+    showToast(`New client workspace created for "${username}"!`);
   };
 
-  // Delete Convo trigger
-  const handleDeleteConvo = (id: string, e: React.MouseEvent) => {
+  // Two-step delete click
+  const handleDeleteConvoClick = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = conversations.filter((c) => c.id !== id);
+    setDeleteConvoId(id);
+    setDeleteStep(1);
+  };
+
+  const handleConfirmDeleteStep1 = () => {
+    setDeleteStep(2);
+  };
+
+  const handleConfirmDeleteStep2 = () => {
+    if (!deleteConvoId) return;
+    const updated = conversations.filter((c) => c.id !== deleteConvoId);
     saveConversations(updated);
-    
-    if (activeConvoId === id) {
+
+    if (activeConvoId === deleteConvoId) {
       if (updated.length > 0) {
         setActiveConvoId(updated[0].id);
       } else {
         setActiveConvoId(null);
       }
     }
-    showToast("Conversation deleted successfully.");
+    showToast(`Client profile "${deleteConvoId}" deleted successfully.`);
+    setDeleteConvoId(null);
+    setDeleteStep(0);
   };
 
+  const handleCancelDelete = () => {
+    setDeleteConvoId(null);
+    setDeleteStep(0);
+  };
+
+  // Load Form Entry (Unique client username generation)
   const handleLoadFormEntry = (entry: any) => {
     const payload = entry.payload;
-    const newId = `convo_${Date.now()}`;
-    
+    const baseName = (payload.name || "client").trim().toLowerCase().replace(/[^a-z0-9]/g, "_");
+    let username = baseName;
+    let count = 1;
+    while (conversations.some(c => c.id.toLowerCase() === username.toLowerCase())) {
+      username = `${baseName}_${count}`;
+      count++;
+    }
+
     const parsedData = { ...DEFAULT_LEAD };
-    
+
     // Attempt name split
     const nameParts = (payload.name || "").trim().split(/\s+/);
     if (nameParts.length > 1) {
@@ -739,7 +894,7 @@ export default function AgentPortal() {
     } else {
       parsedData.personal_first_names = payload.name || "";
     }
-    
+
     parsedData.personal_nationality = payload.nationality || "";
     parsedData.travel_destinations = payload.destination || "";
     parsedData.address_phone = payload.phone || "";
@@ -756,7 +911,7 @@ export default function AgentPortal() {
     });
 
     const newConvo: Conversation = {
-      id: newId,
+      id: username,
       timestamp: Date.now(),
       agentUsername,
       messages: [
@@ -767,15 +922,172 @@ export default function AgentPortal() {
       ],
       parsedData,
       missingFields: missing,
-      assistantMsg: "Loaded lead from contact form."
+      assistantMsg: "Loaded lead from contact form.",
+      coverLetterText: "",
+      coverLetterAiInput: "",
+      coverLetterMessages: [
+        {
+          role: "assistant",
+          content: "Hello! I am your AI Cover Letter Parser Assistant. Paste any client notes, passport details, travel dates, or share code text below to extract data and build the official Schengen cover letter."
+        }
+      ]
     };
 
     const updated = [newConvo, ...conversations];
     saveConversations(updated);
-    setActiveConvoId(newId);
+    setActiveConvoId(username);
     setActiveTab("convos"); // Switch tab back to active conversation list
     setInputText("");
     showToast("Form entry loaded into visa application form workspace.");
+  };
+
+  // Handle document image upload and OCR parsing
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
+    setIsScanning(true);
+    setScanError("");
+
+    let currentConvoId = activeConvoId;
+    let listCopy = [...conversations];
+
+    if (!currentConvoId) {
+      const newId = `convo_${Date.now()}`;
+      const newConvo: Conversation = {
+        id: newId,
+        timestamp: Date.now(),
+        agentUsername,
+        messages: [],
+        parsedData: { ...DEFAULT_LEAD },
+        missingFields: getDynamicCriticalFields(DEFAULT_LEAD),
+        assistantMsg: ""
+      };
+      listCopy = [newConvo];
+      currentConvoId = newId;
+    }
+
+    const currentConvo = listCopy.find((c) => c.id === currentConvoId);
+    if (!currentConvo) {
+      setIsScanning(false);
+      return;
+    }
+
+    // Read and scale image using Canvas
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const maxDim = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          showToast("Failed to initialize client-side image canvas.", "error");
+          setIsScanning(false);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const base64Image = canvas.toDataURL("image/jpeg", 0.8);
+
+        // Add file info to chat
+        currentConvo.messages.push({ role: "user", content: `[Uploaded Image Document: ${file.name}]` });
+        currentConvo.timestamp = Date.now();
+        saveConversations(listCopy);
+        setActiveConvoId(currentConvoId);
+
+        try {
+          const res = await fetch("/api/agent/parse-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64Image }),
+          });
+
+          const data = await res.json();
+          if (!res.ok || data.error) {
+            const errMsg = data.error || "Failed to extract information from document.";
+            showToast(errMsg, "error");
+            currentConvo.messages.push({
+              role: "assistant",
+              content: `Error parsing image: ${errMsg}`
+            });
+            saveConversations(listCopy);
+            return;
+          }
+
+          // Merge newly parsed fields
+          const updatedData = { ...currentConvo.parsedData };
+          const allFieldIds = new Set(visaSections.flatMap((s) => s.fields.map((f) => f.id)));
+          
+          Object.keys(data).forEach(key => {
+            if (allFieldIds.has(key) && data[key] !== null && data[key] !== undefined) {
+              updatedData[key] = String(data[key]);
+            }
+          });
+
+          const missingFields = getDynamicCriticalFields(updatedData);
+
+          currentConvo.messages.push({
+            role: "assistant",
+            content: `Successfully parsed document scan (${file.name}). Found and updated details such as: ${
+              Object.keys(data)
+                .filter(k => allFieldIds.has(k) && data[k])
+                .map(k => {
+                  let label = k;
+                  visaSections.forEach(sec => {
+                    const found = sec.fields.find(f => f.id === k);
+                    if (found) label = found.label;
+                  });
+                  return label;
+                })
+                .join(", ") || "none detected"
+            }.`
+          });
+
+          currentConvo.parsedData = updatedData;
+          currentConvo.missingFields = missingFields;
+          currentConvo.assistantMsg = "Image parsed successfully.";
+
+          saveConversations(listCopy);
+          setTempParsedData({ ...updatedData });
+          setFieldFilter("filled");
+          showToast("Document scanned and details parsed successfully!");
+        } catch (err) {
+          console.error(err);
+          showToast("Failed to connect to document scanning service.", "error");
+          currentConvo.messages.push({
+            role: "assistant",
+            content: "Error: Failed to reach document OCR engine."
+          });
+          saveConversations(listCopy);
+        } finally {
+          setIsScanning(false);
+        }
+      };
+      img.onerror = () => {
+        showToast("Failed to load uploaded image for scanning.", "error");
+        setIsScanning(false);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      showToast("Failed to read image file.", "error");
+      setIsScanning(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   // Send message for parsing
@@ -1014,17 +1326,18 @@ export default function AgentPortal() {
           <span className="font-sans text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight">
             Quick Holidays Portal
           </span>
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[#C99537] bg-[#C99537]/15 px-2 py-0.5 border border-[#C99537]/20">
+          <span className="text-[10px] uppercase font-bold tracking-widest text-[#C99537] bg-[#C99537]/15 px-2 py-0.5 border border-[#C99537]/20 rounded-lg">
             {portalWorkspaceMode === "visaDoc" ? "Visa Application Workspace" : "Visa Cover Letter Workspace"}
+            {activeConvoId && ` (${activeConvoId})`}
           </span>
 
           {/* 2 Portal Tool Workspace Mode Selectors */}
           <div className="hidden md:flex items-center gap-2 ml-4">
             <button
               onClick={() => setPortalWorkspaceMode("visaDoc")}
-              className={`font-bold uppercase text-[10px] tracking-wider px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer rounded-none border ${
+              className={`font-bold uppercase text-[10px] tracking-wider px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer rounded-xl border ${
                 portalWorkspaceMode === "visaDoc"
-                  ? "bg-[#C99537] text-zinc-950 border-[#C99537] font-extrabold shadow-[2px_2px_0_#000]"
+                  ? "bg-[#C99537] text-zinc-950 border-[#C99537] font-extrabold shadow-sm"
                   : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700"
               }`}
             >
@@ -1037,9 +1350,9 @@ export default function AgentPortal() {
                   setEmbeddedCoverLetterText(generateMasterCoverLetterText(tempParsedData));
                 }
               }}
-              className={`font-bold uppercase text-[10px] tracking-wider px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer rounded-none border ${
+              className={`font-bold uppercase text-[10px] tracking-wider px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer rounded-xl border ${
                 portalWorkspaceMode === "coverLetter"
-                  ? "bg-[#C99537] text-zinc-950 border-[#C99537] font-extrabold shadow-[2px_2px_0_#000]"
+                  ? "bg-[#C99537] text-zinc-950 border-[#C99537] font-extrabold shadow-sm"
                   : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700"
               }`}
             >
@@ -1132,14 +1445,14 @@ export default function AgentPortal() {
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Create User Card */}
-                <div className="lg:col-span-4 border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-[4px_4px_0_#000] dark:shadow-[4px_4px_0_#111]">
+                <div className="lg:col-span-4 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-md rounded-2xl">
                   <h3 className="font-sans text-xs uppercase font-bold text-[#C99537] tracking-wider mb-4 border-b border-zinc-200 dark:border-zinc-800 pb-2">
                     Create Agent Profile
                   </h3>
                   
                   {agentUsername === "owner" ? (
                     <div className="py-6 text-left space-y-3">
-                      <div className="bg-amber-500/10 border border-amber-500/25 text-[#C99537] p-4 text-[11px] leading-relaxed font-light">
+                      <div className="bg-amber-500/10 border border-amber-500/25 text-[#C99537] p-4 text-[11px] leading-relaxed font-light rounded-xl">
                         <strong className="block font-bold mb-1">Owner Restricted Access:</strong>
                         Profile creation is restricted for this account type. You have administrative permissions to view, suspend, delete, or modify agent access codes in the directory.
                       </div>
@@ -1157,7 +1470,7 @@ export default function AgentPortal() {
                           onChange={(e) => setNewUsername(e.target.value)}
                           placeholder="e.g. agent2"
                           autoComplete="off"
-                          className="w-full bg-zinc-50 dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs px-3 py-2 focus:outline-none focus:border-[#C99537] transition-all rounded-none no-custom-cursor"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs px-3 py-2.5 focus:outline-none focus:border-[#C99537] transition-all rounded-xl no-custom-cursor shadow-sm"
                         />
                       </div>
 
@@ -1172,19 +1485,19 @@ export default function AgentPortal() {
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder="e.g. pass456"
                           autoComplete="off"
-                          className="w-full bg-zinc-50 dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs px-3 py-2 focus:outline-none focus:border-[#C99537] transition-all rounded-none no-custom-cursor"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs px-3 py-2.5 focus:outline-none focus:border-[#C99537] transition-all rounded-xl no-custom-cursor shadow-sm"
                         />
                       </div>
 
                       {adminError && (
-                        <div className="bg-red-500/10 border border-red-500/35 text-red-500 dark:text-red-400 p-2.5 text-[10px] rounded-none">
+                        <div className="bg-red-500/10 border border-red-500/35 text-red-500 dark:text-red-400 p-2.5 text-[10px] rounded-xl">
                           ⚠️ {adminError}
                         </div>
                       )}
 
                       <button
                         type="submit"
-                        className="w-full bg-[#C99537] text-zinc-955 font-bold uppercase tracking-wider text-xs py-3 rounded-none hover:bg-[#E2B755] transition-colors cursor-pointer no-custom-cursor shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                        className="w-full bg-[#C99537] text-zinc-950 font-bold uppercase tracking-wider text-xs py-3 rounded-xl hover:bg-[#E2B755] transition-colors cursor-pointer no-custom-cursor shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
                       >
                         Add Account
                       </button>
@@ -1193,7 +1506,7 @@ export default function AgentPortal() {
                 </div>
 
                 {/* Accounts Directory Card */}
-                <div className="lg:col-span-8 border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-[4px_4px_0_#000] dark:shadow-[4px_4px_0_#111]">
+                <div className="lg:col-span-8 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-md rounded-2xl">
                   <h3 className="font-sans text-xs uppercase font-bold text-[#C99537] tracking-wider mb-4 border-b border-zinc-200 dark:border-zinc-800 pb-2">
                     Accounts Directory
                   </h3>
@@ -1203,7 +1516,7 @@ export default function AgentPortal() {
                       const info = adminAccounts[user];
                       const isAdmin = user === "admin";
                       return (
-                        <div key={user} className="p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-55 dark:bg-zinc-950/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-none transition-colors">
+                        <div key={user} className="p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-55 dark:bg-zinc-950/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl transition-colors">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-sm text-zinc-900 dark:text-white">@{user}</span>
@@ -1345,7 +1658,7 @@ export default function AgentPortal() {
               <div className="shrink-0 border-b border-zinc-200 dark:border-zinc-800 pb-4 mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="font-sans text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                    <span>🤖</span> AI Cover Letter Extraction Assistant & Chat
+                    <span>🤖</span> AI Cover Letter Extraction Assistant & Chat {activeConvoId && <span className="text-[#C99537] normal-case font-bold">({activeConvoId})</span>}
                   </h2>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-light">Interactive AI workspace for parsing applicant notes, share codes, and travel logistics.</p>
                 </div>
@@ -1354,7 +1667,7 @@ export default function AgentPortal() {
                   <button
                     type="button"
                     onClick={handleNewCoverLetterSession}
-                    className="text-[10px] font-extrabold uppercase tracking-wider bg-[#C99537]/15 border border-[#C99537]/50 text-[#C99537] hover:bg-[#C99537] hover:text-zinc-950 px-3 py-2 rounded-none cursor-pointer flex items-center gap-1.5 transition-all"
+                    className="text-[10px] font-extrabold uppercase tracking-wider bg-[#C99537]/15 border border-[#C99537]/50 text-[#C99537] hover:bg-[#C99537] hover:text-zinc-950 px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1.5 transition-all"
                   >
                     <span>➕</span> Start New Cover Letter
                   </button>
@@ -1362,7 +1675,7 @@ export default function AgentPortal() {
                   <button
                     type="button"
                     onClick={() => setShowCoverLetterPreviewModal(true)}
-                    className="text-[10px] font-extrabold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-4 py-2 hover:bg-[#E2B755] rounded-none cursor-pointer shadow-[2px_2px_0_#000] flex items-center gap-1.5"
+                    className="text-[10px] font-extrabold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-4 py-2 hover:bg-[#E2B755] rounded-xl cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1.5"
                   >
                     <span>👁️</span> Preview & Edit Cover Letter
                   </button>
@@ -1370,7 +1683,7 @@ export default function AgentPortal() {
                   <button
                     type="button"
                     onClick={() => handleExportWithValidation("coverDoc")}
-                    className="text-[10px] font-bold uppercase tracking-wider border-2 border-[#C99537] text-[#C99537] px-3.5 py-2 hover:bg-[#C99537] hover:text-zinc-950 rounded-none cursor-pointer"
+                    className="text-[10px] font-bold uppercase tracking-wider border border-[#C99537] text-[#C99537] px-3.5 py-2 hover:bg-[#C99537] hover:text-zinc-950 rounded-xl cursor-pointer transition-colors"
                   >
                     📄 Export Word (.DOC)
                   </button>
@@ -1378,7 +1691,7 @@ export default function AgentPortal() {
                   <button
                     type="button"
                     onClick={() => handleExportWithValidation("coverPdf")}
-                    className="text-[10px] font-bold uppercase tracking-wider border-2 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-3.5 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-none cursor-pointer"
+                    className="text-[10px] font-bold uppercase tracking-wider border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-3.5 py-2 hover:bg-zinc-250 dark:hover:bg-zinc-800 rounded-xl cursor-pointer transition-colors"
                   >
                     📕 Export ATS Cover Letter (PDF)
                   </button>
@@ -1386,15 +1699,15 @@ export default function AgentPortal() {
               </div>
 
               {/* Chat Conversation Log Stream */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-[3px_3px_0_#000] mb-4 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-2xl mb-4 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700">
                 {coverLetterMessages.map((m, idx) => {
                   const isAssistant = m.role === "assistant";
                   return (
                     <div key={idx} className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}>
-                      <div className={`max-w-2xl p-4 text-xs font-sans leading-relaxed border-2 ${
+                      <div className={`max-w-2xl p-4 text-xs font-sans leading-relaxed border ${
                         isAssistant
-                          ? "bg-zinc-50 dark:bg-zinc-950/80 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-[2px_2px_0_#ccc] dark:shadow-[2px_2px_0_#111]"
-                          : "bg-zinc-100 dark:bg-zinc-800/90 border-[#C99537]/50 text-zinc-900 dark:text-white shadow-[2px_2px_0_rgba(201,149,55,0.2)]"
+                          ? "bg-zinc-50 dark:bg-zinc-950/80 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-sm rounded-2xl rounded-tl-none"
+                          : "bg-zinc-100 dark:bg-zinc-800/90 border-[#C99537]/30 text-zinc-900 dark:text-white shadow-sm rounded-2xl rounded-tr-none"
                       }`}>
                         <span className="text-[9px] uppercase font-bold tracking-wider text-[#C99537] block mb-1.5">
                           {isAssistant ? "AI Cover Letter Parser Assistant" : `@${agentUsername} (Agent Notes)`}
@@ -1406,7 +1719,7 @@ export default function AgentPortal() {
                             ⚠️ Remaining Unclear / Missing Fields:
                             <div className="flex flex-wrap gap-1 mt-1">
                               {m.missingFields.map((f) => (
-                                <span key={f} className="bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded-none text-[9px] font-mono">
+                                <span key={f} className="bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded-lg text-[9px] font-mono">
                                   {f}
                                 </span>
                               ))}
@@ -1420,18 +1733,18 @@ export default function AgentPortal() {
               </div>
 
               {/* Chat Input Form */}
-              <form onSubmit={handleParseCoverLetterWithAI} className="p-3 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-[3px_3px_0_#000] flex gap-2 shrink-0">
+              <form onSubmit={handleParseCoverLetterWithAI} className="p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-2xl flex gap-2 shrink-0">
                 <textarea
                   rows={2}
                   value={coverLetterAiInput}
                   onChange={(e) => setCoverLetterAiInput(e.target.value)}
                   placeholder="Type or paste raw client notes, passport info, flight booking emails, share code details, or reply to AI questions..."
-                  className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs p-2.5 focus:outline-none focus:border-[#C99537] rounded-none resize-none"
+                  className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs p-2.5 focus:outline-none focus:border-[#C99537] rounded-xl resize-none"
                 />
                 <button
                   type="submit"
                   disabled={isAiParsingCoverLetter || !coverLetterAiInput.trim()}
-                  className="bg-[#C99537] text-zinc-950 px-5 py-2.5 font-extrabold uppercase tracking-wider text-[10px] rounded-none hover:bg-[#E2B755] disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-[2px_2px_0_#000] cursor-pointer"
+                  className="bg-[#C99537] text-zinc-950 px-5 py-2.5 font-extrabold uppercase tracking-wider text-[10px] rounded-xl hover:bg-[#E2B755] disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
                 >
                   {isAiParsingCoverLetter ? "Processing..." : "✨ Send to AI Parser"}
                 </button>
@@ -1442,7 +1755,7 @@ export default function AgentPortal() {
           <>
         {/* Left Column: Sidebar History */}
         <aside 
-          className="shrink-0 border-r-2 border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/50 flex flex-col overflow-hidden relative"
+          className="shrink-0 border-r border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/50 flex flex-col overflow-hidden relative"
           style={{ 
             width: leftCollapsed ? "0px" : `${leftWidth}px`, 
             minWidth: leftCollapsed ? "0px" : `${leftWidth}px`,
@@ -1452,7 +1765,7 @@ export default function AgentPortal() {
           <div className="p-4 shrink-0 border-b border-zinc-200 dark:border-zinc-850">
             <button
               onClick={handleNewConvo}
-              className="w-full bg-[#C99537] text-zinc-950 font-bold uppercase tracking-wider text-xs py-3 rounded-none shadow-[4px_4px_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-[#E2B755] transition-all cursor-pointer flex items-center justify-center gap-2 no-custom-cursor"
+              className="w-full bg-[#C99537] text-zinc-950 font-bold uppercase tracking-wider text-xs py-3 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 transition-all cursor-pointer flex items-center justify-center gap-2 no-custom-cursor"
             >
               {/* Plus Icon SVG */}
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -1463,7 +1776,7 @@ export default function AgentPortal() {
           </div>
 
           {/* Active Chats Header */}
-          <div className="py-2.5 px-4 border-b-2 border-zinc-200 dark:border-zinc-800 shrink-0 text-xs font-bold uppercase tracking-wider bg-zinc-200 dark:bg-zinc-950 flex items-center justify-between text-[#C99537]">
+          <div className="py-2.5 px-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0 text-xs font-bold uppercase tracking-wider bg-zinc-200/50 dark:bg-zinc-950 flex items-center justify-between text-[#C99537]">
             <span className="flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5 inline-block shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -1499,29 +1812,32 @@ export default function AgentPortal() {
                   <div
                     key={c.id}
                     onClick={() => setActiveConvoId(c.id)}
-                    className={`p-3 border-2 transition-all cursor-pointer flex justify-between items-start group rounded-none no-custom-cursor ${
+                    className={`p-3 border transition-all cursor-pointer flex justify-between items-start group rounded-xl no-custom-cursor ${
                       isActive
                         ? "border-[#C99537] bg-[#C99537]/10"
-                        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 hover:border-[#C99537] hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
+                        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 hover:border-[#C99537] hover:bg-zinc-50 dark:hover:bg-zinc-900/45"
                     }`}
                   >
-                    <div className="flex-1 min-w-0 pr-2">
-                      <p className="text-[11px] font-bold text-zinc-700 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors truncate">
+                    <div className="flex-1 min-w-0 pr-2 text-left">
+                      <p className="text-[11px] font-extrabold text-zinc-800 dark:text-zinc-200 group-hover:text-[#C99537] transition-colors truncate">
+                        👤 {c.id}
+                      </p>
+                      <p className="text-[9px] text-zinc-450 dark:text-zinc-500 truncate mt-0.5 font-light">
                         {previewText}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[9px] text-zinc-450 dark:text-zinc-600 font-light block">
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className="text-[8px] text-zinc-400 dark:text-zinc-650 font-light block">
                           {timeString}
                         </span>
                         {c.agentUsername && (
-                          <span className="text-[8px] font-bold uppercase tracking-wider text-[#C99537]/70 bg-[#C99537]/10 px-1 py-px">
+                          <span className="text-[8px] font-bold uppercase tracking-wider text-[#C99537]/75 bg-[#C99537]/10 px-1 py-px rounded">
                             @{c.agentUsername}
                           </span>
                         )}
                       </div>
                     </div>
                     <button
-                      onClick={(e) => handleDeleteConvo(c.id, e)}
+                      onClick={(e) => handleDeleteConvoClick(c.id, e)}
                       className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 p-1 transition-colors cursor-pointer shrink-0 no-custom-cursor"
                       title="Delete Conversation"
                     >
@@ -1543,7 +1859,7 @@ export default function AgentPortal() {
             {/* Centered pull-tab handle with horizontal double arrow */}
             <div
               onMouseDown={handleLeftMouseDown}
-              className="absolute w-5 h-8 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-[2px_2px_0_#000] flex items-center justify-center cursor-col-resize select-none z-40 hover:border-[#C99537] active:border-[#C99537] transition-colors rounded-none"
+              className="absolute w-5 h-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center cursor-col-resize select-none z-40 hover:border-[#C99537] active:border-[#C99537] transition-colors rounded-lg"
             >
               <svg className="w-3.5 h-3.5 text-zinc-650 dark:text-zinc-400 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18m0 0l-7.5 7.5M21 12l-7.5-7.5" />
@@ -1554,6 +1870,19 @@ export default function AgentPortal() {
 
         {/* Middle Column: Chat workspace area */}
         <main className="flex-1 flex flex-col bg-white dark:bg-zinc-950 relative overflow-hidden transition-colors duration-300">
+          {activeConvo && (
+            <div className="shrink-0 border-b border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm flex justify-between items-center z-10">
+              <div>
+                <h2 className="font-sans text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                  <span>📄</span> Visa Application Form Parser {activeConvoId && <span className="text-[#C99537] normal-case font-bold">({activeConvoId})</span>}
+                </h2>
+                <p className="text-[11px] text-zinc-505 dark:text-zinc-400 font-light mt-0.5">
+                  Review, edit, and parse Schengen visa application details for this client.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Logo Watermark behind workspace */}
           <div className="absolute inset-0 flex justify-center items-center pointer-events-none opacity-[0.03] dark:opacity-[0.015]">
             <img src="/logos/logo.svg" alt="Watermark" className="w-[420px] h-[420px] object-contain" />
@@ -1570,10 +1899,10 @@ export default function AgentPortal() {
                     className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}
                   >
                     <div
-                      className={`max-w-xl p-4 border-2 text-xs sm:text-sm font-sans leading-relaxed ${
+                      className={`max-w-xl p-4 border text-xs sm:text-sm font-sans leading-relaxed ${
                         isAssistant
-                          ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-300 rounded-none shadow-[3px_3px_0_#ccc] dark:shadow-[3px_3px_0_#222]"
-                          : "bg-zinc-100 dark:bg-zinc-800/85 border-zinc-300 dark:border-[#C99537]/45 text-zinc-900 dark:text-white rounded-none shadow-[3px_3px_0_rgba(201,149,55,0.15)]"
+                          ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-300 rounded-2xl rounded-tl-none shadow-sm"
+                          : "bg-zinc-100 dark:bg-zinc-800/85 border-zinc-300 dark:border-[#C99537]/20 text-zinc-900 dark:text-white rounded-2xl rounded-tr-none shadow-sm"
                       }`}
                     >
                       <span className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${
@@ -1609,14 +1938,43 @@ export default function AgentPortal() {
 
           {/* Message Input Box */}
           {activeConvo && (
-            <form onSubmit={handleSendMessage} className="p-4 shrink-0 border-t-2 border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 flex gap-3.5 items-end z-10">
+            <form onSubmit={handleSendMessage} className="p-4 shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 flex gap-3 items-end z-10">
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                id="agent-ocr-file-input"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isScanning || isSubmitting}
+                className="hidden animate-none"
+              />
+
+              {/* Upload Button */}
+              <label
+                htmlFor="agent-ocr-file-input"
+                className="flex items-center justify-center p-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-400 dark:text-zinc-600 hover:text-[#C99537] hover:border-[#C99537] transition-all cursor-pointer shrink-0 h-[48px] w-[48px] rounded-xl select-none shadow-sm"
+                title="Upload client document/passport picture to parse"
+              >
+                {isScanning ? (
+                  <svg className="animate-spin w-5 h-5 text-[#C99537]" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                  </svg>
+                )}
+              </label>
+
               <textarea
                 rows={2}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Paste client text here..."
-                disabled={isSubmitting}
-                className="flex-1 bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs sm:text-sm px-4 py-3.5 focus:outline-none focus:border-[#C99537] transition-all resize-none placeholder-zinc-400 dark:placeholder-zinc-700 rounded-none no-custom-cursor"
+                disabled={isSubmitting || isScanning}
+                className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs sm:text-sm px-4 py-3.5 focus:outline-none focus:border-[#C99537] transition-all resize-none placeholder-zinc-400 dark:placeholder-zinc-700 rounded-xl no-custom-cursor shadow-sm"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -1626,10 +1984,10 @@ export default function AgentPortal() {
               />
               <button
                 type="submit"
-                disabled={isSubmitting || !inputText.trim()}
-                className="bg-[#C99537] text-zinc-950 font-bold uppercase tracking-widest text-xs px-6 py-4 shadow-[3px_3px_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-[#E2B755] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shrink-0 no-custom-cursor"
+                disabled={isSubmitting || isScanning || !inputText.trim()}
+                className="bg-[#C99537] text-zinc-950 font-bold uppercase tracking-widest text-xs px-6 h-[48px] rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shrink-0 no-custom-cursor"
               >
-                {isSubmitting ? "Parsing..." : "Parse"}
+                {isSubmitting || isScanning ? "Parsing..." : "Parse"}
               </button>
             </form>
           )}
@@ -1641,7 +1999,7 @@ export default function AgentPortal() {
             {/* Centered pull-tab handle with horizontal double arrow */}
             <div
               onMouseDown={handleRightMouseDown}
-              className="absolute w-5 h-8 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-[2px_2px_0_#000] flex items-center justify-center cursor-col-resize select-none z-40 hover:border-[#C99537] active:border-[#C99537] transition-colors rounded-none"
+              className="absolute w-5 h-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center cursor-col-resize select-none z-40 hover:border-[#C99537] active:border-[#C99537] transition-colors rounded-lg"
             >
               <svg className="w-3.5 h-3.5 text-zinc-650 dark:text-zinc-400 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18m0 0l-7.5 7.5M21 12l-7.5-7.5" />
@@ -1652,7 +2010,7 @@ export default function AgentPortal() {
 
         {/* Right Column: Structured Data Review Panel */}
         <aside 
-          className="shrink-0 border-l-2 border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 flex flex-col overflow-hidden relative"
+          className="shrink-0 border-l border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 flex flex-col overflow-hidden relative"
           style={{ 
             width: rightCollapsed ? "0px" : `${rightWidth}px`, 
             minWidth: rightCollapsed ? "0px" : `${rightWidth}px`,
@@ -1672,13 +2030,13 @@ export default function AgentPortal() {
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setTempParsedData({ ...activeConvo.parsedData })}
-                  className="text-[8px] uppercase font-bold px-2 py-0.5 bg-zinc-950 text-white hover:bg-zinc-850 transition-colors cursor-pointer no-custom-cursor rounded-none border-none"
+                  className="text-[8px] uppercase font-bold px-2 py-1 bg-zinc-950 text-white hover:bg-zinc-850 transition-colors cursor-pointer no-custom-cursor rounded-lg border-none"
                 >
                   Discard
                 </button>
                 <button
                   onClick={handleSaveChanges}
-                  className="text-[8px] uppercase font-bold px-2 py-0.5 bg-white text-zinc-950 hover:bg-zinc-100 transition-colors shadow-sm cursor-pointer no-custom-cursor rounded-none border-none"
+                  className="text-[8px] uppercase font-bold px-2 py-1 bg-white text-zinc-950 hover:bg-zinc-100 transition-colors shadow-sm cursor-pointer no-custom-cursor rounded-lg border-none"
                 >
                   Save
                 </button>
@@ -1705,34 +2063,6 @@ export default function AgentPortal() {
           <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
             {activeConvo ? (
               <>
-                {/* Active missing fields alerts */}
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block">
-                    Validation Checklist
-                  </span>
-                  {activeConvo.missingFields.length === 0 ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 p-3.5 text-xs rounded-none font-semibold text-left">
-                      ✓ Ready: All critical Schengen Visa form fields verified and complete!
-                    </div>
-                  ) : (
-                    <div className="bg-amber-500/10 border border-[#C99537]/35 text-[#C99537] p-3.5 text-xs rounded-none font-light leading-relaxed text-left">
-                      <strong className="block font-bold mb-1">Critical Missing Fields:</strong>
-                      <ul className="list-disc pl-4 space-y-0.5">
-                        {activeConvo.missingFields.map((field) => {
-                          // Find human friendly label
-                          let label = field;
-                          visaSections.forEach(sec => {
-                            const found = sec.fields.find(f => f.id === field);
-                            if (found) label = found.label;
-                          });
-                          return (
-                            <li key={field} className="capitalize text-left">{label}</li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )}
-                </div>
 
                 {/* Grouped Visa Form Fields Panel */}
                 <div className="space-y-4">
@@ -1806,7 +2136,7 @@ export default function AgentPortal() {
                   <button
                     onClick={handleSaveChanges}
                     disabled={!hasUnsavedChanges}
-                    className="w-full bg-[#C99537] text-zinc-950 font-bold uppercase tracking-wider text-xs py-3 rounded-none transition-all cursor-pointer shadow-[3px_3px_0_#000] hover:bg-[#E2B755] disabled:opacity-45 disabled:pointer-events-none no-custom-cursor animate-none"
+                    className="w-full bg-[#C99537] text-zinc-950 font-bold uppercase tracking-wider text-xs py-3 rounded-xl transition-all cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-45 disabled:pointer-events-none no-custom-cursor animate-none"
                   >
                     Save Changes
                   </button>
@@ -1818,13 +2148,13 @@ export default function AgentPortal() {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => handleExportWithValidation("visaDoc")}
-                        className="border-2 border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor"
+                        className="border border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-xl transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor"
                       >
                         📄 Form (.DOC)
                       </button>
                       <button
                         onClick={() => handleExportWithValidation("visaPdf")}
-                        className="bg-[#C99537]/20 border-2 border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor"
+                        className="bg-[#C99537]/20 border border-[#C99537] text-[#C99537] font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-xl transition-all cursor-pointer hover:bg-[#C99537] hover:text-zinc-950 no-custom-cursor"
                       >
                         📕 Form (PDF)
                       </button>
@@ -1838,13 +2168,13 @@ export default function AgentPortal() {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => handleExportWithValidation("coverDoc")}
-                        className="border-2 border-zinc-700 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-zinc-800 hover:text-white no-custom-cursor"
+                        className="border border-zinc-700 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-xl transition-all cursor-pointer hover:bg-zinc-800 hover:text-white no-custom-cursor"
                       >
                         📄 Letter (.DOC)
                       </button>
                       <button
                         onClick={() => handleExportWithValidation("coverPdf")}
-                        className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-none transition-all cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-100 no-custom-cursor"
+                        className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold uppercase tracking-wider text-[10px] py-2.5 rounded-xl transition-all cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-100 no-custom-cursor"
                       >
                         📕 Letter (PDF)
                       </button>
@@ -1870,7 +2200,7 @@ export default function AgentPortal() {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9, transition: { duration: 0.2 } }}
-            className={`fixed bottom-6 right-6 z-[99999] border-2 px-5 py-4 shadow-[6px_6px_0_#000] flex items-center gap-3.5 max-w-sm pointer-events-auto rounded-none ${
+            className={`fixed bottom-6 right-6 z-[99999] border px-5 py-4 shadow-xl flex items-center gap-3.5 max-w-sm pointer-events-auto rounded-xl ${
               toast.type === "success"
                 ? "bg-[#C99537] border-zinc-950 text-zinc-950"
                 : "bg-red-950 border-red-500 text-white"
@@ -1892,7 +2222,7 @@ export default function AgentPortal() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-zinc-950 border-2 border-zinc-300 dark:border-[#C99537]/70 p-6 max-w-lg w-full shadow-[6px_6px_0_rgba(0,0,0,0.6)] dark:shadow-[6px_6px_0_rgba(201,149,55,0.25)] text-left relative rounded-none animate-none"
+              className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-[#C99537]/40 p-6 max-w-lg w-full shadow-2xl text-left relative rounded-2xl animate-none"
             >
               {approvalStep === "preview" ? (
                 <>
@@ -2246,6 +2576,139 @@ export default function AgentPortal() {
                   Export Anyway
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 1. Username Assignment Modal */}
+      <AnimatePresence>
+        {showUsernameModal && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm pointer-events-auto">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 max-w-md w-full shadow-2xl text-left relative rounded-2xl animate-none"
+            >
+              <h3 className="font-serif text-lg font-bold text-zinc-900 dark:text-white mb-2">Create New Client Session</h3>
+              <p className="text-[11px] text-zinc-550 dark:text-zinc-400 mb-4 font-light leading-relaxed">
+                Assign a unique username/identifier for this client. This will sync their Visa Form and Cover Letter info to the database.
+              </p>
+
+              <form onSubmit={handleCreateNewClientConvo} className="space-y-4 text-left">
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                    Client Unique Username
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newConvoUsername}
+                    onChange={(e) => setNewConvoUsername(e.target.value)}
+                    placeholder="e.g. john_doe"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-xs px-3 py-2.5 focus:outline-none focus:border-[#C99537] transition-all rounded-xl no-custom-cursor"
+                  />
+                </div>
+
+                {usernameModalError && (
+                  <div className="bg-red-500/10 border border-red-500/35 text-red-500 dark:text-red-400 p-2.5 text-[10px] rounded-xl">
+                    ⚠️ {usernameModalError}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowUsernameModal(false);
+                      setNewConvoUsername("");
+                      setUsernameModalError("");
+                    }}
+                    className="border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white px-4 py-2 font-bold uppercase tracking-wider text-[10px] rounded-xl transition-colors cursor-pointer no-custom-cursor"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-[#C99537] text-zinc-950 px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] rounded-xl transition-colors cursor-pointer hover:bg-[#E2B755] no-custom-cursor"
+                  >
+                    Create Workspace
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 2. Double-Confirmation Profile Deletion Modal */}
+      <AnimatePresence>
+        {deleteStep > 0 && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm pointer-events-auto">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-zinc-900 border border-red-500 p-6 max-w-md w-full shadow-2xl text-left relative rounded-2xl animate-none"
+            >
+              {deleteStep === 1 ? (
+                <>
+                  <div className="flex items-center gap-3 text-red-500 mb-2">
+                    <span className="text-xl font-bold">⚠️</span>
+                    <h3 className="font-sans text-base font-extrabold uppercase tracking-wide text-zinc-900 dark:text-white">
+                      Delete Client Profile
+                    </h3>
+                  </div>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 mb-5 font-light leading-relaxed">
+                    Are you sure you want to delete the client profile for <strong className="font-semibold text-zinc-900 dark:text-white">"{deleteConvoId}"</strong>?
+                  </p>
+                  <div className="flex justify-end gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={handleCancelDelete}
+                      className="border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-4 py-2 font-bold uppercase tracking-wider text-[10px] rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmDeleteStep1}
+                      className="bg-red-600 text-white px-4 py-2 font-bold uppercase tracking-wider text-[10px] rounded-xl hover:bg-red-700 cursor-pointer"
+                    >
+                      Delete Profile
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 text-red-600 mb-2">
+                    <span className="text-xl font-bold">🚨</span>
+                    <h3 className="font-sans text-base font-extrabold uppercase tracking-wide text-zinc-900 dark:text-white">
+                      Final Security Confirmation
+                    </h3>
+                  </div>
+                  <p className="text-xs text-zinc-650 dark:text-zinc-300 mb-5 font-light leading-relaxed">
+                    This action is <strong className="font-bold text-red-500">permanent</strong> and will delete all form data, documents, and cover letters for <strong className="font-semibold text-zinc-900 dark:text-white">"{deleteConvoId}"</strong> from the database. Confirm final deletion?
+                  </p>
+                  <div className="flex justify-end gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={handleCancelDelete}
+                      className="border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-4 py-2 font-bold uppercase tracking-wider text-[10px] rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmDeleteStep2}
+                      className="bg-red-700 text-white px-5 py-2.5 font-extrabold uppercase tracking-wider text-[10px] rounded-xl hover:bg-red-800 cursor-pointer"
+                    >
+                      Permanently Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         )}

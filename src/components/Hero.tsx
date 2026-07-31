@@ -486,17 +486,6 @@ export default function Hero() {
             }}
             className={`w-full lg:max-w-xl flex flex-col gap-4 pointer-events-auto items-center lg:items-start text-center lg:text-left`}
           >
-            {/* Subtitle */}
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 10 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-              }}
-              className="text-primary font-sans text-xs sm:text-sm font-bold uppercase tracking-widest block text-center lg:text-left mx-auto lg:mx-0"
-              style={{ textShadow: HERO_CONFIG.subtitleTextShadow }}
-            >
-              {siteConfig.heroSubtitle}
-            </motion.div>
 
             {/* Row 1: Logo (Left) + Stacked Text Heading (Right) */}
             <motion.div
@@ -533,7 +522,7 @@ export default function Hero() {
               }}
               className={`${HERO_CONFIG.paragraphMaxWidth} flex flex-col items-center lg:items-start`}
             >
-              <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed text-center lg:text-left mx-auto lg:mx-0"
+              <p className="font-sans text-white text-base sm:text-lg font-light leading-relaxed text-center lg:text-left mx-auto lg:mx-0 bg-[#C99537]/10 px-5 py-4 rounded-2xl backdrop-blur-[2px]"
                 style={{ textShadow: HERO_CONFIG.descriptionTextShadow }}>
                 {siteConfig.heroDescription}
               </p>
@@ -555,22 +544,6 @@ export default function Hero() {
                 </ThemeButton>
               </div>
 
-              {/* Trust Signals */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm sm:text-base font-sans text-white/95 select-none pointer-events-none mt-4 font-normal">
-                <span className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                  Free eligibility check
-                </span>
-                <span className="hidden sm:inline w-2 h-2 rounded-full bg-zinc-700" />
-                <span className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                  No hidden fees
-                </span>
-              </div>
             </motion.div>
           </motion.div>
 
@@ -634,7 +607,7 @@ export default function Hero() {
                         <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                       </svg>
                       <span className="text-zinc-950 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        Choose Ur Destination
+                        See All Countries
                       </span>
                     </button>
                   </div>
