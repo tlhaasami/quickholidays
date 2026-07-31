@@ -88,26 +88,7 @@ export async function GET() {
     // 2. Fetch existing reviews
     let res = await client.query("SELECT * FROM video_reviews ORDER BY id ASC;");
 
-    // 3. Seed initial 5 reviews if empty
-    if (res.rows.length === 0) {
-      const seedReviews = [
-        { name: "Natasha K.", country: "France Visa", youtubeId: "tgbNymZ7vqY", caption: "Assisted by Nile after a refusal. Smooth biometrics support." },
-        { name: "KJ Ldn", country: "Schengen Visa", youtubeId: "H5v3kku4y6Q", caption: "Anaya found my TLS appointment in 6 days. Highly recommend." },
-        { name: "Nadeeka W.", country: "Spain Visa", youtubeId: "dQw4w9WgXcQ", caption: "Jenny prepared our family file stress-free. 10/10 service." },
-        { name: "Amara O.", country: "Germany Visa", youtubeId: "9bZkp7q19f0", caption: "Professional cover letter and checklist. Approved in 8 days." },
-        { name: "Dmitry K.", country: "Italy Visa", youtubeId: "L_LUpnjgPso", caption: "Superb slot tracking. The split-deposit model gives true peace of mind." }
-      ];
-
-      for (const rev of seedReviews) {
-        await client.query(
-          "INSERT INTO video_reviews (name, country, youtube_id, caption) VALUES ($1, $2, $3, $4);",
-          [rev.name, rev.country, rev.youtubeId, rev.caption]
-        );
-      }
-
-      // Re-fetch seeded rows
-      res = await client.query("SELECT * FROM video_reviews ORDER BY id ASC;");
-    }
+    // 3. (Seed block removed so table remains clean for user-added links)
 
     // Format output, filtering out duplicates by youtubeId
     const seen = new Set<string>();
@@ -154,9 +135,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "All fields (name, country, youtubeLink, caption) are required." }, { status: 400 });
     }
 
-    const youtubeId = extractYoutubeId(youtubeLink);
-    if (!youtubeId || youtubeId.length !== 11) {
-      return NextResponse.json({ success: false, error: "Invalid YouTube video link or ID (must resolve to an 11-char ID)." }, { status: 400 });
+    let youtubeId = youtubeLink.trim();
+    const isDirectVideo = youtubeId.startsWith("http") && (
+      youtubeId.includes(".mp4") ||
+      youtubeId.includes(".webm") ||
+      youtubeId.includes(".mov") ||
+      youtubeId.includes("/storage/v1/object/")
+    );
+
+    if (!isDirectVideo) {
+      youtubeId = extractYoutubeId(youtubeLink);
+      if (!youtubeId || youtubeId.length !== 11) {
+        return NextResponse.json({ success: false, error: "Invalid video link (must be a YouTube link or a direct video URL ending in .mp4/.webm/.mov)." }, { status: 400 });
+      }
     }
 
     // 3. Connect and insert

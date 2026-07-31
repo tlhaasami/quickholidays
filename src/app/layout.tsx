@@ -19,6 +19,11 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NODE_ENV === "production"
+      ? "https://www.quickholidays.co.uk"
+      : "http://localhost:3000"
+  ),
   title: "Quick Holidays Ltd | Schengen Visa Specialists",
   description: "Get your Schengen visa handled properly with clear costs, honest advice, and our full Accountability Promise.",
   icons: {

@@ -16,10 +16,7 @@ export default function AddReviewPage() {
   const [password, setPassword] = useState("");
 
   // Review fields
-  const [name, setName] = useState("");
-  const [country, setCountry] = useState("");
   const [youtubeLink, setYoutubeLink] = useState("");
-  const [caption, setCaption] = useState("");
 
   // UI state
   const [error, setError] = useState<string | null>(null);
@@ -43,8 +40,8 @@ export default function AddReviewPage() {
       return;
     }
 
-    if (!name || !country || !youtubeLink || !caption) {
-      setError("Please fill out all reviewer details (Name, Visa Country, YouTube link, and Caption).");
+    if (!youtubeLink) {
+      setError("Please enter a YouTube video link or Shorts link.");
       return;
     }
 
@@ -57,10 +54,10 @@ export default function AddReviewPage() {
         body: JSON.stringify({
           username,
           password,
-          name,
-          country,
+          name: "Client Review",
+          country: "Schengen Visa",
           youtubeLink,
-          caption
+          caption: "Visa Success Testimonial"
         })
       });
 
@@ -71,13 +68,10 @@ export default function AddReviewPage() {
         return;
       }
 
-      setSuccess(`Successfully added video review for ${name}! It is now live in the system.`);
+      setSuccess(`Successfully added video review! It is now live in the system.`);
       
       // Clear fields on success
-      setName("");
-      setCountry("");
       setYoutubeLink("");
-      setCaption("");
       setIsSubmitting(false);
 
       // Redirect after brief delay
@@ -153,32 +147,6 @@ export default function AddReviewPage() {
               <h3 className="text-xs font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
                 2. Testimonial Details
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                    Reviewer Name
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Natasha K."
-                    className="w-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-sm px-4 py-3 rounded-xl focus:outline-none focus:border-[#C99537] transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                    Visa Country
-                  </label>
-                  <input
-                    type="text"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    placeholder="e.g. France Visa"
-                    className="w-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-sm px-4 py-3 rounded-xl focus:outline-none focus:border-[#C99537] transition-all"
-                  />
-                </div>
-              </div>
 
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
@@ -192,22 +160,113 @@ export default function AddReviewPage() {
                   className="w-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-sm px-4 py-3 rounded-xl focus:outline-none focus:border-[#C99537] transition-all"
                 />
                 <span className="text-[10px] text-zinc-500 font-sans block mt-1">
-                  Supports full URLs, shorts links (e.g. youtube.com/shorts/id), or directly standard 11-char video IDs.
+                  Supports full URLs, shorts links, 11-char video IDs, or direct video file links (.mp4, .webm, .mov) from Supabase Storage.
                 </span>
+
+                {/* Coordinated Live Preview & Suitability Guide */}
+                {(() => {
+                  const clean = youtubeLink.trim();
+                  const isDirectVideo = clean.startsWith("http") && (
+                    clean.includes(".mp4") ||
+                    clean.includes(".webm") ||
+                    clean.includes(".mov") ||
+                    clean.includes("/storage/v1/object/")
+                  );
+
+                  if (isDirectVideo) {
+                    return (
+                      <div className="mt-4 p-4 rounded-2xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 space-y-4">
+                        <div className="text-xs font-bold text-[#C99537] flex items-center gap-1.5">
+                          <span>💡 Real-Time Direct Video Preview</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-6 items-center">
+                          {/* Simulated HomePage Video Card */}
+                          <div className="relative aspect-[9/16] w-[130px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden shrink-0">
+                            <video
+                              src={clean}
+                              controls
+                              playsInline
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          {/* Suitability guidelines */}
+                          <div className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
+                            <p className="font-semibold text-zinc-900 dark:text-white">
+                              Direct Video Hosting (Zero Cost)
+                            </p>
+                            <p>
+                              ✅ <strong className="text-emerald-500 font-semibold">Safe & Permanent</strong>: Since this file is hosted in your Supabase Storage bucket, no external platforms can delete it.
+                            </p>
+                            <p>
+                              💡 <strong className="text-primary font-semibold">Portrait Format (9:16)</strong> is highly recommended to fill the vertical display container cleanly.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  let previewId = "";
+                  if (clean.length === 11) {
+                    previewId = clean;
+                  } else {
+                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                    const match = clean.match(regExp);
+                    if (match && match[2].length === 11) {
+                      previewId = match[2];
+                    } else {
+                      const shortsReg = /\/shorts\/([a-zA-Z0-9_-]{11})/;
+                      const shortsMatch = clean.match(shortsReg);
+                      if (shortsMatch && shortsMatch[1].length === 11) {
+                        previewId = shortsMatch[1];
+                      }
+                    }
+                  }
+
+                  if (previewId && previewId.length === 11) {
+                    return (
+                      <div className="mt-4 p-4 rounded-2xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 space-y-4">
+                        <div className="text-xs font-bold text-[#C99537] flex items-center gap-1.5">
+                          <span>💡 Real-Time Embed Preview</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-6 items-center">
+                          {/* Simulated HomePage Video Card */}
+                          <div className="relative aspect-[9/16] w-[130px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden shrink-0">
+                            <div className="absolute top-[-25px] left-0 w-full h-[calc(100%+25px)] overflow-hidden">
+                              <iframe
+                                src={`https://www.youtube.com/embed/${previewId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1&controls=1`}
+                                title="Review Preview"
+                                className="w-full h-full object-cover border-0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                            </div>
+                          </div>
+                          {/* Suitability guidelines */}
+                          <div className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
+                            <p className="font-semibold text-zinc-900 dark:text-white">
+                              Which format is suited here?
+                            </p>
+                            <p>
+                              ✅ <strong className="text-emerald-500 font-semibold">YouTube Shorts (9:16 Portrait)</strong>: Highly recommended. They fill the vertical space naturally, matching the mobile-first portrait reviews grid.
+                            </p>
+                            <p>
+                              ⚠️ <strong className="text-amber-500 font-semibold">Standard Videos (16:9 Landscape)</strong>: Will display, but with black letterbox bars on top/bottom because they are cropped into the portrait container.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="mt-2 p-3.5 rounded-xl bg-zinc-100/50 dark:bg-white/[0.02] border border-dashed border-zinc-200 dark:border-white/5 text-xs text-zinc-555 dark:text-zinc-500 font-light">
+                      💡 <strong>Format Suitability</strong>: You can paste a YouTube link or a direct video URL (e.g. from Supabase Storage). Portrait videos (9:16) are highly recommended. Landscape (16:9) will fit but display with black bars.
+                    </div>
+                  );
+                })()}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-[10px] font-sans font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                  Caption / Caption Text
-                </label>
-                <textarea
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  placeholder="e.g. Professional cover letter and checklist. Approved in 8 days."
-                  rows={3}
-                  className="w-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-sans text-sm px-4 py-3 rounded-xl focus:outline-none focus:border-[#C99537] transition-all resize-none"
-                />
-              </div>
             </div>
 
             {/* Notification messages */}

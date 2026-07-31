@@ -256,13 +256,13 @@ export function Navbar() {
 
       {/* Sticky Mobile Navbar (Mobile Only) */}
       <header className={cn(
-        "fixed top-8 left-0 right-0 h-16 z-[998] md:hidden transition-all duration-300",
+        "fixed top-0 left-0 right-0 h-16 z-[998] md:hidden transition-all duration-300",
         showTransparent 
           ? "bg-transparent border-transparent" 
           : "bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-white/10"
       )}>
         <div className={cn(
-          "h-full flex items-center justify-between px-6 transition-opacity duration-300",
+          "h-full flex items-center justify-center px-6 transition-opacity duration-300",
           showTransparent ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
         )}>
           <Link href="/" className="flex items-center gap-2.5 select-none">
@@ -288,7 +288,7 @@ export function Navbar() {
           }}
           aria-label="Toggle Navigation Menu"
           className={cn(
-            "fixed top-[42px] right-6 z-[1000] p-2.5 rounded-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-white/10 shadow-lg cursor-pointer md:hidden flex flex-col justify-center items-center gap-1.5 w-11 h-11 pointer-events-auto transition-all duration-300 hover:scale-105 active:scale-95",
+            "fixed top-[10px] right-6 z-[1000] p-2.5 rounded-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-white/10 shadow-lg cursor-pointer md:hidden flex flex-col justify-center items-center gap-1.5 w-11 h-11 pointer-events-auto transition-all duration-300 hover:scale-105 active:scale-95",
             isOpen ? "rotate-90" : "rotate-0"
           )}
         >

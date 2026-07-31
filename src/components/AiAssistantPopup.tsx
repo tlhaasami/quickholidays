@@ -67,10 +67,10 @@ export function AiAssistantPopup() {
   useEffect(() => {
     if (isCentered) return;
 
-    // 1. Initial delay: appear after 3.5 seconds
+    // 1. Initial delay: appear after 11 seconds (when WhatsApp tooltip auto-hides)
     const startTimeout = setTimeout(() => {
       setIsPunchlineVisible(true);
-    }, 3500);
+    }, 11000);
 
     return () => clearTimeout(startTimeout);
   }, [isCentered]);

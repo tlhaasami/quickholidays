@@ -7,19 +7,36 @@ import { Highlighter } from "@/components/ui/highlighter";
 
 function VideoCard({ video }: { video: any }) {
   const elementId = `reviews-yt-player-${video.id}`;
+  const isDirectVideo = video.youtubeId.startsWith("http") && (
+    video.youtubeId.includes(".mp4") ||
+    video.youtubeId.includes(".webm") ||
+    video.youtubeId.includes(".mov") ||
+    video.youtubeId.includes("/storage/v1/object/")
+  );
+
   return (
-    <div className="relative aspect-[9/16] w-full max-w-[240px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden group">
-      {/* Video Iframe Player Container with Top Cropping */}
-      <div className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] overflow-hidden z-10">
-        <iframe
-          id={elementId}
-          src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1&controls=1`}
-          title={`${video.name} review`}
-          className="w-full h-full object-cover border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+    <div className="relative aspect-[9/16] w-full max-w-[240px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden group flex justify-center items-center">
+      {isDirectVideo ? (
+        <video
+          src={video.youtubeId}
+          controls
+          playsInline
+          loop
+          className="w-full h-full object-cover"
         />
-      </div>
+      ) : (
+        /* Video Iframe Player Container with Top Cropping */
+        <div className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] overflow-hidden z-10">
+          <iframe
+            id={elementId}
+            src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1&controls=1`}
+            title={`${video.name} review`}
+            className="w-full h-full object-cover border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )}
     </div>
   );
 }

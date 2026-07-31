@@ -24,19 +24,36 @@ import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 function VideoCard({ video }: { video: any }) {
   const elementId = `yt-player-${video.id}`;
+  const isDirectVideo = video.youtubeId.startsWith("http") && (
+    video.youtubeId.includes(".mp4") ||
+    video.youtubeId.includes(".webm") ||
+    video.youtubeId.includes(".mov") ||
+    video.youtubeId.includes("/storage/v1/object/")
+  );
+
   return (
-    <div className="relative aspect-[9/16] w-full max-w-[240px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden group">
-      {/* Video Iframe Player Container with Top Cropping */}
-      <div className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] overflow-hidden z-10">
-        <iframe
-          id={elementId}
-          src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1&controls=1`}
-          title={`${video.name} review`}
-          className="w-full h-full object-cover border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+    <div className="relative aspect-[9/16] w-full max-w-[240px] rounded-2xl border border-zinc-200 dark:border-white/10 bg-black shadow-lg overflow-hidden group flex justify-center items-center">
+      {isDirectVideo ? (
+        <video
+          src={video.youtubeId}
+          controls
+          playsInline
+          loop
+          className="w-full h-full object-cover"
         />
-      </div>
+      ) : (
+        /* Video Iframe Player Container with Top Cropping */
+        <div className="absolute top-[-50px] left-0 w-full h-[calc(100%+50px)] overflow-hidden z-10">
+          <iframe
+            id={elementId}
+            src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1&controls=1`}
+            title={`${video.name} review`}
+            className="w-full h-full object-cover border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -380,7 +397,7 @@ export default function Hero() {
 
 
       {/* 1. Hero Section (7.1) */}
-      <section id="hero" className="relative w-full h-screen overflow-hidden bg-black">
+      <section id="hero" className="relative w-full h-auto min-h-screen lg:h-screen lg:overflow-hidden bg-black">
         {/* Background Hero Image (Visible immediately until video is fully loaded) */}
         <div className="absolute inset-0 overflow-hidden z-0 bg-black">
           <img
@@ -451,7 +468,7 @@ export default function Hero() {
         )}
 
         {/* Hero content split container — centered vertically (shifted slightly up on mobile), brand on left, flags on right, pinned using vw */}
-        <div className="absolute inset-0 z-10 w-full px-[6vw] lg:px-[8vw] flex flex-col lg:flex-row justify-start lg:justify-between items-center gap-8 lg:gap-12 pointer-events-none pt-20 sm:pt-24 lg:pt-0 overflow-hidden">
+        <div className="relative lg:absolute lg:inset-0 z-10 w-full px-[6vw] lg:px-[8vw] flex flex-col lg:flex-row justify-start lg:justify-between items-center gap-8 lg:gap-12 pointer-events-none pt-24 sm:pt-28 pb-16 lg:pb-0 overflow-visible">
 
           {/* Left Column: Brand Block */}
           <motion.div
@@ -467,7 +484,7 @@ export default function Hero() {
                 }
               }
             }}
-            className={`w-full lg:max-w-xl flex flex-col gap-4 pointer-events-auto`}
+            className={`w-full lg:max-w-xl flex flex-col gap-4 pointer-events-auto items-center lg:items-start text-center lg:text-left`}
           >
             {/* Subtitle */}
             <motion.div
@@ -475,7 +492,7 @@ export default function Hero() {
                 hidden: { opacity: 0, y: 10 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
               }}
-              className="text-primary font-sans text-xs sm:text-sm font-bold uppercase tracking-widest block"
+              className="text-primary font-sans text-xs sm:text-sm font-bold uppercase tracking-widest block text-center lg:text-left mx-auto lg:mx-0"
               style={{ textShadow: HERO_CONFIG.subtitleTextShadow }}
             >
               {siteConfig.heroSubtitle}
@@ -487,7 +504,7 @@ export default function Hero() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className="flex items-center gap-6"
+              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 w-full lg:w-auto"
             >
               {/* Logo */}
               <div className={`shrink-0 flex items-center justify-center ${HERO_CONFIG.logoSizeMobile} ${HERO_CONFIG.logoSizeTablet} ${HERO_CONFIG.logoSizeDesktop}`}>
@@ -498,7 +515,7 @@ export default function Hero() {
                 />
               </div>
               {/* Stacked Heading */}
-              <div className={`flex flex-col leading-none select-none tracking-tighter ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
+              <div className={`flex flex-col leading-none select-none tracking-tighter items-center sm:items-start text-center sm:text-left ${HERO_CONFIG.headingFont} ${HERO_CONFIG.headingBoldness}`}>
                 <span className={`text-4xl xs:text-5xl sm:text-6xl md:text-7xl ${HERO_CONFIG.headingBoldness}`} style={{ color: HERO_CONFIG.quickColor, textShadow: "0 1px 3px rgba(255,255,255,0.4)" }}>
                   {word1}
                 </span>
@@ -514,9 +531,9 @@ export default function Hero() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className={HERO_CONFIG.paragraphMaxWidth}
+              className={`${HERO_CONFIG.paragraphMaxWidth} flex flex-col items-center lg:items-start`}
             >
-              <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed"
+              <p className="font-sans text-white/95 text-base sm:text-lg font-light leading-relaxed text-center lg:text-left mx-auto lg:mx-0"
                 style={{ textShadow: HERO_CONFIG.descriptionTextShadow }}>
                 {siteConfig.heroDescription}
               </p>
@@ -527,9 +544,9 @@ export default function Hero() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className="flex flex-col gap-4 mt-2 items-start"
+              className="flex flex-col gap-4 mt-2 items-center lg:items-start w-full"
             >
-              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-start w-full">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start w-full">
                 <ThemeButton href="/schengen-ready" size="sm">
                   Check if you're Schengen Ready — free
                 </ThemeButton>
@@ -539,7 +556,7 @@ export default function Hero() {
               </div>
 
               {/* Trust Signals */}
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm sm:text-base font-sans text-white/95 select-none pointer-events-none mt-4 font-normal">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-sm sm:text-base font-sans text-white/95 select-none pointer-events-none mt-4 font-normal">
                 <span className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -557,12 +574,11 @@ export default function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right Column: Swipable Polaroid Flag Stack */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="block relative w-[280px] xs:w-[320px] sm:w-[420px] h-[180px] xs:h-[200px] sm:h-[265px] pr-0 sm:pr-8 pointer-events-auto select-none mt-14 lg:mt-0"
+            className="block relative w-[240px] xs:w-[280px] sm:w-[360px] lg:w-[420px] h-[155px] xs:h-[180px] sm:h-[230px] lg:h-[265px] pr-0 sm:pr-8 pointer-events-auto select-none mt-12 mb-6 lg:mb-0 lg:mt-0 mx-auto lg:mx-0"
           >
             <div className="w-full h-full">
               {flagsLoaded ? (
