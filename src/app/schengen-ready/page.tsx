@@ -50,8 +50,7 @@ export default function SchengenReadyTool() {
     { label: "EU Settlement Scheme (EUSS - Settled / Pre-Settled)", value: "euss" },
     { label: "Student Visa / Student Route (formerly Tier 4)", value: "student" },
     { label: "Graduate Visa", value: "graduate" },
-    { label: "Dependant / PBS Dependant Visa", value: "dependant" },
-    { label: "Standard Visitor / Tourist Visa", value: "tourist" }
+    { label: "Dependant / PBS Dependant Visa", value: "dependant" }
   ];
 
   const balanceOptions = [
@@ -96,15 +95,8 @@ export default function SchengenReadyTool() {
     const parsedTravelStart = travelDate ? new Date(travelDate) : new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
     const parsedTravelEnd = new Date(parsedTravelStart.getTime() + (parseInt(tripDuration) || 7) * 24 * 60 * 60 * 1000);
 
-    // 1. UK Visa Type Checks
-    if (visaType === "tourist") {
-      isRed = true;
-      reasons.push("You hold a UK Standard Visitor or Tourist visa.");
-      fixes.push("Schengen consulates in the UK do not accept visa applications from short-term tourists. You must return to your home country to apply.");
-    }
-
-    // 2. BRP/UK Visa Expiry Checks
-    if (visaType !== "tourist" && brpExpiry) {
+    // BRP/UK Visa Expiry Checks
+    if (brpExpiry) {
       const parsedBrpExpiry = new Date(brpExpiry);
       const minBrpDate = new Date(parsedTravelEnd.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 days after exit
       
@@ -210,7 +202,7 @@ export default function SchengenReadyTool() {
   const isStepValid = () => {
     switch (step) {
       case 1: return visaType !== "";
-      case 2: return visaType === "tourist" || brpExpiry !== "";
+      case 2: return brpExpiry !== "";
       case 3: return passportIssue !== "" && passportExpiry !== "";
       case 4: return bankBalance !== "";
       case 5: return employment !== "";
