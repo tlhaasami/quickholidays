@@ -238,7 +238,7 @@ export default function Pricing() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
-                  <span><strong>Outsourcing center fee:</strong> Charged by VFS Global or TLScontact during slot confirmation. Typically £30 to £45.</span>
+                  <span>For Denmark, Norway and Sweden, the visa fee is paid online on behalf of the customer. This fee is not included in our services.</span>
                 </li>
               </ul>
             </div>

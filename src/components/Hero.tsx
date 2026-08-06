@@ -1163,7 +1163,17 @@ export default function Hero() {
               },
               {
                 q: "What are the total costs for a Schengen visa?",
-                a: "There are three separate costs: (1) Our consulting service fee — see our full pricing page at /pricing for the three tiers (Templates £45, Document Audit £95, Complete Service £175). (2) The mandatory embassy visa fee of €90 for adults / €45 for children aged 6–12, paid directly to the embassy at your biometrics appointment. (3) A VFS/TLS visa centre booking fee of approximately £30–£45, paid directly to the appointment centre. We never bundle these — every cost is itemised so you know exactly what is paid to whom."
+                a: (
+                  <span>
+                    There are three separate costs: (1) Our consulting service fee — which includes appointment and insurance fees.{" "}
+                    <Link href="/pricing" className="text-primary hover:underline font-medium">
+                      See our full pricing page for the three tiers
+                    </Link>{" "}
+                    (Documentation Service £95, Appointment Booking Service £95, Complete Package £175).{" "}
+                    (2) The mandatory embassy visa fee of €90 for adults / €45 for children aged 6–12, paid directly to the embassy at your biometrics appointment.{" "}
+                    (3) For Denmark, Norway and Sweden, the visa fee is paid online on behalf of the customer (this fee is not included in our services). We never bundle these — every cost is itemised so you know exactly what is paid to whom.
+                  </span>
+                )
               },
               {
                 q: "What is your Accountability Promise refund policy?",

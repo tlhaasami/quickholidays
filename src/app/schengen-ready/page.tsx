@@ -23,7 +23,7 @@ export default function SchengenReadyTool() {
   }, []);
 
   const [step, setStep] = useState(1);
-  const totalSteps = 8;
+  const totalSteps = 7;
 
   // Email Lead Capture State
   const [emailInput, setEmailInput] = useState("");
@@ -35,7 +35,6 @@ export default function SchengenReadyTool() {
   const [brpExpiry, setBrpExpiry] = useState("");
   const [passportIssue, setPassportIssue] = useState("");
   const [passportExpiry, setPassportExpiry] = useState("");
-  const [bankBalance, setBankBalance] = useState("");
   const [employment, setEmployment] = useState("");
   const [destination, setDestination] = useState("France");
   const [isDestOpen, setIsDestOpen] = useState(false);
@@ -51,13 +50,6 @@ export default function SchengenReadyTool() {
     { label: "Student Visa / Student Route (formerly Tier 4)", value: "student" },
     { label: "Graduate Visa", value: "graduate" },
     { label: "Dependant / PBS Dependant Visa", value: "dependant" }
-  ];
-
-  const balanceOptions = [
-    { label: "Under £500", value: "under500" },
-    { label: "£500 - £1,500", value: "500to1500" },
-    { label: "£1,500 - £3,000", value: "1500to3000" },
-    { label: "Over £3,000", value: "over3000" }
   ];
 
   const employmentOptions = [
@@ -130,45 +122,20 @@ export default function SchengenReadyTool() {
       }
     }
 
-    // 4. Proof of Funds Checks
-    if (bankBalance === "under500") {
-      isRed = true;
-      reasons.push("Your personal UK bank balance is under £500.");
-      fixes.push("The embassy requires proof of financial subsistence (typically £60-£100 per day of trip). A balance under £500 faces a high refusal risk. We recommend building savings to at least £1,500.");
-    } else if (bankBalance === "500to1500") {
-      isYellow = true;
-      reasons.push("Your bank balance is low relative to standard consulate guidelines.");
-      fixes.push("Ensure you provide 3 months of bank statements showing a steady closing balance. If possible, show a balance closer to £1,500 to secure approval.");
-    }
-
-    // 5. Employment Checks
+    // 4. Employment Checks
     if (employment === "unemployed") {
-      isYellow = true;
-      reasons.push("Your employment status is listed as Unemployed.");
-      fixes.push("Unemployed applicants must show strong financial independence (large personal savings) or provide a sponsor letter from a spouse or parent who is working.");
+      fixes.push("Any additional documentation requirements will be advised by your consultant.");
     } else if (employment === "selfemployed") {
-      isYellow = true;
-      reasons.push("You are Self-Employed.");
-      fixes.push("Self-employed files require extra verification: you must submit your HMRC UTR letter, SA302 tax calculation, and an accountant letter.");
+      fixes.push("Your consultant will provide you with the relevant document checklist.");
     } else if (employment === "sponsored") {
-      isYellow = true;
-      reasons.push("You are applying as a sponsored dependent.");
-      fixes.push("You must provide your official marriage/birth certificate (translated to English if foreign) and your sponsor's employment letters + 3 months of bank statements.");
+      fixes.push("Your consultant will explain any supporting documents required based on your circumstances.");
     }
 
     // 6. Prior Refusals
     if (priorRefusal === "yes") {
       isYellow = true;
       reasons.push("You have faced a Schengen visa refusal in the last 2 years.");
-      fixes.push(
-        <span>
-          Your application requires a custom rebuttal cover letter addressing the exact refusal codes from your rejection letter to prove the issue is resolved. Read our dedicated{" "}
-          <Link href="/refused-before" className="text-primary underline hover:text-[#C99537] font-semibold">
-            Visa Refusal Guide
-          </Link>
-          .
-        </span>
-      );
+      fixes.push("Your case will be reviewed by one of our experienced Schengen visa consultants, who will assess the refusal reason(s), recommend the best approach, and advise you on any additional documents or improvements that may strengthen your new application.");
     }
 
     if (isRed) {
@@ -189,11 +156,20 @@ export default function SchengenReadyTool() {
       };
     }
 
+    const greenFixes = ["Everything looks perfect! You are ready to book your appointment and submit your documents."];
+    if (employment === "unemployed") {
+      greenFixes.push("Any additional documentation requirements will be advised by your consultant.");
+    } else if (employment === "selfemployed") {
+      greenFixes.push("Your consultant will provide you with the relevant document checklist.");
+    } else if (employment === "sponsored") {
+      greenFixes.push("Your consultant will explain any supporting documents required based on your circumstances.");
+    }
+
     return {
       status: "green",
       title: "Schengen Ready!",
-      reasons: ["Your passport is fully compliant.", "Your BRP validity meets the 90-day post-trip requirement.", "You have sufficient personal financial proof.", "Your travel itinerary meets the guidelines."],
-      fixes: ["Everything looks perfect! You are ready to book your appointment and submit your documents."]
+      reasons: ["Your passport is fully compliant.", "Your BRP validity meets the 90-day post-trip requirement.", "Your travel itinerary meets the guidelines."],
+      fixes: greenFixes
     };
   };
 
@@ -204,11 +180,10 @@ export default function SchengenReadyTool() {
       case 1: return visaType !== "";
       case 2: return brpExpiry !== "";
       case 3: return passportIssue !== "" && passportExpiry !== "";
-      case 4: return bankBalance !== "";
-      case 5: return employment !== "";
-      case 6: return destination !== "";
-      case 7: return priorRefusal !== "";
-      case 8: return travelDate !== "" && tripDuration !== "";
+      case 4: return employment !== "";
+      case 5: return destination !== "";
+      case 6: return priorRefusal !== "";
+      case 7: return travelDate !== "" && tripDuration !== "";
       default: return false;
     }
   };
@@ -366,33 +341,6 @@ export default function SchengenReadyTool() {
                     {step === 4 && (
                       <div className="space-y-4">
                         <label className="font-serif text-lg sm:text-xl font-medium text-zinc-900 dark:text-white block">
-                          What is your average personal bank balance?
-                        </label>
-                        <p className="font-sans text-xs text-zinc-500 dark:text-zinc-400 font-light">
-                          Consulates verify your statements for the last 3 consecutive months.
-                        </p>
-                        <div className="grid grid-cols-1 gap-3">
-                          {balanceOptions.map((opt) => (
-                            <button
-                              key={opt.value}
-                              onClick={() => { setBankBalance(opt.value); handleNext(); }}
-                              className={`w-full text-left p-4 rounded-xl border text-sm font-sans transition-all flex justify-between items-center ${
-                                bankBalance === opt.value
-                                  ? "border-primary bg-primary/5 text-primary font-semibold"
-                                  : "border-zinc-200 dark:border-white/5 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-350 dark:hover:border-white/20"
-                              }`}
-                            >
-                              <span>{opt.label}</span>
-                              {bankBalance === opt.value && <span className="text-primary font-bold">✓</span>}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {step === 5 && (
-                      <div className="space-y-4">
-                        <label className="font-serif text-lg sm:text-xl font-medium text-zinc-900 dark:text-white block">
                           What is your UK employment status?
                         </label>
                         <div className="grid grid-cols-1 gap-3">
@@ -414,7 +362,7 @@ export default function SchengenReadyTool() {
                       </div>
                     )}
 
-                    {step === 6 && (
+                    {step === 5 && (
                       <div className="space-y-4">
                         <label className="font-serif text-lg sm:text-xl font-medium text-zinc-900 dark:text-white block">
                           Which Schengen destination is your main stop?
@@ -474,7 +422,7 @@ export default function SchengenReadyTool() {
                       </div>
                     )}
 
-                    {step === 7 && (
+                    {step === 6 && (
                       <div className="space-y-4">
                         <label className="font-serif text-lg sm:text-xl font-medium text-zinc-900 dark:text-white block">
                           Have you been refused a Schengen visa in the last 2 years?
@@ -506,7 +454,7 @@ export default function SchengenReadyTool() {
                       </div>
                     )}
 
-                    {step === 8 && (
+                    {step === 7 && (
                       <div className="space-y-4">
                         <label className="font-serif text-lg sm:text-xl font-medium text-zinc-900 dark:text-white block">
                           Enter your travel start date and length of stay
@@ -693,7 +641,7 @@ export default function SchengenReadyTool() {
                 {verdict.status === "red" ? (
                   <>
                     <button
-                      onClick={() => { setStep(1); setVisaType(""); setBrpExpiry(""); setPassportIssue(""); setPassportExpiry(""); setBankBalance(""); setEmployment(""); setPriorRefusal(""); }}
+                      onClick={() => { setStep(1); setVisaType(""); setBrpExpiry(""); setPassportIssue(""); setPassportExpiry(""); setEmployment(""); setPriorRefusal(""); }}
                       className="px-6 py-3 rounded-xl border border-zinc-200 dark:border-white/10 text-xs font-sans font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all text-center"
                     >
                       Start Assessment Over

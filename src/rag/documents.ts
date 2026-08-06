@@ -43,7 +43,7 @@ export const knowledgeBase: DocumentChunk[] = [
     metadata: { category: "Visa Process", type: "faq" }
   },
   {
-    content: "Embassy Visa Fees and outsourced center costs: The mandatory fees paid directly to embassies and centers are separate from our service fees. The standard Embassy Visa Fee is €90 for adults (€45 for children aged 6-12; free for children under 6). The Outsourcing Booking Fee is typically £30-£45, paid directly to VFS Global or TLScontact during slot confirmation. Standard consulate processing takes 15 calendar days, but can take up to 30-45 days during peak summer seasons (May to August). We recommend starting your process 6-8 weeks before your intended travel date.",
+    content: "Embassy Visa Fees: The mandatory fees paid directly to embassies are separate from our service fees. The standard Embassy Visa Fee is €90 for adults (€45 for children aged 6-12; free for children under 6). For Denmark, Norway, and Sweden, the visa fee is paid online on behalf of the customer (this fee is not included in our services). Standard consulate processing takes 15 calendar days, but can take up to 30-45 days during peak summer seasons (May to August). We recommend starting your process 6-8 weeks before your intended travel date.",
     metadata: { category: "Fees & Payments", type: "faq" }
   },
 
