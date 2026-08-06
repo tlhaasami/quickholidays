@@ -114,15 +114,11 @@ The schema you must output is:
     "minor_phone": string or null,
     "minor_email": string or null
   },
-   "missingFields": string[] (List of ALL empty/null fields from the schema. Check every field and if it is null, empty string, or not provided, add its field ID to this list.),
+  "missingFields": string[] (List of ALL empty/null fields from the schema. Check every field and if it is null, empty string, or not provided, add its field ID to this list.),
   "message": string (A structured plain-text response in EXACTLY this format — no markdown symbols, no asterisks, no hashes:
 
 EXTRACTED DETAILS
 (List every field that was successfully extracted, grouped by section. Use the exact human-readable label for each field from the mapping below. Format each line as: [Section] > [Field Label]: [Value])
-
-REMAINING FIELDS NEEDED
-Please provide the following details to complete the application:
-(List every single empty/missing field identified in missingFields above. One per line starting with a dash using its human-readable label from the mapping below.)
 
 Use this field ID to human-readable label mapping:
 personal_surname -> Surname (Family name)

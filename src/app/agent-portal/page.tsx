@@ -293,6 +293,106 @@ export default function AgentPortal() {
     showToast("Started new blank Cover Letter session.");
   };
 
+  const handleSyncFromVisaForm = () => {
+    const updated = { ...tempParsedData };
+
+    // full_name
+    if (updated.personal_first_names || updated.personal_surname) {
+      const fn = updated.personal_first_names || "";
+      const sn = updated.personal_surname || "";
+      updated.full_name = `${fn} ${sn}`.trim();
+    }
+
+    // passport_number
+    if (updated.passport_number) {
+      updated.passport_number = updated.passport_number;
+    }
+
+    // nationality
+    if (updated.personal_nationality) {
+      updated.nationality = updated.personal_nationality;
+    }
+
+    // uk_address
+    if (updated.address_street || updated.address_city || updated.address_postal_code || updated.address_country) {
+      const parts = [
+        updated.address_street,
+        updated.address_city,
+        updated.address_postal_code,
+        updated.address_country
+      ].filter(Boolean);
+      if (parts.length > 0) {
+        updated.uk_address = parts.join(", ");
+      }
+    }
+
+    // phone_number
+    if (updated.address_phone) {
+      updated.phone_number = updated.address_phone;
+    }
+
+    // email_address
+    if (updated.address_email) {
+      updated.email_address = updated.address_email;
+    }
+
+    // uk_share_code
+    if (updated.uk_share_code) {
+      updated.uk_share_code = updated.uk_share_code;
+    }
+
+    // share_code_expiry
+    if (updated.uk_share_code_expiry) {
+      updated.share_code_expiry = updated.uk_share_code_expiry;
+    }
+
+    // destination_country & target_embassy
+    if (updated.travel_destinations) {
+      updated.destination_country = updated.travel_destinations;
+      if (!updated.target_embassy || updated.target_embassy.includes("Embassy of")) {
+        updated.target_embassy = `Embassy of ${updated.travel_destinations}`;
+      }
+    }
+
+    // trip_start_date & trip_end_date
+    if (updated.travel_start_date) {
+      updated.trip_start_date = updated.travel_start_date;
+    }
+    if (updated.travel_return_date) {
+      updated.trip_end_date = updated.travel_return_date;
+    }
+
+    // institution_or_employer & job_title_or_degree
+    if (updated.emp_employer_name) {
+      updated.institution_or_employer = updated.emp_employer_name;
+    }
+    if (updated.emp_job_title || updated.emp_occupation) {
+      updated.job_title_or_degree = updated.emp_job_title || updated.emp_occupation;
+    }
+
+    // hotel_booking_details
+    if (updated.acc_hotel_name || updated.acc_city || updated.acc_country) {
+      const parts = [
+        updated.acc_hotel_name,
+        updated.acc_city,
+        updated.acc_country
+      ].filter(Boolean);
+      if (parts.length > 0) {
+        updated.hotel_booking_details = parts.join(", ");
+      }
+    }
+
+    // bank_summary
+    if (updated.finance_costs_covered) {
+      updated.bank_summary = updated.finance_costs_covered;
+    }
+
+    setTempParsedData(updated);
+    const fresh = generateMasterCoverLetterText(updated);
+    setEmbeddedCoverLetterText(fresh);
+    showToast("Synchronized and refreshed Cover Letter from current applicant details");
+  };
+
   // Agent Access Code controls
   const [showChangeCodeModal, setShowChangeCodeModal] = useState(false);
   const [oldAgentCode, setOldAgentCode] = useState("");
@@ -1609,11 +1709,7 @@ export default function AgentPortal() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      const fresh = generateMasterCoverLetterText(tempParsedData);
-                      setEmbeddedCoverLetterText(fresh);
-                      showToast("Refreshed Cover Letter from current applicant details");
-                    }}
+                    onClick={handleSyncFromVisaForm}
                     className="text-[9px] font-bold uppercase tracking-wider border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-2.5 py-1.5 rounded-none hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
                   >
                     🔄 Sync
@@ -2368,11 +2464,7 @@ export default function AgentPortal() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      const fresh = generateMasterCoverLetterText(tempParsedData);
-                      setEmbeddedCoverLetterText(fresh);
-                      showToast("Refreshed Cover Letter from current applicant details");
-                    }}
+                    onClick={handleSyncFromVisaForm}
                     className="text-[10px] font-bold uppercase tracking-wider bg-[#C99537] text-zinc-950 px-3 py-1.5 rounded-none hover:bg-[#E2B755] cursor-pointer"
                   >
                     🔄 Sync Form Data
