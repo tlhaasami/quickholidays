@@ -12,9 +12,10 @@ const RAG_CONFIG = {
 
 // Default accounts logic matching /api/agent/auth
 const DEFAULT_ACCOUNTS: Record<string, { password: string; suspended: boolean; role: string }> = {
-  owner: { password: "QH_Owner#2026!Secured89", suspended: false, role: "owner" },
-  admin: { password: "QH_Admin#2026!Master74", suspended: false, role: "admin" },
-  tlhaasami: { password: "QH_Agent#2026!Talha92", suspended: false, role: "agent" }
+  owner: { password: "12345678", suspended: false, role: "owner" },
+  admin: { password: "12345678", suspended: false, role: "admin" },
+  agent: { password: "12345678", suspended: false, role: "agent" },
+  reviews: { password: "12345678", suspended: false, role: "agent" }
 };
 const STORAGE_FILE = path.join(process.cwd(), ".data_accounts.json");
 

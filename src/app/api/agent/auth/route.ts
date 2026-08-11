@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// Strong production passwords initialized as default server credentials
+// Default server credentials
 const DEFAULT_ACCOUNTS: Record<string, { password: string; suspended: boolean; role: string }> = {
-  owner: { password: "QH_Owner#2026!Secured89", suspended: false, role: "owner" },
-  admin: { password: "QH_Admin#2026!Master74", suspended: false, role: "admin" },
-  tlhaasami: { password: "QH_Agent#2026!Talha92", suspended: false, role: "agent" }
+  owner: { password: "12345678", suspended: false, role: "owner" },
+  admin: { password: "12345678", suspended: false, role: "admin" },
+  agent: { password: "12345678", suspended: false, role: "agent" },
+  reviews: { password: "12345678", suspended: false, role: "agent" }
 };
 
 // In-memory & file persistence path for global production server state

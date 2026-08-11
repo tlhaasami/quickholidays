@@ -36,7 +36,8 @@ export default function LoginPage() {
       const initialAccounts = {
         owner: { password: "12345678", suspended: false },
         admin: { password: "12345678", suspended: false },
-        tlhaasami: { password: "12345678", suspended: false }
+        agent: { password: "12345678", suspended: false },
+        reviews: { password: "12345678", suspended: false }
       };
       localStorage.setItem("qh-agent-accounts", JSON.stringify(initialAccounts));
     } else {
@@ -51,12 +52,16 @@ export default function LoginPage() {
           parsed.admin = { password: "12345678", suspended: false };
           changed = true;
         }
-        if (!parsed.tlhaasami) {
-          parsed.tlhaasami = { password: "12345678", suspended: false };
+        if (!parsed.agent) {
+          parsed.agent = { password: "12345678", suspended: false };
           changed = true;
         }
-        if (parsed.agent) {
-          delete parsed.agent;
+        if (!parsed.reviews) {
+          parsed.reviews = { password: "12345678", suspended: false };
+          changed = true;
+        }
+        if (parsed.tlhaasami) {
+          delete parsed.tlhaasami;
           changed = true;
         }
         if (parsed.processor) {
