@@ -29,54 +29,6 @@ export default function LoginPage() {
       }
     };
     fetchIp();
-    
-    // Seed initial default accounts if none exist or update account directory
-    let accounts = localStorage.getItem("qh-agent-accounts");
-    if (!accounts) {
-      const initialAccounts = {
-        owner: { password: "12345678", suspended: false },
-        admin: { password: "12345678", suspended: false },
-        agent: { password: "12345678", suspended: false },
-        reviews: { password: "12345678", suspended: false }
-      };
-      localStorage.setItem("qh-agent-accounts", JSON.stringify(initialAccounts));
-    } else {
-      try {
-        const parsed = JSON.parse(accounts);
-        let changed = false;
-        if (!parsed.owner) {
-          parsed.owner = { password: "12345678", suspended: false };
-          changed = true;
-        }
-        if (!parsed.admin) {
-          parsed.admin = { password: "12345678", suspended: false };
-          changed = true;
-        }
-        if (!parsed.agent) {
-          parsed.agent = { password: "12345678", suspended: false };
-          changed = true;
-        }
-        if (!parsed.reviews) {
-          parsed.reviews = { password: "12345678", suspended: false };
-          changed = true;
-        }
-        if (parsed.tlhaasami) {
-          delete parsed.tlhaasami;
-          changed = true;
-        }
-        if (parsed.processor) {
-          delete parsed.processor;
-          changed = true;
-        }
-        if (parsed["qh-agent"]) {
-          delete parsed["qh-agent"];
-          changed = true;
-        }
-        if (changed) {
-          localStorage.setItem("qh-agent-accounts", JSON.stringify(parsed));
-        }
-      } catch (err) {}
-    }
 
     const session = localStorage.getItem("qh-agent-session");
     if (session === "authenticated") {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Client } from "pg";
-import fs from "fs";
-import path from "path";
+import { supabase } from "@/lib/supabase";
 
 const RAG_CONFIG = {
   DB_DEFAULT_HOST: "localhost",
@@ -9,28 +8,6 @@ const RAG_CONFIG = {
   DB_DEFAULT_USER: "postgres",
   DB_DEFAULT_NAME: "postgres"
 };
-
-// Default accounts logic matching /api/agent/auth
-const DEFAULT_ACCOUNTS: Record<string, { password: string; suspended: boolean; role: string }> = {
-  owner: { password: "12345678", suspended: false, role: "owner" },
-  admin: { password: "12345678", suspended: false, role: "admin" },
-  agent: { password: "12345678", suspended: false, role: "agent" },
-  reviews: { password: "12345678", suspended: false, role: "agent" }
-};
-const STORAGE_FILE = path.join(process.cwd(), ".data_accounts.json");
-
-function loadAccounts(): Record<string, { password: string; suspended: boolean; role: string }> {
-  try {
-    if (fs.existsSync(STORAGE_FILE)) {
-      const fileData = fs.readFileSync(STORAGE_FILE, "utf-8");
-      const parsed = JSON.parse(fileData);
-      return { ...DEFAULT_ACCOUNTS, ...parsed };
-    }
-  } catch (err) {
-    console.error("Failed reading server accounts file:", err);
-  }
-  return { ...DEFAULT_ACCOUNTS };
-}
 
 function extractYoutubeId(urlOrId: string): string {
   const clean = urlOrId.trim();
@@ -123,11 +100,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { username, password, name, country, youtubeLink, caption } = body;
 
-    // 1. Authenticate user credentials
-    const accounts = loadAccounts();
+    // 1. Authenticate user credentials against Supabase Auth
     const userClean = (username || "").trim().toLowerCase();
-    const account = accounts[userClean];
-    if (!account || account.password !== password || account.suspended) {
+    const email = `${userClean}@quickholidays.co.uk`;
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (authError || !authData.user || authData.user.user_metadata?.suspended) {
       return NextResponse.json({ success: false, error: "Access Denied: Invalid credentials." }, { status: 401 });
     }
 
