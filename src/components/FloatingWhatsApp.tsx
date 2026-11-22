@@ -164,8 +164,8 @@ export function FloatingWhatsApp() {
                   For urgent appointment issues, out-of-hours assistance, or Schengen visa emergencies:
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <a href="tel:+447828707425" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors font-bold">
-                    📞 +44 7828 707425
+                  <a href="tel:+447453421417" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors font-bold">
+                    📞 +44 7453 421417
                   </a>
                   <a href="https://wa.me/447453421417" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600/20 transition-colors font-bold">
                     💬 WhatsApp Emergency
