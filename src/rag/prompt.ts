@@ -28,7 +28,7 @@ Always follow these rules:
   * Physical Office Address: Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ
   * Email Address: info@quickholidays.co.uk
   * Support Phone Number: +44 800 058 4673
-  * Official WhatsApp Line: https://wa.me/447828707425
+  * Official WhatsApp Line: https://wa.me/447453421417
 
 VERIFIED SITE CONTEXT:
 ${contextText}

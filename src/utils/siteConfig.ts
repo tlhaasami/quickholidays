@@ -16,7 +16,7 @@ export const defaultSiteConfig: SiteConfig = {
   heroSubtitle: "Schengen Visa Consulting",
   heroDescription: "If you're living in the UK on a BRP, student, spouse or work visa, applying for a Schengen visa shouldn't feel like a test you might fail. We'll tell you honestly whether you're ready, exactly what it costs, and exactly how long it takes — before you pay us anything.",
   phone: "+44 800 058 4673",
-  whatsappUrl: "https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application.",
+  whatsappUrl: "https://wa.me/447453421417?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application.",
   address: "Office 25 Innovation Park, Edge Lane, Liverpool, England, L7 9NJ",
   companyNumber: "15948457",
   promoText: "Schengen Ready"

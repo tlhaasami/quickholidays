@@ -88,7 +88,7 @@ export function FloatingWhatsApp() {
         </AnimatePresence>
 
         <a
-          href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20the%2010%20pounds%20discount%20over%20WhatsApp%20now."
+          href="https://wa.me/447453421417?text=Hi,%20I'd%20like%20to%20get%20the%2010%20pounds%20discount%20over%20WhatsApp%20now."
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => trackContact("WhatsApp")}
@@ -167,7 +167,7 @@ export function FloatingWhatsApp() {
                   <a href="tel:+447828707425" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors font-bold">
                     📞 +44 7828 707425
                   </a>
-                  <a href="https://wa.me/447828707425" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600/20 transition-colors font-bold">
+                  <a href="https://wa.me/447453421417" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600/20 transition-colors font-bold">
                     💬 WhatsApp Emergency
                   </a>
                 </div>

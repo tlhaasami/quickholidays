@@ -430,7 +430,7 @@ export function AiAssistantPopup() {
                         <motion.a
                           whileHover={{ scale: 1.02, y: -1 }}
                           whileTap={{ scale: 0.98 }}
-                          href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
+                          href="https://wa.me/447453421417?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-full py-3.5 px-4 text-left text-xs font-semibold border border-emerald-500/20 rounded-none bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500 hover:text-white hover:shadow-[0_8px_20px_rgba(16,185,129,0.08)] transition-all flex items-center justify-between cursor-pointer font-sans group"
@@ -472,7 +472,7 @@ export function AiAssistantPopup() {
                                   Book Consultation
                                 </a>
                                 <a
-                                  href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
+                                  href="https://wa.me/447453421417?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="px-3 py-2 bg-emerald-600 text-white font-bold text-[10px] tracking-wider uppercase border border-zinc-950 dark:border-white text-center flex-1 rounded-lg transition-all hover:brightness-105 active:scale-98"
@@ -513,7 +513,7 @@ export function AiAssistantPopup() {
                         Limit reached. Please contact our live experts directly on WhatsApp or drop us a message.
                       </p>
                       <a
-                        href="https://wa.me/447828707425?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
+                        href="https://wa.me/447453421417?text=Hi,%20I'd%20like%20to%20get%20help%20with%20my%20Schengen%20visa%20application."
                         target="_blank"
                         className="inline-block px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg transition-all hover:brightness-105 active:scale-98"
                       >
